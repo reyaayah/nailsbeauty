@@ -47,7 +47,7 @@ Now open: http://localhost:3000
 ## 🎨 Customization
 
 - Replace images in `/public`
-- Update product data inside `HeroWithProducts.tsx`
+- Update product data 
 - Modify UI using Tailwind classes
 
 ---

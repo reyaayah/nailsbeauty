@@ -6,7 +6,7 @@ import Image from "next/image";
 const slides = [
     {
         id: 1,
-        image: "/hero1.png",
+        image: "/nails1.png",
         title: "Mother’s Day Gifts",
         subtitle:
             "Every mom is a hot mom with chic nails that save time and keep you fabulous.",

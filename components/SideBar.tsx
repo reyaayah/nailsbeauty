@@ -57,7 +57,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             {shopOpen ? <Minus size={18} color="black" /> : <Plus size={18} color="black" />}
                         </div>
 
-                        <div className={`overflow-hidden transition-all duration-300 ${shopOpen ? "max-h-[1200px] mt-3" : "max-h-0"}`}>
+                        <div className={`overflow-hidden transition-all duration-300 ${shopOpen ? "max-h-300 mt-3" : "max-h-0"}`}>
                             <div className="pl-2 space-y-1 text-base text-gray-700">
                                 <SubItem label="SHOP ALL" children={["BEST SELLERS", "NEW ARRIVALS", "SALES"]} />
                                 <SubItem label="SHOP BY COLLECTIONS" children={["SUMMER", "SPRING", "MUSIC FESTIVAL", "ERSA ESSENCE", "CLASSY NAILS", "LNY 2026", "LOVE EDIT", "CATHOLIC", "PRESS ON TOENAILS"]} />
@@ -73,7 +73,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <div className="text-black text-xl">NEW</div>
                     <div className="text-black text-xl">VACAY</div>
                     <div className="text-red-500">MOTHER'S DAY</div>
-                    <div>ABOUT US</div>
+                    <div className="text-black text-xl">ABOUT US</div>
                 </div>
 
                 <div className="px-6 pb-10 pt-6 text-sm space-y-3">

@@ -33,7 +33,12 @@ const allProducts = [
   { id: 5, name: "Rich Girl", image: "/product1.png" },
   { id: 6, name: "Candy Blossom", image: "/product3.png" },
 ];
-
+const navItems = [
+  { name: 'New Arrivals', href: '#new-arrivals' },
+  { name: 'Shop All', href: '#shop-all' },
+  { name: 'Bundles', href: '#bundles' },
+  { name: 'Best Sellers', href: '#best-sellers' }, 
+];
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -107,40 +112,37 @@ export default function Navbar() {
       <header
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="fixed top-0 left-0 w-full z-40 transition-all duration-300 bg-white border-b border-gray-100"
+        className="fixed top-0 left-0 w-full z-40 transition-all duration-300  "
       >
 
 
 
         {/* Main Navbar Wrapper */}
         <nav
-          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white ease-in-out ${searchOpen
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white/60 ease-in-out ${searchOpen
             ? "bg-white backdrop-blur-md py-3 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]"
             : "bg-transparent py-6"
             }`}
         >
           <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
-
-           <div className="flex items-center gap-8 md:gap-12">
-    {/* Interactive Menu */}
+  
+  <div className="flex flex-1 items-center gap-4">
     <button
       onClick={() => setIsOpen(true)}
       className="group flex items-center gap-2 overflow-hidden"
     >
-      <div className="relative w-6 h-6 flex flex-col justify-center gap-1.5">
+      <div className="relative w-6 h-6 flex flex-col justify-center gap-1">
         <span className="h-[1px] w-6 transition-all duration-300 bg-black group-hover:w-4" />
         <span className="h-[1px] w-4 transition-all duration-300 bg-black group-hover:w-6" />
       </div>
-      <span className="hidden md:block text-[10px] tracking-[0.3em] uppercase transition-colors duration-300 text-black">
+      <span className="hidden md:block text-[10px] tracking-[0.3em] uppercase text-black">
         Menu
       </span>
     </button>
 
-    {/* Branding */}
     <div className="flex flex-col leading-none">
       <h1
-        style={{ color: theme.colors.primary }}
-        className="text-lg md:text-xl font-black tracking-tighter uppercase whitespace-nowrap"
+        className="text-lg md:text-xl text-[#c28c8d] font-black tracking-tighter uppercase whitespace-nowrap"
       >
         Gloss <span className="font-light italic text-gray-400">&</span> Grace
       </h1>
@@ -150,34 +152,46 @@ export default function Navbar() {
     </div>
   </div>
 
-            {/* Right: Modern Actions */}
-            <div className="flex-1 flex items-center justify-end gap-4 md:gap-8">
-              <button
-                onClick={() => setSearchOpen(true)}
-                className={`transition-transform duration-300 hover:scale-110 text-black`}
-              >
-                <Search size={20} strokeWidth={1.5} />
-              </button>
-              <button
-                className={`transition-transform duration-300 hover:scale-110 text-black`}
-              >
-                <User size={20} strokeWidth={1.5} />
-              </button>
 
-              <button
-                onClick={() => setCartOpen(true)}
-                className={`relative transition-transform duration-300 hover:scale-110 text-black`}
-              >
-                <ShoppingCart size={20} strokeWidth={1.5} />
-                <span
-                  style={{ backgroundColor: theme.colors.primary }}
-                  className="absolute -top-2 -right-2 text-[9px] w-4 h-4 flex items-center justify-center rounded-full bg-black text-white border border-white/20"
-                >
-                  2
-                </span>
-              </button>
-            </div>
-          </div>
+<div className="hidden lg:flex flex-1 justify-center items-center gap-4">
+  {navItems.map((item) => (
+    <a
+      key={item.name}
+      href={item.href} // This points to the ID
+      className="group relative text-[11px] font-bold uppercase tracking-[0.15em] text-gray-600 hover:text-black transition-colors"
+    >
+      {item.name}
+      <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-black rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+    </a>
+  ))}
+</div>
+
+  {/* 3. Right Section: Actions (Width: 1/3) */}
+  <div className="flex flex-1 items-center justify-end gap-4 md:gap-8">
+    <button
+      onClick={() => setSearchOpen(true)}
+      className="transition-transform duration-300 hover:scale-110 text-black"
+    >
+      <Search size={20} strokeWidth={1.5} />
+    </button>
+    <button className="transition-transform duration-300 hover:scale-110 text-black">
+      <User size={20} strokeWidth={1.5} />
+    </button>
+    <button
+      onClick={() => setCartOpen(true)}
+      className="relative transition-transform duration-300 hover:scale-110 text-black"
+    >
+      <ShoppingCart size={20} strokeWidth={1.5} />
+      <span
+        style={{ backgroundColor: theme.colors.primary }}
+        className="absolute -top-2 -right-2 text-[9px] w-4 h-4 flex items-center justify-center rounded-full text-white border border-white/20"
+      >
+        2
+      </span>
+    </button>
+  </div>
+
+</div>
 
           {/* Refined Search Overlay (Slide Down) */}
           <div

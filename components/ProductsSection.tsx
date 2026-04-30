@@ -3,18 +3,9 @@
 import { useState, useRef } from "react";
 import { Heart, ShoppingBag } from "lucide-react";
 import theme from "@/theme";
+import { Product } from "@/types/product";
 
-interface Product {
-    id: number;
-    name: string;
-    image: string;
-    hoverImage: string;
-    price: number;
-    originalPrice?: number;
-    discount?: string;
-    reviews?: number;
-    rating?: number;
-}
+
 
 const products: Product[] = [
     {
@@ -159,7 +150,7 @@ export default function BestSellers() {
     const prevMobile = () => setCurrent((c) => (c - 1 + products.length) % products.length);
 
     return (
-        <section
+        <section id="best-sellers"
             className="px-6 md:px-12 py-24 w-full max-w-[1600px] mx-auto overflow-hidden"
             style={{ backgroundColor: theme.colors.light }}
         >

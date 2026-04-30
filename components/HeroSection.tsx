@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import theme from "@/theme";
+import { useRouter } from "next/navigation";
 
 const slides = [
     {
@@ -33,6 +34,7 @@ const slides = [
 
 export default function HeroSlider() {
     const [current, setCurrent] = useState(0);
+    const router = useRouter();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -112,6 +114,7 @@ export default function HeroSlider() {
                             {/* BUTTONS */}
                             <div className="flex gap-4">
                                 <button
+                                    onClick={() => router.push("/collections")}
                                     className="px-6 py-3 rounded-full font-medium transition hover:opacity-90"
                                     style={{
                                         backgroundColor: theme.colors.primary,

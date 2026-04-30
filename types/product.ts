@@ -3,10 +3,15 @@ export interface Product {
     name: string;
     image: string;
     hoverImage?: string;
+    images?: string[];
     price: number;
     originalPrice?: number;
     discount?: string;
     reviews?: number;
     rating?: number;
-    category?: string;
+    category: string;
+    description?: string;
+    features?: string[];
+    sizes?: string[];
+    isNew?: boolean;
 }

@@ -16,6 +16,7 @@ const products: Product[] = [
 export default function HeroWithProducts() {
     return (
         <div
+            id="new-arrivals"
             className="min-h-screen font-sans w-full"
             style={{ backgroundColor: theme.colors.light, color: theme.colors.dark }}
         >
@@ -75,7 +76,7 @@ export default function HeroWithProducts() {
                         style={{ backgroundColor: theme.colors.subtitle + "50", borderColor: theme.colors.subtitle }}
                     >
                         <div className="text-center">
-                            <p className="text-xs uppercase tracking-widest mb-1 opacity-60">Top Rated</p>
+                            <p className="text-xs uppercase tracking-widest mb-1 opacity-60">New Arrivals</p>
                             <p className="text-xl font-bold">{products[0].name}</p>
                             <div className="relative h-40 w-40 mx-auto mt-4">
                                 <Image src={products[0].image} alt="feature" fill className="object-contain" />

@@ -97,7 +97,22 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                 {/* Navigation Content */}
                 <div className="flex-1 overflow-y-auto px-8 custom-scrollbar">
                     <div className="mt-4 space-y-1">
-                        <NavItem label="Shop All" children={["Best Sellers", "New Arrivals", "Flash Sale"]} />
+                        <NavItem
+                            label="Shop All"
+                            children={["Best Sellers", "New Arrivals", "Flash Sale"]}
+                            onChildClick={(val) => {
+                                if (val === "Best Sellers") {
+                                    router.push("/collections/bestseller");
+                                    onClose();
+                                } else if (val === "New Arrivals") {
+                                    router.push("/collections/newarrivals");
+                                    onClose();
+                                } else if (val === "Flash Sale") {
+                                    router.push("/collections/flashsale");
+                                    onClose();
+                                }
+                            }}
+                        />
                         <NavItem label="Collections" children={["Summer '24", "G & G Essence", "The Love Edit", "LNY Limited"]} />
                         <NavItem
                             label="Shop by Shape"

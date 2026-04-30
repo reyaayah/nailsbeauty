@@ -5,17 +5,17 @@ import { products } from "@/data/product";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MobileFilterBar, DesktopFilterSidebar } from "@/components/FilterBar";
 import ProductCard from "@/components/cards/ProductCard";
+import VacaySection from "@/components/headers/BestSellers";
 
-export default function AllProductsPage() {
+export default function NewArrivalsPage() {
     const searchParams = useSearchParams();
-    const router = useRouter();
-
-    const filteredProducts = products.filter((product) => {
+    const newArrivals = products.filter(
+        (product) => product.isNew
+    );
+    const filteredProducts = newArrivals.filter((product) => {
         const shape = searchParams.get("shape");
         const length = searchParams.get("length");
         const style = searchParams.get("style");
-
-        if (!shape && !length && !style) return true;
 
         return (
             (!shape || product.shape?.includes(shape)) &&
@@ -29,33 +29,14 @@ export default function AllProductsPage() {
             className="min-h-screen font-sans"
             style={{ backgroundColor: theme.colors.light }}
         >
-            {/* Hero Header */}
-
-            <div className="max-w-[1400px] mx-auto px-6 pt-24 pb-12 text-center">
-                <h1
-                    className="text-5xl md:text-6xl font-serif mb-5 tracking-tight"
-                    style={{ color: theme.colors.dark }}
-                >
-                    The Collection
-                </h1>
-                <nav
-                    className="text-[12px] uppercase tracking-[0.3em] flex justify-center gap-3 items-center"
-                    style={{ color: theme.colors.muted }}
-                >
-                    <span onClick={() => { router.push("/") }}>Home</span>
-                    <span>/</span>
-                    <span className="font-bold" style={{ color: theme.colors.dark }}>
-                        All Products
-                    </span>
-                </nav>
-            </div>
+            <VacaySection collectionName="New Arrivals" />
 
 
-            <MobileFilterBar totalCount={products.length} />
+            <MobileFilterBar totalCount={newArrivals.length} />
 
 
-            <div className="flex max-w-[1400px] mx-auto">
-                <DesktopFilterSidebar totalCount={products.length} />
+            <div className="flex max-w-[1400px] mx-auto pt-10">
+                <DesktopFilterSidebar totalCount={newArrivals.length} />
 
                 {/* Product grid */}
                 <div className="flex-1 min-w-0 px-6 lg:px-8 pb-20">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
 import Sidebar from "./SideBar";
 import CartSidebar from "./Cart";
 import theme from "@/theme";
@@ -98,7 +98,6 @@ export default function Navbar() {
     setSearchQuery("");
   };
 
-  const showBg = scrolled || hovered;
 
   return (
     <>
@@ -108,64 +107,70 @@ export default function Navbar() {
       <header
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        className="fixed top-0 left-0 w-full z-40 transition-all duration-300"
+        className="fixed top-0 left-0 w-full z-40 transition-all duration-300 bg-white border-b border-gray-100"
       >
 
 
 
         {/* Main Navbar Wrapper */}
         <nav
-          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${showBg || searchOpen
-            ? "bg-white/80 backdrop-blur-md py-3 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]"
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-white ease-in-out ${searchOpen
+            ? "bg-white backdrop-blur-md py-3 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]"
             : "bg-transparent py-6"
             }`}
         >
           <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
 
-            {/* Left: Interactive Menu */}
-            <div className="flex-1 flex items-center">
-              <button
-                onClick={() => setIsOpen(true)}
-                className="group flex items-center gap-2 overflow-hidden"
-              >
-                <div className="relative w-6 h-6 flex flex-col justify-center gap-1.5">
-                  <span className={`h-[1px] w-6 transition-all duration-300 ${showBg ? "bg-black" : "bg-white"} group-hover:w-4`} />
-                  <span className={`h-[1px] w-4 transition-all duration-300 ${showBg ? "bg-black" : "bg-white"} group-hover:w-6`} />
-                </div>
-                <span
-                  className={`hidden md:block text-[10px] tracking-[0.3em] uppercase transition-colors duration-300 ${showBg ? "text-black" : "text-white"
-                    }`}
-                >
-                  Menu
-                </span>
-              </button>
-            </div>
+           <div className="flex items-center gap-8 md:gap-12">
+    {/* Interactive Menu */}
+    <button
+      onClick={() => setIsOpen(true)}
+      className="group flex items-center gap-2 overflow-hidden"
+    >
+      <div className="relative w-6 h-6 flex flex-col justify-center gap-1.5">
+        <span className="h-[1px] w-6 transition-all duration-300 bg-black group-hover:w-4" />
+        <span className="h-[1px] w-4 transition-all duration-300 bg-black group-hover:w-6" />
+      </div>
+      <span className="hidden md:block text-[10px] tracking-[0.3em] uppercase transition-colors duration-300 text-black">
+        Menu
+      </span>
+    </button>
 
-            {/* Center: Branding */}
-            <div className="flex-[2] text-center">
-              <h1
-                className={`text-lg md:text-3xl font-light tracking-[0.5em] uppercase cursor-pointer transition-all duration-700 ${showBg ? "text-black" : "text-white"
-                  }`}
-              >
-                Gloss <span className="italic font-serif lowercase tracking-normal text-xs md:text-lg">&</span> Grace
-              </h1>
-            </div>
+    {/* Branding */}
+    <div className="flex flex-col leading-none">
+      <h1
+        style={{ color: theme.colors.primary }}
+        className="text-lg md:text-xl font-black tracking-tighter uppercase whitespace-nowrap"
+      >
+        Gloss <span className="font-light italic text-gray-400">&</span> Grace
+      </h1>
+      <span className="text-[7px] tracking-[0.4em] text-gray-400 ml-0.5 uppercase">
+        Aesthetics Studio
+      </span>
+    </div>
+  </div>
 
             {/* Right: Modern Actions */}
             <div className="flex-1 flex items-center justify-end gap-4 md:gap-8">
               <button
                 onClick={() => setSearchOpen(true)}
-                className={`transition-transform duration-300 hover:scale-110 ${showBg ? "text-black" : "text-white"}`}
+                className={`transition-transform duration-300 hover:scale-110 text-black`}
               >
                 <Search size={20} strokeWidth={1.5} />
+              </button>
+              <button
+                className={`transition-transform duration-300 hover:scale-110 text-black`}
+              >
+                <User size={20} strokeWidth={1.5} />
               </button>
 
               <button
                 onClick={() => setCartOpen(true)}
-                className={`relative transition-transform duration-300 hover:scale-110 ${showBg ? "text-black" : "text-white"}`}
+                className={`relative transition-transform duration-300 hover:scale-110 text-black`}
               >
                 <ShoppingCart size={20} strokeWidth={1.5} />
                 <span
+                  style={{ backgroundColor: theme.colors.primary }}
                   className="absolute -top-2 -right-2 text-[9px] w-4 h-4 flex items-center justify-center rounded-full bg-black text-white border border-white/20"
                 >
                   2

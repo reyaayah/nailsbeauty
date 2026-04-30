@@ -1,6 +1,9 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import theme from "@/theme";
+import { useRef, useState } from "react";
+
+
 
 const deals = [
     {
@@ -25,30 +28,45 @@ const deals = [
 
 function Card({ deal }: { deal: typeof deals[0] }) {
     return (
-        <div className="relative rounded-xl overflow-hidden aspect-video bg-white w-full ">
+        <div
+            className="relative rounded-2xl overflow-hidden aspect-[4/5] sm:aspect-square md:aspect-[3/4] lg:aspect-[4/5] w-full group shadow-sm transition-all duration-500 hover:shadow-xl"
+            style={{ backgroundColor: theme.colors.light }}
+        >
             <img
                 src={deal.image}
                 alt={`Buy ${deal.buy} Get ${deal.get}% off`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
             />
-            <div className="absolute inset-0 bg-black/35" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-4">
-                <div className="flex items-center gap-1.5">
-                    <span className="text-white text-2xl md:text-3xl font-serif">
-                        Buy {deal.buy}
+
+            <div className="absolute inset-0 bg-gradient-to-t from-[#422B23]/90 via-[#422B23]/30 to-transparent" />
+
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-6 sm:pb-10 gap-3 px-4 text-center">
+                <div className="flex flex-col items-center">
+                    <span
+                        className="uppercase tracking-[0.25em] text-[9px] sm:text-xs mb-1"
+                        style={{ color: theme.colors.subtitle }}
+                    >
+                        Special Offer
                     </span>
-                    <div className="bg-[#c8102e] flex items-start gap-1 px-2 py-1">
-                        <span className="text-white text-2xl md:text-3xl font-serif leading-none">
-                            Get {deal.get}
+                    <div className="flex flex-wrap justify-center items-baseline gap-2">
+                        <span className="text-white text-2xl sm:text-3xl lg:text-4xl font-light italic">
+                            Buy {deal.buy}
                         </span>
-                        <div className="flex flex-col leading-none pt-1">
-                            <span className="text-white text-[9px] font-semibold">%</span>
-                            <span className="text-white text-[9px] font-semibold">off</span>
+                        <div
+                            className="px-2 sm:px-3 py-0.5 rounded-full"
+                            style={{ backgroundColor: theme.colors.primary }}
+                        >
+                            <span className="text-white text-lg sm:text-xl lg:text-2xl font-semibold">
+                                -{deal.get}%
+                            </span>
                         </div>
                     </div>
                 </div>
-                <p className="text-white text-[11px] md:text-xs tracking-widest">
-                    CODE: {deal.code}
+
+                <div className="h-px w-8 sm:w-12 opacity-50" style={{ backgroundColor: theme.colors.muted }} />
+
+                <p className="text-[10px] sm:text-xs tracking-[0.3em] font-medium text-white/90">
+                    CODE: <span className="text-white">{deal.code}</span>
                 </p>
             </div>
         </div>
@@ -63,67 +81,87 @@ export default function DealsSection() {
     const next = () => setCurrent((c) => (c + 1) % deals.length);
 
     return (
-        <section className="px-4 py-8 max-w-7xl mx-auto">
-
-            {/* Desktop: 3 columns */}
-            <div className="hidden md:flex gap-4">
-                {deals.map((deal, i) => (
-                    <div key={i} className="flex-1">
-                        <Card deal={deal} />
-                    </div>
-                ))}
-            </div>
-
-            {/* Mobile: carousel */}
-            <div className="md:hidden relative">
-                <div
-                    className="overflow-hidden rounded-xl"
-                    onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
-                    onTouchEnd={(e) => {
-                        const diff = touchStartX.current - e.changedTouches[0].clientX;
-                        if (diff > 40) next();
-                        else if (diff < -40) prev();
-                    }}
-                >
-                    <div
-                        className="flex transition-transform duration-300 ease-in-out"
-                        style={{ transform: `translateX(-${current * 100}%)` }}
+        <section className="w-full px-4 sm:px-8 py-12 md:py-20 overflow-hidden">
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-8 md:mb-14 text-center px-4">
+                    <h2
+                        className="text-2xl sm:text-3xl md:text-5xl font-serif mb-3"
+                        style={{ color: theme.colors.dark }}
                     >
-                        {deals.map((deal, i) => (
-                            <div key={i} className="min-w-full">
-                                <Card deal={deal} />
-                            </div>
+                        Exclusive Seasonal Savings
+                    </h2>
+                    <p
+                        className="text-[10px] sm:text-xs md:text-sm tracking-[0.2em] uppercase font-medium"
+                        style={{ color: theme.colors.muted }}
+                    >
+                        Handpicked deals for your next journey
+                    </p>
+                </div>
+
+                {/* Desktop/Tablet Grid: Shows 3 columns from 'md' breakpoint up */}
+                <div className="hidden md:grid md:grid-cols-3 gap-4 lg:gap-8">
+                    {deals.map((deal, i) => (
+                        <Card key={i} deal={deal} />
+                    ))}
+                </div>
+
+                {/* Mobile Carousel: Shows only on screens smaller than 'md' (768px) */}
+                <div className="md:hidden relative">
+                    <div
+                        className="overflow-visible"
+                        onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                        onTouchEnd={(e) => {
+                            const diff = touchStartX.current - e.changedTouches[0].clientX;
+                            if (diff > 50) next();
+                            else if (diff < -50) prev();
+                        }}
+                    >
+                        <div
+                            className="flex transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                            style={{ transform: `translateX(-${current * 100}%)` }}
+                        >
+                            {deals.map((deal, i) => (
+                                <div key={i} className="min-w-full px-2">
+                                    <Card deal={deal} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Navigation Arrows - Hidden on touch devices usually, but kept for UI cues */}
+                    <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-4 pointer-events-none">
+                        <button
+                            onClick={prev}
+                            className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg pointer-events-auto backdrop-blur-sm transition-transform active:scale-90"
+                            style={{ backgroundColor: `${theme.colors.light}CC`, color: theme.colors.dark }}
+                        >
+                            <span className="text-xl">←</span>
+                        </button>
+                        <button
+                            onClick={next}
+                            className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg pointer-events-auto backdrop-blur-sm transition-transform active:scale-90"
+                            style={{ backgroundColor: `${theme.colors.light}CC`, color: theme.colors.dark }}
+                        >
+                            <span className="text-xl">→</span>
+                        </button>
+                    </div>
+
+                    {/* Dynamic Pagination Dots */}
+                    <div className="flex justify-center items-center gap-3 mt-8">
+                        {deals.map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setCurrent(i)}
+                                className={`transition-all duration-500 rounded-full border-none cursor-pointer ${i === current ? "w-10 h-1.5" : "w-1.5 h-1.5 opacity-40"
+                                    }`}
+                                style={{
+                                    backgroundColor: i === current ? theme.colors.primary : theme.colors.dark
+                                }}
+                            />
                         ))}
                     </div>
                 </div>
-
-                {/* Arrows */}
-                <button
-                    onClick={prev}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/45 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg border-none cursor-pointer"
-                >
-                    ‹
-                </button>
-                <button
-                    onClick={next}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/45 text-white w-8 h-8 rounded-full flex items-center justify-center text-lg border-none cursor-pointer"
-                >
-                    ›
-                </button>
-
-                {/* Dots */}
-                <div className="flex justify-center gap-1.5 mt-3">
-                    {deals.map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => setCurrent(i)}
-                            className={`w-2 h-2 rounded-full border-none cursor-pointer transition-colors ${i === current ? "bg-[#c8102e]" : "bg-gray-300"
-                                }`}
-                        />
-                    ))}
-                </div>
             </div>
-
         </section>
     );
 }

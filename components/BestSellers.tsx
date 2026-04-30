@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
+import theme from "@/theme";
 
 interface Product {
     id: number;
@@ -18,69 +19,68 @@ interface Product {
 const products: Product[] = [
     {
         id: 1,
-        name: "Rich Girl",
+        name: "Midnight Silk",
         image: "/product1.png",
         hoverImage: "/backimg1.png",
-        price: 59.99,
+        price: 64.00,
+        discount: "BEST SELLER",
+        reviews: 124,
+        rating: 5
     },
     {
         id: 2,
-        name: "Spiced Bloom",
+        name: "Vintage Rose Gold",
         image: "/product2.png",
         hoverImage: "/backimg2.png",
-        price: 44.99,
-        originalPrice: 49.99,
-        discount: "$5 USD OFF",
-        reviews: 18,
-        rating: 5,
+        price: 48.00,
+        originalPrice: 55.00,
+        discount: "LIMITED RUN",
+        reviews: 89,
+        rating: 5
     },
     {
         id: 3,
-        name: "Lush Green",
+        name: "Frosted Peony",
         image: "/product3.png",
         hoverImage: "/backimg3.png",
-        price: 44.99,
-        originalPrice: 49.99,
-        discount: "$5 USD OFF",
-        reviews: 12,
-        rating: 5,
+        price: 52.00,
+        reviews: 210,
+        rating: 5
     },
     {
         id: 4,
-        name: "Candy Blossom",
+        name: "Champagne Toast",
         image: "/product1.png",
         hoverImage: "/backimg1.png",
-        price: 49.99,
+        price: 49.00,
+        discount: "NEW ARRIVAL",
+        reviews: 45,
+        rating: 5
     },
     {
         id: 5,
-        name: "Petal Rush",
+        name: "Obsidian Glaze",
         image: "/product2.png",
         hoverImage: "/backimg2.png",
-        price: 54.99,
-        originalPrice: 59.99,
-        discount: "$5 USD OFF",
-        reviews: 8,
-        rating: 5,
+        price: 58.00,
+        originalPrice: 65.00,
+        reviews: 156,
+        rating: 5
     },
+
 ];
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
     return (
-        <div className="flex items-center justify-center gap-1 mb-1">
-            <div className="flex">
+        <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
-                    <svg
-                        key={i}
-                        className={`w-3.5 h-3.5 ${i < rating ? "text-yellow-400" : "text-gray-300"}`}
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                    >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
+                    <span key={i} className="text-[10px]" style={{ color: i < rating ? theme.colors.primary : theme.colors.muted }}>
+                        ✦
+                    </span>
                 ))}
             </div>
-            <span className="text-xs text-gray-500">{count} reviews</span>
+            <span className="text-[9px] tracking-[0.1em] font-medium opacity-60" style={{ color: theme.colors.dark }}>{count} REVIEWS</span>
         </div>
     );
 }
@@ -90,63 +90,60 @@ function ProductCard({ product }: { product: Product }) {
     const [hovered, setHovered] = useState(false);
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col group">
             <div
-                className="relative bg-[#f7f4f4] rounded-lg overflow-hidden aspect-square mb-3 cursor-grab active:cursor-grabbing"
+                className="relative bg-[#F2ECE4] rounded-2xl overflow-hidden aspect-[3/4] mb-5 cursor-pointer shadow-sm group-hover:shadow-md transition-shadow duration-500"
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={() => setHovered(false)}
             >
                 {product.discount && (
-                    <div className="absolute top-3 left-3 z-10 bg-[#c8102e] text-white text-[10px] font-semibold px-2 py-1 tracking-wide">
+                    <div
+                        className="absolute top-4 left-4 z-10 text-[8px] font-bold px-3 py-1.5 rounded-full tracking-widest uppercase shadow-sm"
+                        style={{ backgroundColor: theme.colors.primary, color: 'white' }}
+                    >
                         {product.discount}
                     </div>
                 )}
+
                 <button
-                    onClick={() => setWished(!wished)}
-                    className="absolute top-3 right-3 z-10"
-                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={(e) => { e.stopPropagation(); setWished(!wished); }}
+                    className="absolute top-4 right-4 z-10 transition-all hover:scale-110 active:scale-90 bg-white/50 backdrop-blur-sm p-2 rounded-full"
                 >
                     <Heart
-                        size={20}
-                        className={wished ? "fill-[#c8102e] text-[#c8102e]" : "text-[#c8102e]"}
+                        size={16}
+                        strokeWidth={1.5}
+                        style={{ fill: wished ? theme.colors.primary : "transparent", stroke: wished ? theme.colors.primary : theme.colors.dark }}
                     />
                 </button>
 
                 <img
                     src={product.image}
                     alt={product.name}
-                    draggable={false}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${hovered ? "opacity-0" : "opacity-100"
-                        }`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${hovered ? "opacity-0 scale-110" : "opacity-100 scale-100"}`}
                 />
                 <img
                     src={product.hoverImage}
-                    alt={`${product.name} alternate view`}
-                    draggable={false}
-                    className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"
-                        }`}
+                    alt={`${product.name} alternate`}
+                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${hovered ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
                 />
 
                 <button
-                    onClick={() => console.log(`Added ${product.name} to cart`)}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    className={`absolute bottom-3 right-3 z-10 bg-black text-white p-2 rounded-full shadow-md transition-all duration-300 hover:bg-[#c8102e] ${hovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
-                        }`}
+                    className={`absolute bottom-6 left-1/2 -translate-x-1/2 w-[80%] py-3.5 rounded-full flex items-center justify-center gap-2 text-[9px] tracking-[0.25em] font-bold transition-all duration-500 backdrop-blur-lg ${hovered ? "translate-y-0 opacity-100 shadow-xl" : "translate-y-4 opacity-0"}`}
+                    style={{ backgroundColor: `${theme.colors.dark}F2`, color: theme.colors.light }}
                 >
-                    <ShoppingCart size={16} />
+                    <ShoppingBag size={12} />
+                    ADD TO BAG
                 </button>
             </div>
 
             <div className="text-center">
-                {product.reviews && product.rating && (
-                    <StarRating rating={product.rating} count={product.reviews} />
-                )}
-                <p className="text-sm text-gray-800 mb-1">{product.name}</p>
+                <StarRating rating={product.rating || 5} count={product.reviews || 0} />
+                <h3 className="text-base font-serif tracking-tight mb-1" style={{ color: theme.colors.dark }}>{product.name}</h3>
                 <div className="flex items-center justify-center gap-2">
-                    <span className="text-sm text-gray-800">${product.price.toFixed(2)} USD</span>
+                    <span className="text-sm font-medium" style={{ color: theme.colors.dark }}>${product.price.toFixed(2)}</span>
                     {product.originalPrice && (
-                        <span className="text-sm text-gray-400 line-through">
-                            ${product.originalPrice.toFixed(2)} USD
+                        <span className="text-xs line-through opacity-30" style={{ color: theme.colors.dark }}>
+                            ${product.originalPrice.toFixed(2)}
                         </span>
                     )}
                 </div>
@@ -156,80 +153,58 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 export default function BestSellers() {
-    const trackRef = useRef<HTMLDivElement>(null);
-    const isDragging = useRef(false);
-    const dragStartX = useRef(0);
-    const scrollStart = useRef(0);
-    const touchStartX = useRef(0);
     const [current, setCurrent] = useState(0);
 
-    // Desktop drag handlers
-    const onMouseDown = (e: React.MouseEvent) => {
-        isDragging.current = true;
-        dragStartX.current = e.clientX;
-        scrollStart.current = trackRef.current?.scrollLeft || 0;
-    };
-    const onMouseMove = (e: React.MouseEvent) => {
-        if (!isDragging.current || !trackRef.current) return;
-        e.preventDefault();
-        trackRef.current.scrollLeft = scrollStart.current - (e.clientX - dragStartX.current);
-    };
-    const onMouseUp = () => { isDragging.current = false; };
-
-    // Mobile swipe handlers
-    const prevMobile = () => setCurrent((c) => (c - 1 + products.length) % products.length);
     const nextMobile = () => setCurrent((c) => (c + 1) % products.length);
+    const prevMobile = () => setCurrent((c) => (c - 1 + products.length) % products.length);
 
     return (
-        <section className="px-4 md:px-10 py-12 w-full mx-auto">
-            {/* Header */}
-            <div className="flex items-start justify-between mb-3">
-                <h2 className="text-3xl md:text-4xl font-serif text-gray-900">
-                    Best Sellers Loved by Thousands
-                </h2>
-                <a
+        <section
+            className="px-6 md:px-12 py-24 w-full max-w-[1600px] mx-auto overflow-hidden"
+            style={{ backgroundColor: theme.colors.light }}
+        >
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-8">
+                <div className="max-w-xl">
+                    <h2 className="text-5xl md:text-6xl font-serif mb-6 leading-[1.1]" style={{ color: theme.colors.dark }}>
+                        The Iconic <span className="italic font-light">Essentials</span>
+                    </h2>
+                    <p className="text-sm md:text-base leading-relaxed opacity-70 max-w-md" style={{ color: theme.colors.dark }}>
+                        Discover the sets that started a movement. Hand-crafted, reusable art that looks and feels like a professional salon application.
+                    </p>
+                </div>
 
-                    href="/best-sellers"
-                    className="hidden md:flex items-center bg-black text-white text-xs font-semibold tracking-widest px-5 py-3 whitespace-nowrap hover:bg-gray-800 transition-colors"
+                <a
+                    href="/collections/best-sellers"
+                    className="group flex items-center gap-6 text-[10px] tracking-[0.4em] font-bold uppercase transition-all"
+                    style={{ color: theme.colors.dark }}
                 >
-                    SHOP BEST SELLERS
+                    VIEW ALL CURATIONS
+                    <div className="relative flex items-center justify-center">
+                        <div className="w-12 h-[1px] transition-all group-hover:w-20" style={{ backgroundColor: theme.colors.primary }} />
+                    </div>
                 </a>
             </div>
-            <p className="text-sm text-gray-500 mb-8 max-w-xl">
-                Our most popular nail sets, chosen by over 100,000 customers. Proven styles that deliver salon-quality results—every time.
-            </p>
 
-            {/* Desktop — drag to scroll, no scrollbar */}
-            <div
-                ref={trackRef}
-                className="hidden md:flex gap-6 overflow-x-auto cursor-grab active:cursor-grabbing select-none"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                onMouseDown={onMouseDown}
-                onMouseMove={onMouseMove}
-                onMouseUp={onMouseUp}
-                onMouseLeave={onMouseUp}
-            >
-                <style>{`.hide-scroll::-webkit-scrollbar { display: none; }`}</style>
+            {/* Desktop Grid */}
+            <div className="hidden md:grid grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-10">
                 {products.map((product) => (
-                    <div key={product.id} className="min-w-[calc(25%-18px)] shrink-0">
-                        <ProductCard product={product} />
-                    </div>
+                    <ProductCard key={product.id} product={product} />
                 ))}
             </div>
 
-            {/* Mobile — swipe carousel, no arrows */}
+            {/* Mobile Carousel */}
             <div className="md:hidden">
                 <div
-                    className="overflow-hidden rounded-lg"
-                    onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                    className="overflow-visible"
+                    onTouchStart={(e) => { (window as any).startX = e.touches[0].clientX; }}
                     onTouchEnd={(e) => {
-                        const diff = touchStartX.current - e.changedTouches[0].clientX;
-                        if (diff > 40) nextMobile();
-                        else if (diff < -40) prevMobile();
+                        const diff = (window as any).startX - e.changedTouches[0].clientX;
+                        if (diff > 50) nextMobile();
+                        else if (diff < -50) prevMobile();
                     }}
                 >
                     <div
-                        className="flex transition-transform duration-300 ease-in-out"
+                        className="flex transition-transform duration-1000 ease-[cubic-bezier(0.2,1,0.2,1)]"
                         style={{ transform: `translateX(-${current * 100}%)` }}
                     >
                         {products.map((product) => (
@@ -240,27 +215,16 @@ export default function BestSellers() {
                     </div>
                 </div>
 
-                {/* Dots only — no arrows */}
-                <div className="flex justify-center gap-1.5 mt-4">
+                <div className="flex justify-center items-center gap-5 mt-12">
                     {products.map((_, i) => (
                         <button
                             key={i}
                             onClick={() => setCurrent(i)}
-                            className={`w-2 h-2 rounded-full border-none cursor-pointer transition-colors ${i === current ? "bg-[#c8102e]" : "bg-gray-300"
-                                }`}
+                            className={`transition-all duration-500 rounded-full ${i === current ? "w-10 h-1" : "w-1.5 h-1.5"}`}
+                            style={{ backgroundColor: i === current ? theme.colors.primary : theme.colors.muted }}
                         />
                     ))}
                 </div>
-            </div>
-
-            {/* Mobile CTA */}
-            <div className="mt-8 flex justify-center md:hidden">
-                <a
-                    href="/best-sellers"
-                    className="bg-black text-white text-xs font-semibold tracking-widest px-8 py-3"
-                >
-                    SHOP BEST SELLERS
-                </a>
             </div>
         </section>
     );

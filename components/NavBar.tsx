@@ -4,11 +4,12 @@ import { useEffect, useState, useRef } from "react";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import Sidebar from "./SideBar";
 import CartSidebar from "./Cart";
+import theme from "@/theme";
 
 const announcements = [
-  "BUY $99 GET 10% OFF | CODE: VACAYREADY10",
-  "FREE SHIPPING ON ORDERS OVER $50",
-  "NEW SUMMER COLLECTION OUT NOW 🌸",
+  "FREE SHIPPING ON ORDERS OVER $75",
+  "NEW SUMMER COLLECTION IS HERE",
+  "BUY 3 GET 1 FREE BUNDLES",
 ];
 
 // Replace with your actual data / API call
@@ -61,12 +62,10 @@ export default function Navbar() {
     (filteredSuggestions.length > 0 || filteredProducts.length > 0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) =>
-        prev === announcements.length - 1 ? 0 : prev + 1
-      );
-    }, 3000);
-    return () => clearInterval(interval);
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % announcements.length);
+    }, 4000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -111,149 +110,131 @@ export default function Navbar() {
         onMouseLeave={() => setHovered(false)}
         className="fixed top-0 left-0 w-full z-40 transition-all duration-300"
       >
-        {/* Announcement Bar */}
-        <div className="text-center text-xs py-2 tracking-wide bg-black text-white">
-          <div className="relative h-4 overflow-hidden">
-            {announcements.map((text, index) => (
-              <div
-                key={index}
-                className={`absolute w-full transition-all duration-500 ${index === currentIndex
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 -translate-x-4"
-                  }`}
-              >
-                {text}
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Main Navbar */}
-        <div
-          className={`relative flex items-center justify-between px-6 md:px-10 py-4 transition-all duration-300 ${showBg || searchOpen
-            ? "bg-white text-black shadow-md"
-            : "bg-transparent text-white"
+
+
+        {/* Main Navbar Wrapper */}
+        <nav
+          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${showBg || searchOpen
+            ? "bg-white/80 backdrop-blur-md py-3 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]"
+            : "bg-transparent py-6"
             }`}
         >
-          <button onClick={() => setIsOpen(true)}>
-            <Menu size={24} />
-          </button>
+          <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
 
-          <h1 className="text-xl md:text-2xl font-serif tracking-wide">
-            Ersa Nails
-          </h1>
+            {/* Left: Interactive Menu */}
+            <div className="flex-1 flex items-center">
+              <button
+                onClick={() => setIsOpen(true)}
+                className="group flex items-center gap-2 overflow-hidden"
+              >
+                <div className="relative w-6 h-6 flex flex-col justify-center gap-1.5">
+                  <span className={`h-[1px] w-6 transition-all duration-300 ${showBg ? "bg-black" : "bg-white"} group-hover:w-4`} />
+                  <span className={`h-[1px] w-4 transition-all duration-300 ${showBg ? "bg-black" : "bg-white"} group-hover:w-6`} />
+                </div>
+                <span
+                  className={`hidden md:block text-[10px] tracking-[0.3em] uppercase transition-colors duration-300 ${showBg ? "text-black" : "text-white"
+                    }`}
+                >
+                  Menu
+                </span>
+              </button>
+            </div>
 
-          <div className="flex items-center gap-4">
-            <span className="text-sm hidden md:block">USD$</span>
-            <button onClick={() => setSearchOpen((prev) => !prev)}>
-              <Search size={20} />
-            </button>
-            <button onClick={() => setCartOpen(true)}>
-              <ShoppingCart size={20} />
-            </button>
+            {/* Center: Branding */}
+            <div className="flex-[2] text-center">
+              <h1
+                className={`text-lg md:text-3xl font-light tracking-[0.5em] uppercase cursor-pointer transition-all duration-700 ${showBg ? "text-black" : "text-white"
+                  }`}
+              >
+                Gloss <span className="italic font-serif lowercase tracking-normal text-xs md:text-lg">&</span> Grace
+              </h1>
+            </div>
+
+            {/* Right: Modern Actions */}
+            <div className="flex-1 flex items-center justify-end gap-4 md:gap-8">
+              <button
+                onClick={() => setSearchOpen(true)}
+                className={`transition-transform duration-300 hover:scale-110 ${showBg ? "text-black" : "text-white"}`}
+              >
+                <Search size={20} strokeWidth={1.5} />
+              </button>
+
+              <button
+                onClick={() => setCartOpen(true)}
+                className={`relative transition-transform duration-300 hover:scale-110 ${showBg ? "text-black" : "text-white"}`}
+              >
+                <ShoppingCart size={20} strokeWidth={1.5} />
+                <span
+                  className="absolute -top-2 -right-2 text-[9px] w-4 h-4 flex items-center justify-center rounded-full bg-black text-white border border-white/20"
+                >
+                  2
+                </span>
+              </button>
+            </div>
           </div>
 
-          {/* Search bar + dropdown */}
+          {/* Refined Search Overlay (Slide Down) */}
           <div
-            className={`absolute left-0 right-0 top-full transition-all h-12 duration-300 ${searchOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-              } bg-white shadow-sm`}
+            className={`absolute inset-x-0 top-0 bg-white transform transition-transform duration-500 ease-out ${searchOpen ? "translate-y-0" : "-translate-y-full"
+              } z-10 shadow-xl`}
           >
-            {/* Input row — centered */}
-            <div className="flex justify-center px-6 py-3 border-t border-gray-100">
-              <div className="flex items-center gap-3 w-full max-w-lg">
-                <Search size={18} className="text-gray-500 shrink-0" />
+            <div className="max-w-4xl mx-auto px-6 py-12">
+              <div className="flex items-center border-b border-black/10 pb-4">
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && searchQuery.trim()) {
-                      console.log("Search:", searchQuery);
-                    }
-                  }}
-                  placeholder="Search"
-                  className="flex-1 bg-transparent text-black text-sm outline-none placeholder-gray-400"
+                  placeholder="SEARCH OUR COLLECTION..."
+                  className="w-full bg-transparent text-xl text-gray-500 font-light tracking-[0.2em] outline-none placeholder:text-gray-800 uppercase"
                 />
-                <button onClick={closeSearch} className="text-gray-400 hover:text-black transition">
-                  <X size={18} />
+                <button onClick={closeSearch} className="ml-4 hover:rotate-90 transition-transform duration-300">
+                  <X size={24} strokeWidth={1} />
                 </button>
               </div>
-            </div>
 
-            {/* Dropdown — same max-w as input, centered */}
-            {showDropdown && (
-              <div className="flex justify-center px-6 pb-4">
-                <div className="w-full max-w-lg bg-white border border-gray-100 rounded-lg shadow-lg overflow-hidden">
-                  <div className="max-h-[60vh] overflow-y-auto">
-                    {/* Suggestions */}
-                    {filteredSuggestions.length > 0 && (
-                      <ul className="px-4 pt-4 pb-2 space-y-3">
-                        {filteredSuggestions.map((s, i) => (
-                          <li
-                            key={i}
-                            className="flex items-center gap-3 cursor-pointer group"
-                            onClick={() => setSearchQuery(s)}
-                          >
-                            <Search size={14} className="text-gray-400 shrink-0" />
-                            <span className="text-sm text-gray-800 group-hover:text-black">
-                              {s}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-
-                    {/* Products */}
-                    {filteredProducts.length > 0 && (
-                      <div className="px-4 pb-4">
-                        <p className="text-xs font-bold tracking-widest text-gray-800 mb-3 mt-2">
-                          PRODUCTS
-                        </p>
-                        <hr className="border-gray-200 mb-4" />
-                        <ul className="space-y-4 mb-4">
-                          {filteredProducts.map((p) => (
-                            <li
-                              key={p.id}
-                              className="flex items-center gap-4 cursor-pointer group"
-                              onClick={() => console.log("Go to product:", p.name)}
-                            >
-                              <div className="w-12 h-12 rounded bg-gray-100 shrink-0 overflow-hidden">
-                                <img
-                                  src={p.image}
-                                  alt={p.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <span className="text-sm text-gray-800 group-hover:text-black">
-                                {p.name}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+              {/* Live Results Section */}
+              {showDropdown && (
+                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+                  {/* Suggestions List */}
+                  <div>
+                    <h4 className="text-[10px] tracking-[0.2em] text-gray-800 mb-6 uppercase">Suggestions</h4>
+                    <ul className="space-y-4">
+                      {filteredSuggestions.map((s, i) => (
+                        <li
+                          key={i}
+                          className="text-sm text-gray-800 font-light hover:translate-x-2 transition-transform cursor-pointer"
+                          onClick={() => setSearchQuery(s)}
+                        >
+                          {s}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  {/* Footer — pinned outside scroll area */}
-                  {filteredProducts.length > 0 && (
-                    <div className="px-4 py-3 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <button
-                          onClick={() => console.log("View all:", searchQuery)}
-                          className="text-sm text-gray-800 hover:text-black transition"
-                        >
-                          View All Results
-                        </button>
-                        <span className="text-xs text-gray-400">Press enter</span>
-                      </div>
+                  {/* Featured Products Mini-Grid */}
+                  <div>
+                    <h4 className="text-[10px] tracking-[0.2em] text-gray-800 mb-6 uppercase">Top Matches</h4>
+                    <div className="space-y-6">
+                      {filteredProducts.slice(0, 3).map((p) => (
+                        <div key={p.id} className="flex gap-4 group cursor-pointer">
+                          <div className="w-16 h-20 bg-gray-50 overflow-hidden">
+                            <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                          </div>
+                          <div className="flex flex-col justify-center">
+                            <p className="text-xs text-gray-600 tracking-widest uppercase mb-1">{p.name}</p>
+                            <p className="text-[10px] text-gray-900">View Product —</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </nav>
       </header>
 
       {/* Overlay to close search when clicking outside */}

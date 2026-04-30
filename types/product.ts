@@ -14,4 +14,7 @@ export interface Product {
     features?: string[];
     sizes?: string[];
     isNew?: boolean;
+    shape?: string;
+    length?: string;
+    style?: string;
 }

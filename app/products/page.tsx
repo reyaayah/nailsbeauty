@@ -1,25 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import theme from "@/theme";
 import Image from "next/image";
 import { Heart, ChevronDown, SlidersHorizontal, ArrowRight, Check } from "lucide-react";
 import { products } from "@/data/product";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AllProductsPage() {
+    const searchParams = useSearchParams();
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
     const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
-
+    const router = useRouter();
     const filterOptions = {
         length: ["Extra-long", "Long", "Med", "Short"],
         shape: ["Almond", "Coffin", "Oval", "Square", "Squoval"],
         style: ["3D", "Aura", "Cat Eye", "Chrome", "French Tip", "Glitter"]
     };
+    useEffect(() => {
+        const shape = searchParams.get("shape");
+        const length = searchParams.get("length");
+        const style = searchParams.get("style");
 
-    const toggleFilterSelection = (option: string) => {
-        setSelectedFilters(prev =>
-            prev.includes(option) ? prev.filter(i => i !== option) : [...prev, option]
+        const filters: string[] = [];
+
+        if (shape) filters.push(shape);
+        if (length) filters.push(length);
+        if (style) filters.push(style);
+
+        setSelectedFilters(filters);
+    }, [searchParams]);
+
+
+    const filteredProducts = products.filter(product => {
+        if (selectedFilters.length === 0) return true;
+
+        return (
+            (!searchParams.get("shape") || product.shape?.includes(searchParams.get("shape")!)) &&
+            (!searchParams.get("length") || product.length?.includes(searchParams.get("length")!)) &&
+            (!searchParams.get("style") || product.style?.includes(searchParams.get("style")!))
         );
+    });
+
+    const toggleFilterSelection = (category: string, option: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (params.get(category) === option) {
+            params.delete(category);
+        } else {
+            params.set(category, option);
+        }
+
+        router.push(`/products?${params.toString()}`);
     };
     return (
         <main className="min-h-screen pt-24 pb-20 font-sans" style={{ backgroundColor: theme.colors.light }}>
@@ -63,7 +95,7 @@ export default function AllProductsPage() {
                                             {options.map((option) => (
                                                 <button
                                                     key={option}
-                                                    onClick={() => toggleFilterSelection(option)}
+                                                    onClick={() => toggleFilterSelection(key, option)}
                                                     className="w-full flex items-center justify-between px-5 py-2.5 text-[13px] hover:bg-neutral-50 transition-colors"
                                                     style={{ color: theme.colors.dark }}
                                                 >
@@ -93,7 +125,7 @@ export default function AllProductsPage() {
 
             <div className="max-w-[1400px] mx-auto px-6">
                 <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-20">
-                    {products.map((product) => (
+                    {filteredProducts.map((product) => (
                         <div key={product.id} className="group relative">
                             {/* Image Wrapper */}
                             <div className="relative aspect-[4/5] overflow-hidden shadow-sm transition-all duration-500 group-hover:shadow-xl" style={{ backgroundColor: theme.colors.subtitle }}>

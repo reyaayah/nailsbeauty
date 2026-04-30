@@ -2,6 +2,7 @@
 
 import theme from "@/theme";
 import { X, ChevronRight, Search, User, ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 
@@ -9,60 +10,54 @@ import { useState } from "react";
 interface SidebarProps {
     isOpen: boolean;
     onClose: () => void;
+    onFilterSelect: (category: string, value: string) => void; // Add this
 }
 
-
-const NavItem = ({ label, children, isNew }: { label: string; children?: string[]; isNew?: boolean }) => {
+const NavItem = ({
+    label,
+    children,
+    isNew,
+    onChildClick
+}: {
+    label: string;
+    children?: string[];
+    isNew?: boolean;
+    onChildClick?: (val: string) => void // Add this
+}) => {
     const [open, setOpen] = useState(false);
 
     return (
         <div className="group">
             <button
                 onClick={() => children && setOpen(!open)}
-                className="w-full flex justify-between items-center py-3 text-left group transition-all"
-                style={{ color: theme.colors.dark }}
+                className="w-full flex justify-between items-center py-3 text-left"
             >
-                <span className="flex items-center gap-3 font-medium tracking-tight text-[16px]">
+                <span className="flex items-center gap-3 font-medium text-[16px]  text-gray-600 ">
                     {label}
-                    {isNew && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#DBA1A2] text-white uppercase tracking-widest font-bold">
-                            New
-                        </span>
-                    )}
                 </span>
-                {children && (
-                    <ChevronRight
-                        size={18}
-                        className={`transition-transform duration-300 ${open ? "rotate-90" : "opacity-40"}`}
-                    />
-                )}
+                {children && <ChevronRight size={18} className={open ? "rotate-90" : ""} color="black" />}
             </button>
 
-            {children && (
-                <div
-                    className={`overflow-hidden transition-all duration-500 ease-in-out ${open ? "max-h-[500px] opacity-100 mb-4" : "max-h-0 opacity-0"
-                        }`}
-                >
-                    <div className="pl-2 border-l-2 ml-1" style={{ borderColor: theme.colors.muted }}>
-                        {children.map((item) => (
-                            <div
-                                key={item}
-                                className="py-2 pl-4 text-[14px] hover:translate-x-1 transition-transform cursor-pointer"
-                                style={{ color: "#6B7280" }} // Gray-500
-                            >
-                                {item}
-                            </div>
-                        ))}
-                    </div>
+            {open && children && (
+                <div className="pl-2 border-l-2 ml-1" style={{ borderColor: theme.colors.muted }}>
+                    {children.map((item) => (
+                        <div
+                            key={item}
+                            onClick={() => onChildClick?.(item)} // Trigger filter
+                            className="py-2 pl-4 text-[14px] cursor-pointer text-gray-600 hover:text-black"
+                        >
+                            {item}
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
     );
 };
 
-/* ---------------- SIDEBAR ---------------- */
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProps) {
+    const router = useRouter();
     return (
         <>
             {/* Glassmorphism Overlay */}
@@ -104,9 +99,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     <div className="mt-4 space-y-1">
                         <NavItem label="Shop All" children={["Best Sellers", "New Arrivals", "Flash Sale"]} />
                         <NavItem label="Collections" children={["Summer '24", "G & G Essence", "The Love Edit", "LNY Limited"]} />
-                        <NavItem label="Shop by Shape" children={["Square", "Almond", "Coffin", "Stiletto"]} />
-                        <NavItem label="Length" children={["Short", "Medium", "Long", "Extra Long"]} />
-                        <NavItem label="Tools & Care" />
+                        <NavItem
+                            label="Shop by Shape"
+                            children={["Square", "Almond", "Coffin", " Oval"]}
+                            onChildClick={(val) => { onFilterSelect('shape', val); onClose(); }}
+                        />
+                        <NavItem
+                            label="Length"
+                            children={["Short", "Medium", "Long", "Extra Long"]}
+                            onChildClick={(val) => { onFilterSelect('length', val); onClose(); }}
+                        />
                     </div>
 
                     <div className="mt-10 pt-8 border-t border-gray-100">
@@ -120,7 +122,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <div className="text-[14px] font-semibold tracking-wide cursor-pointer text-[#DBA1A2]">
                                 MOTHER'S DAY BUNDLES
                             </div>
-                            <div className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>About Gloss & Grace</div>
+                            <div onClick={() => { router.push("/aboutus") }} className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>About Gloss & Grace</div>
                             <div className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>Shipping & FAQ</div>
                         </div>
                     </div>

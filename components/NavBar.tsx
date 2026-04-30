@@ -120,10 +120,13 @@ export default function Navbar() {
   };
 
 
+
   return (
     <>
       <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-      <Sidebar isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <Sidebar isOpen={isOpen} onClose={() => setIsOpen(false)} onFilterSelect={(category, value) => {
+        router.push(`/products?${category}=${value}`);
+      }} />
 
       <header
         onMouseEnter={() => setHovered(true)}

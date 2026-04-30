@@ -13,6 +13,9 @@ export const products: Product[] = [
         rating: 5,
         category: "Press-on Nails",
         isNew: true,
+        shape: "Almond",
+        length: "Medium",
+        style: "Glossy",
     },
     {
         id: 2,
@@ -26,6 +29,9 @@ export const products: Product[] = [
         rating: 5,
         category: "Press-on Nails",
         isNew: true,
+        shape: "Square",
+        length: "Short",
+        style: "Metallic",
     },
     {
         id: 3,
@@ -37,6 +43,9 @@ export const products: Product[] = [
         rating: 5,
         category: "Press-on Nails",
         isNew: true,
+        shape: "Coffin",
+        length: "Long",
+        style: "Matte",
     },
     {
         id: 4,
@@ -49,6 +58,9 @@ export const products: Product[] = [
         rating: 5,
         category: "Press-on Nails",
         isNew: false,
+        shape: "Oval",
+        length: "Medium",
+        style: "Glitter",
     },
     {
         id: 5,
@@ -61,6 +73,9 @@ export const products: Product[] = [
         rating: 5,
         category: "Press-on Nails",
         isNew: true,
+        shape: "Almond",
+        length: "Medium",
+        style: "Glossy",
     },
 
 ];

@@ -57,16 +57,7 @@ export default function Faqs() {
                 ))}
             </div>
 
-            {/* Contact Help */}
-            <div className="mt-12 text-center">
-                <p className="text-xs opacity-50 uppercase tracking-widest mb-4">Still have questions?</p>
-                <button
-                    className="text-xs font-black underline decoration-2 underline-offset-4"
-                    style={{ color: theme.colors.dark }}
-                >
-                    Chat with our Nail Expert
-                </button>
-            </div>
+
         </section>
     );
 }

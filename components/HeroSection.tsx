@@ -114,7 +114,7 @@ export default function HeroSlider() {
                             {/* BUTTONS */}
                             <div className="flex gap-4">
                                 <button
-                                    onClick={() => router.push("/collections")}
+                                    onClick={() => router.push("/products")}
                                     className="px-6 py-3 rounded-full font-medium transition hover:opacity-90"
                                     style={{
                                         backgroundColor: theme.colors.primary,

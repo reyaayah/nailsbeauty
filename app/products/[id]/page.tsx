@@ -96,12 +96,12 @@ export default function ProductDetails() {
                     </h1>
 
                     <div className="text-3xl font-bold flex items-baseline gap-2">
-                        <span style={{ color: theme.colors.primary }}>Rs {product.price.toFixed(1)}</span>
+                        <span style={{ color: theme.colors.primary }}>$ {product.price.toFixed(1)}</span>
                         <span className="text-xs font-normal italic opacity-50">inc. VAT</span>
                     </div>
 
                     <div className="space-y-4">
-                        <p className="leading-relaxed italic opacity-80">
+                        <p className="leading-relaxed opacity-80">
                             {product.description}
                         </p>
 

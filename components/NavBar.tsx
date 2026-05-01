@@ -6,6 +6,7 @@ import Sidebar from "./SideBar";
 import CartSidebar from "./Cart";
 import theme from "@/theme";
 import { usePathname, useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 const announcements = [
   "FREE SHIPPING ON ORDERS OVER $75",
@@ -49,6 +50,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { totalItems } = useCart();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -204,12 +206,14 @@ export default function Navbar() {
                 className="relative transition-transform duration-300 hover:scale-110 text-black"
               >
                 <ShoppingCart size={20} strokeWidth={1.5} />
-                <span
-                  style={{ backgroundColor: theme.colors.primary }}
-                  className="absolute -top-2 -right-2 text-[9px] w-4 h-4 flex items-center justify-center rounded-full text-white border border-white/20"
-                >
-                  2
-                </span>
+                {totalItems > 0 && (
+                  <span
+                    style={{ backgroundColor: theme.colors.primary }}
+                    className="absolute -top-2 -right-2 text-[9px] w-4 h-4 flex items-center justify-center rounded-full text-white border border-white/20"
+                  >
+                    {totalItems}
+                  </span>
+                )}
               </button>
             </div>
 

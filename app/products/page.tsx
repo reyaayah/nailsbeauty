@@ -4,7 +4,7 @@ import theme from "@/theme";
 import { products } from "@/data/product";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MobileFilterBar, DesktopFilterSidebar } from "@/components/FilterBar";
-import ProductCard from "@/components/cards/ProductCard";
+import ProductCard from "@/components/cards/MainProductCard";
 
 export default function AllProductsPage() {
     const searchParams = useSearchParams();
@@ -77,7 +77,7 @@ export default function AllProductsPage() {
                     )}
                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-16 lg:gap-y-20">
                         {filteredProducts.map((product) => (
-                            <ProductCard key={product.id} {...product} />
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 </div>

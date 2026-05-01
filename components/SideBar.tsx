@@ -158,7 +158,7 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
 
                 {/* Bottom Utility Bar */}
                 <div className="p-8 bg-white border-t border-gray-50">
-                    <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-3 gap-4 mb-2">
                         <button className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition" style={{ color: theme.colors.dark }}>
                             <Search size={18} />
                             <span className="text-[10px] uppercase">Search</span>
@@ -173,12 +173,12 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                         </button>
                     </div>
 
-                    <button
+                    {/* <button
                         className="w-full py-4 text-white text-xs font-bold uppercase tracking-widest rounded-sm transition-transform active:scale-95"
                         style={{ backgroundColor: theme.colors.dark }}
                     >
                         Shop New Arrivals
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

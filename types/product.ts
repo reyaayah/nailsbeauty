@@ -19,4 +19,5 @@ export interface Product {
     shape?: string;
     length?: string;
     style?: string;
+    collection?: string;
 }

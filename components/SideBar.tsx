@@ -113,7 +113,20 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                                 }
                             }}
                         />
-                        <NavItem label="Collections" children={["Summer '24", "G & G Essence", "The Love Edit", "LNY Limited"]} />
+                        <NavItem
+                            label="Collections"
+                            children={["Summer '24", "G & G Essence", "The Love Edit", "LNY Limited"]}
+                            onChildClick={(val) => {
+                                const matched = {
+                                    "Summer '24": "summer-24",
+                                    "G & G Essence": "g-g-essence",
+                                    "The Love Edit": "the-love-edit",
+                                    "LNY Limited": "lny-limited",
+                                }[val];
+                                router.push(`/collections?collection=${matched}`);
+                                onClose();
+                            }}
+                        />
                         <NavItem
                             label="Shop by Shape"
                             children={["Square", "Almond", "Coffin", " Oval"]}

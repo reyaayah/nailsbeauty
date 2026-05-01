@@ -36,7 +36,7 @@ const allProducts = [
 ];
 const navItems = [
   { name: 'New Arrivals', href: '#new-arrivals' },
-  { name: 'Shop All', href: '#shop-all' },
+  { name: 'Shop All', href: '/products' },
   { name: 'Bundles', href: '#bundles' },
   { name: 'Best Sellers', href: '#best-sellers' },
 ];

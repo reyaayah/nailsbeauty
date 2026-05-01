@@ -1,28 +1,44 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import theme from "@/theme";
 import { CollectionCard } from "./cards/CollectionCard";
+import { products } from "@/data/product";
+import ProductCard from "./cards/ProductCard";
+
+interface CollectionsCarouselProps {
+    activeCollection?: string | null;
+}
 
 const COLLECTIONS = [
-    { name: "Gel Sets", image: "/deal1.png", bg: "#F2DED3" },
-    { name: "Press-On", image: "/deal2.png", bg: "#EDD9E9" },
-    { name: "Nail Art", image: "/deal3.png", bg: "#D9E9E0" },
-    { name: "Bundles", image: "/deal1.png", bg: "#F5EAD0" },
-    { name: "Glitter & Foil", image: "/deal2.png", bg: "#D9E2F5" },
-    { name: "French Tips", image: "/deal3.png", bg: "#EEDFD9" },
-    { name: "Seasonal Edit", image: "/deal1.png", bg: "#FAE0EC" },
+    { name: "Summer '24", slug: "summer-24", image: "/deal1.png", bg: "#F2DED3", filter: "Summer '24" },
+    { name: "G & G Essence", slug: "g-g-essence", image: "/deal2.png", bg: "#EDD9E9", filter: "G & G Essence" },
+    { name: "The Love Edit", slug: "the-love-edit", image: "/deal3.png", bg: "#D9E9E0", filter: "The Love Edit" },
+    { name: "LNY Limited", slug: "lny-limited", image: "/deal1.png", bg: "#F5EAD0", filter: "LNY Limited" },
 ];
 
 const CARD_W = 170;
 const GAP = 16;
 const STEP = CARD_W + GAP;
 
-export function CollectionsCarousel() {
+export function CollectionsCarousel({ activeCollection }: CollectionsCarouselProps) {
     const wrapRef = useRef<HTMLDivElement>(null);
-    const dragStart = useRef(0);
 
     const [index, setIndex] = useState(0);
     const [maxIdx, setMaxIdx] = useState(0);
 
+    const [selectedCollection, setSelectedCollection] = useState<string | null>(() => {
+        if (!activeCollection) return null;
+        return COLLECTIONS.find((c) => c.slug === activeCollection)?.filter ?? null;
+    });
+
+    useEffect(() => {
+        if (!activeCollection) {
+            setSelectedCollection(null);
+            return;
+        }
+        // activeCollection is a slug like "summer-24" — resolve to filter name like "Summer '24"
+        const matched = COLLECTIONS.find((c) => c.slug === activeCollection);
+        setSelectedCollection(matched?.filter ?? null);
+    }, [activeCollection]);
     const recalc = useCallback(() => {
         if (!wrapRef.current) return;
         const visible = Math.floor((wrapRef.current.offsetWidth + GAP) / STEP);
@@ -37,6 +53,9 @@ export function CollectionsCarousel() {
 
     const goTo = (i: number) => setIndex(Math.max(0, Math.min(i, maxIdx)));
 
+    const collectionProducts = selectedCollection
+        ? products.filter((p) => p.collection === selectedCollection)
+        : [];
 
     return (
         <div className="mb-[52px]">
@@ -60,11 +79,7 @@ export function CollectionsCarousel() {
             </div>
 
             {/* Scrollable track */}
-            <div
-                ref={wrapRef}
-                className="overflow-hidden cursor-grab active:cursor-grabbing"
-
-            >
+            <div ref={wrapRef} className="overflow-hidden cursor-grab active:cursor-grabbing">
                 <div
                     className="flex"
                     style={{
@@ -74,7 +89,23 @@ export function CollectionsCarousel() {
                     }}
                 >
                     {COLLECTIONS.map((c) => (
-                        <CollectionCard key={c.name} collection={c} />
+                        <div
+                            key={c.name}
+                            onClick={() =>
+                                // ✅ Toggle off if clicking the already-selected collection
+                                setSelectedCollection((prev) => (prev === c.filter ? null : c.filter))
+                            }
+                            className="cursor-pointer flex-shrink-0"
+                            style={{
+                                outline: selectedCollection === c.filter
+                                    ? `2px solid ${theme.colors.primary}`
+                                    : "2px solid transparent",
+                                borderRadius: 12,
+                                transition: "outline 0.2s",
+                            }}
+                        >
+                            <CollectionCard collection={c} />
+                        </div>
                     ))}
                 </div>
             </div>
@@ -95,6 +126,43 @@ export function CollectionsCarousel() {
                 ))}
             </div>
 
+            {/* Collection product grid */}
+            {selectedCollection && (
+                <div className="mt-10">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2
+                            className="text-[22px] font-serif tracking-tight"
+                            style={{ color: theme.colors.dark }}
+                        >
+                            {COLLECTIONS.find((c) => c.filter === selectedCollection)?.name}
+                        </h2>
+                        <button
+                            onClick={() => setSelectedCollection(null)}
+                            className="text-[12px] tracking-wide underline cursor-pointer"
+                            style={{ color: theme.colors.muted }}
+                        >
+                            Clear
+                        </button>
+                    </div>
+
+                    {collectionProducts.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-20 gap-3">
+                            <p className="text-[18px] font-serif tracking-tight" style={{ color: theme.colors.dark }}>
+                                No products found
+                            </p>
+                            <p className="text-[13px] tracking-wide" style={{ color: theme.colors.muted }}>
+                                Nothing in this collection yet.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-16">
+                            {collectionProducts.map((product) => (
+                                <ProductCard key={product.id} {...product} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

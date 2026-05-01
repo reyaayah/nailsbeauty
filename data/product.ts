@@ -18,6 +18,7 @@ export const products: Product[] = [
         shape: "Almond",
         length: "Medium",
         style: "Glossy",
+        collection: "LNY Limited",
     },
     {
         id: 2,
@@ -35,6 +36,7 @@ export const products: Product[] = [
         shape: "Square",
         length: "Short",
         style: "Metallic",
+        collection: "The Love Edit",
     },
     {
         id: 3,
@@ -50,6 +52,7 @@ export const products: Product[] = [
         shape: "Coffin",
         length: "Long",
         style: "Matte",
+        collection: "G & G Essence",
     },
     {
         id: 4,
@@ -65,6 +68,7 @@ export const products: Product[] = [
         shape: "Oval",
         length: "Medium",
         style: "Glitter",
+        collection: "Summer '24",
     },
     {
         id: 5,
@@ -80,6 +84,7 @@ export const products: Product[] = [
         shape: "Almond",
         length: "Medium",
         style: "Glossy",
+        collection: "Summer '24",
     },
 
 ];

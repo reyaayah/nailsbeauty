@@ -112,7 +112,7 @@ export default function HeroSlider() {
                             </p>
 
                             {/* BUTTONS */}
-                            <div className="flex gap-4">
+                            <div className="flex gap-4 flex-wrap">
                                 <button
                                     onClick={() => router.push("/collections")}
                                     className="px-6 py-3 rounded-full font-medium transition hover:opacity-90"

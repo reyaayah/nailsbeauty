@@ -2,28 +2,15 @@
 
 import { CollectionsCarousel } from "@/components/CollectionCarousel";
 import theme from "@/theme";
-import { useState } from "react";
-
-
-// ─── Main Component ───────────────────────────────────────────────────────────
+import { useSearchParams } from "next/navigation";
 
 export default function ShopCollection() {
-    const [loadMoreHovered, setLoadMoreHovered] = useState(false);
-
+    const searchParams = useSearchParams();
+    const activeCollection = searchParams.get("collection") ?? null;
 
     return (
         <>
-            <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .card-enter {
-          animation: fadeUp 0.38s ease both;
-        }
-      `}</style>
 
             <section
                 className="min-h-screen py-[72px] px-6"
@@ -57,13 +44,10 @@ export default function ShopCollection() {
                                 color: theme.colors.dark,
                             }}
                         >
-                            Shop Our{" "}
-                            <em
-                                className="italic"
-                                style={{ color: theme.colors.primary }}
-                            >
-                                Collection
-                            </em>
+                            {activeCollection
+                                ? <>Browsing{" "}<em className="italic" style={{ color: theme.colors.primary }}>{activeCollection.replace(/-+/g, " ")}</em></>
+                                : <>Shop Our{" "}<em className="italic" style={{ color: theme.colors.primary }}>Collection</em></>
+                            }
                         </h2>
 
                         <p
@@ -73,8 +57,26 @@ export default function ShopCollection() {
                             Salon-quality nails at home — gel sets, press-ons &amp; nail art
                             delivered to your door.
                         </p>
+                        {activeCollection && (
+                            <div className="mt-4 flex items-center justify-center gap-2">
+                                <span
+                                    className="text-[12px] px-3 py-1 rounded-full capitalize"
+                                    style={{ background: theme.colors.primary + "22", color: theme.colors.primary }}
+                                >
+                                    {activeCollection.replace(/-+/g, " ")}
+                                </span>
+                                <a
+                                    href="/collections"
+                                    className="text-[11px] underline opacity-60 hover:opacity-100"
+                                    style={{ color: theme.colors.dark }}
+                                >
+                                    Clear
+                                </a>
+                            </div>
+                        )}
+
                     </div>
-                    <CollectionsCarousel />
+                    <CollectionsCarousel activeCollection={activeCollection}/>
 
 
 

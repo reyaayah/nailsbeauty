@@ -3,17 +3,12 @@
 import Image from "next/image";
 import { Star, ArrowUpRight } from "lucide-react";
 import theme from "@/theme";
-import { Product } from "@/types/product";
 import ProductCard from "./cards/MainProductCard";
-
-const featuredProducts: Product[] = [
-    { id: 1, name: "ProTouch Kit Max", price: 24.99, image: "/product1.png", category: "Essentials" },
-    { id: 2, name: "Ersa Nails Pro", price: 19.99, image: "/product2.png", category: "Pro Line" },
-    { id: 3, name: "ProTouch Mini", price: 17.99, image: "/product3.png", category: "Starter" },
-    { id: 4, name: "Nail Essentials", price: 29.99, image: "/product1.png", category: "New Arrival" },
-];
+import { useNewArrivals } from "@/hooks/useNewArrivals";
 
 export default function HeroWithProducts() {
+    const { featured, rest, loading, error } = useNewArrivals();
+
     return (
         <div
             id="new-arrivals"
@@ -25,7 +20,7 @@ export default function HeroWithProducts() {
                 {/* ── ROW 1: Hero (8 cols) + Stats card (4 cols) ── */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
 
-                    {/* HERO — spans 8 cols, 2 rows via explicit row-span on a wrapper */}
+                    {/* HERO */}
                     <div className="md:col-span-8 md:row-span-2 relative rounded-[2rem] overflow-hidden group min-h-[420px] md:min-h-[600px]">
                         <Image
                             src="/shoot.png"
@@ -54,7 +49,7 @@ export default function HeroWithProducts() {
                         </div>
                     </div>
 
-                    {/* STATS CARD — spans 4 cols */}
+                    {/* STATS CARD */}
                     <div
                         className="md:col-span-4 p-8 rounded-[2rem] flex flex-col justify-center border"
                         style={{ borderColor: theme.colors.muted, backgroundColor: "white" }}
@@ -70,7 +65,7 @@ export default function HeroWithProducts() {
                         </p>
                     </div>
 
-                    {/* FEATURE PRODUCT BLOCK — spans 4 cols, sits below stats */}
+                    {/* FEATURED NEW ARRIVAL BLOCK */}
                     <div
                         className="md:col-span-4 rounded-[2rem] p-6 relative overflow-hidden flex items-center justify-center border"
                         style={{
@@ -78,32 +73,62 @@ export default function HeroWithProducts() {
                             borderColor: theme.colors.subtitle,
                         }}
                     >
-                        <div className="text-center">
-                            <p className="text-xs uppercase tracking-widest mb-1 opacity-60">New Arrival</p>
-                            <p className="text-xl font-bold">{featuredProducts[0].name}</p>
-                            <div className="relative h-40 w-40 mx-auto mt-4">
-                                <Image
-                                    src={featuredProducts[0].image}
-                                    alt={featuredProducts[0].name}
-                                    fill
-                                    className="object-contain"
-                                />
+                        {/* Skeleton */}
+                        {loading && (
+                            <div className="animate-pulse text-center w-full">
+                                <div className="h-3 bg-gray-200 rounded w-1/3 mx-auto mb-2" />
+                                <div className="h-5 bg-gray-200 rounded w-2/3 mx-auto mb-4" />
+                                <div className="w-40 h-40 bg-gray-200 rounded-full mx-auto" />
+                                <div className="h-3 bg-gray-200 rounded w-1/4 mx-auto mt-4" />
                             </div>
-                            <p className="mt-3 text-sm font-medium opacity-60">
-                                ${featuredProducts[0].price.toFixed(2)}
-                            </p>
-                        </div>
-                    </div>
+                        )}
 
+                        {/* Error */}
+                        {!loading && error && (
+                            <p className="text-sm text-red-400 text-center">{error}</p>
+                        )}
+
+                        {/* Featured product */}
+                        {!loading && !error && featured && (
+                            <div className="text-center">
+                                <p className="text-xs uppercase tracking-widest mb-1 opacity-60">New Arrival</p>
+                                <p className="text-xl font-bold">{featured.name}</p>
+                                <div className="relative h-40 w-40 mx-auto mt-4">
+                                    <Image
+                                        src={featured.image}
+                                        alt={featured.name}
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </div>
+                                <p className="mt-3 text-sm font-medium opacity-60">
+                                    ${featured.price.toFixed(2)}
+                                </p>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* ── ROW 2: Product Cards strip ── */}
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {featuredProducts.slice(1).map((product) => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
+                {loading && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {Array.from({ length: 3 }).map((_, i) => (
+                            <div key={i} className="animate-pulse">
+                                <div className="bg-gray-200 rounded-2xl aspect-[3/4] mb-4" />
+                                <div className="h-3 bg-gray-200 rounded w-3/4 mb-2" />
+                                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                            </div>
+                        ))}
+                    </div>
+                )}
 
+                {!loading && !error && rest.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {rest.map((product) => (
+                            <ProductCard key={product.id} product={product} />
+                        ))}
+                    </div>
+                )}
             </main>
         </div>
     );

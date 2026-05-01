@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import theme from "@/theme";
 import { CollectionCard } from "./cards/CollectionCard";
 import { products } from "@/data/product";
-import ProductCard from "./cards/ProductCard";
+import ProductCard from "./cards/MainProductCard";
 
 interface CollectionsCarouselProps {
     activeCollection?: string | null;
@@ -26,13 +26,14 @@ export function CollectionsCarousel({ activeCollection }: CollectionsCarouselPro
     const [maxIdx, setMaxIdx] = useState(0);
 
     const [selectedCollection, setSelectedCollection] = useState<string | null>(() => {
-        if (!activeCollection) return null;
+        if (!activeCollection) return COLLECTIONS[0]?.filter ?? null;
         return COLLECTIONS.find((c) => c.slug === activeCollection)?.filter ?? null;
     });
 
     useEffect(() => {
         if (!activeCollection) {
-            setSelectedCollection(null);
+            // No collection in URL — default to the first collection
+            setSelectedCollection(COLLECTIONS[0]?.filter ?? null);
             return;
         }
         // activeCollection is a slug like "summer-24" — resolve to filter name like "Summer '24"
@@ -157,7 +158,7 @@ export function CollectionsCarousel({ activeCollection }: CollectionsCarouselPro
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-16">
                             {collectionProducts.map((product) => (
-                                <ProductCard key={product.id} {...product} />
+                                <ProductCard key={product.id} product={product} />
                             ))}
                         </div>
                     )}

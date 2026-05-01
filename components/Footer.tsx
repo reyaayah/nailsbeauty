@@ -4,30 +4,31 @@ import {
     ArrowRight,
     CreditCard
 } from 'lucide-react';
+import theme from '@/theme';
 
 const Footer = () => {
-    const theme = {
-        colors: {
-            primary: "#DBA1A2",
-            dark: "#422B23",
-            light: "#F7F3ED",
-            muted: "#C2C6B9",
-            subtitle: "#EFD8D6",
-        },
-    };
+
 
     const footerSections = [
         {
-            title: "SERVICES",
-            links: ["Hair Styling", "Color & Highlights", "Manicure & Pedicure", "Facial Treatments", "Bridal Packages", "Men's Grooming"]
+            title: "CUSTOMER SERVICES",
+            links: ["REWARDS", "SIZE GUIDE", "HELP CENTER", "CUSTOMIZATION SERVICE",
+                "SHIPPING POLICY",
+                "RETURN & EXCHANGE POLICY"]
         },
         {
-            title: "BOUTIQUE",
-            links: ["Hair Care", "Skin Care", "Gift Cards", "Membership", "New Arrivals"]
+            title: "BRAND",
+            links: ["ABOUT US", "CONTACT US", "BLOGS"]
         },
         {
-            title: "INFORMATION",
-            links: ["About Us", "Our Stylists", "Contact Us", "Careers", "Privacy Policy", "Terms of Service"]
+            title: "SHOP",
+            links: ["BEST SELLERS",
+                "NEW ARRIVALS",
+                "SALES",
+                "SHOP BY COLLECTIONS",
+                "SHOP BY SHAPE",
+                "SHOP BY LENGTH"
+                , "TOOLS & ACCESSORIES"]
         }
     ];
 

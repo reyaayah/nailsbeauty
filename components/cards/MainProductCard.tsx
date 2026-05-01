@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+
 import { Heart, ShoppingBag } from "lucide-react";
 import theme from "@/theme";
 import { Product } from "@/types/product";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "@/context/CartContext";
+import SizeShapeSelector from "../modals/SizeShapeSelector";
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
     return (
@@ -36,13 +37,15 @@ export default function ProductCard({ product }: { product: Product }) {
     const [wished, setWished] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [added, setAdded] = useState(false);
-    const { addToCart } = useCart();
+    const [selectorOpen, setSelectorOpen] = useState(false);
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        addToCart(product);
-        // Brief "Added!" feedback flash
+        setSelectorOpen(true);
+    };
+
+    const handleAdded = () => {
         setAdded(true);
         setTimeout(() => setAdded(false), 1200);
     };
@@ -148,6 +151,14 @@ export default function ProductCard({ product }: { product: Product }) {
                     )}
                 </div>
             </Link>
+
+            {selectorOpen && (
+                <SizeShapeSelector
+                    product={product}
+                    onClose={() => setSelectorOpen(false)}
+                    onAdded={handleAdded}
+                />
+            )}
         </div>
     );
 }

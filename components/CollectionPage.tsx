@@ -5,9 +5,9 @@ import theme from "@/theme";
 import { products } from "@/data/product";
 import { useSearchParams } from "next/navigation";
 import { MobileFilterBar, DesktopFilterSidebar } from "@/components/FilterBar";
-import ProductCard from "@/components/cards/ProductCard";
 import VacaySection from "@/components/headers/BestSellers";
 import { Product } from "@/types/product";
+import ProductCard from "./cards/MainProductCard";
 
 type CollectionConfig = {
     collectionName: string;
@@ -67,7 +67,7 @@ export default function CollectionPage({ collection }: { collection: keyof typeo
                     )}
                     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-16 lg:gap-y-20">
                         {filteredProducts.map((product) => (
-                            <ProductCard key={product.id} {...product} />
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 </div>

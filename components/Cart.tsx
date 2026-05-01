@@ -5,8 +5,6 @@ import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import theme from "@/theme";
 
-
-
 const categories = [
     {
         title: "New Arrival",
@@ -25,7 +23,7 @@ const categories = [
 const FREE_SHIPPING_THRESHOLD = 70;
 
 export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-    const { items, removeFromCart, updateQuantity, totalItems, subtotal } = useCart();
+    const { items, removeFromCart, updateQuantity, totalItems, subtotal, syncing } = useCart();
     const isEmpty = items.length === 0;
     const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
     const shippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
@@ -54,8 +52,11 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onCl
                         <h2 style={{ color: theme.colors.dark }} className="text-3xl font-serif italic leading-none">
                             Your Selection
                         </h2>
-                        <p style={{ color: theme.colors.muted }} className="text-[10px] uppercase tracking-[0.2em] font-bold">
+                        <p style={{ color: theme.colors.muted }} className="text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-2">
                             Items in Bag — {totalItems}
+                            {syncing && (
+                                <span className="w-1.5 h-1.5 rounded-full animate-pulse inline-block" style={{ backgroundColor: theme.colors.primary }} />
+                            )}
                         </p>
                     </div>
                     <button
@@ -148,10 +149,10 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onCl
                         </div>
                     ) : (
                         /* Cart Items */
-                        <div className="space-y-6 pb-4">
-                            {items.map(({ product, quantity }) => (
+                        <div className="space-y-4 pb-4">
+                            {items.map(({ product, quantity, size, shape }) => (
                                 <div
-                                    key={product.id}
+                                    key={`${product.id}-${size}-${shape}`}
                                     className="flex gap-4 p-4 rounded-2xl bg-white/60 shadow-sm"
                                 >
                                     {/* Thumbnail */}
@@ -166,30 +167,59 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onCl
 
                                     {/* Details */}
                                     <div className="flex flex-col justify-between flex-1 min-w-0">
+                                        {/* Name + Delete */}
                                         <div className="flex items-start justify-between gap-2">
                                             <h4
-                                                className="text-sm font-serif leading-snug truncate"
+                                                className="text-sm font-serif leading-snug"
                                                 style={{ color: theme.colors.dark }}
                                             >
                                                 {product.name}
                                             </h4>
                                             <button
-                                                onClick={() => removeFromCart(product.id)}
-                                                className="flex-shrink-0 opacity-30 hover:opacity-70 transition-opacity"
+                                                onClick={() => removeFromCart(product.id, size, shape)}
+                                                className="flex-shrink-0 opacity-30 hover:opacity-80 hover:text-red-500 transition-all"
                                                 aria-label="Remove item"
                                             >
                                                 <Trash2 size={13} style={{ color: theme.colors.dark }} />
                                             </button>
                                         </div>
 
-                                        <div className="flex items-center justify-between mt-2">
-                                            {/* Quantity Control */}
+                                        {/* Size & Shape badges */}
+                                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                                            {size && (
+                                                <span
+                                                    className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border"
+                                                    style={{
+                                                        borderColor: `${theme.colors.primary}40`,
+                                                        color: theme.colors.primary,
+                                                        backgroundColor: `${theme.colors.primary}0D`,
+                                                    }}
+                                                >
+                                                    <span className="opacity-50">SIZE</span> {size}
+                                                </span>
+                                            )}
+                                            {shape && (
+                                                <span
+                                                    className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border"
+                                                    style={{
+                                                        borderColor: `${theme.colors.dark}25`,
+                                                        color: theme.colors.dark,
+                                                        backgroundColor: `${theme.colors.dark}06`,
+                                                    }}
+                                                >
+                                                    <span className="opacity-40">SHAPE</span> {shape}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Quantity + Price */}
+                                        <div className="flex items-center justify-between mt-2.5">
                                             <div
                                                 className="flex items-center gap-2 border rounded-full px-2 py-1"
                                                 style={{ borderColor: `${theme.colors.dark}20` }}
                                             >
                                                 <button
-                                                    onClick={() => updateQuantity(product.id, quantity - 1)}
+                                                    onClick={() => updateQuantity(product.id, quantity - 1, size, shape)}
                                                     className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
                                                     aria-label="Decrease quantity"
                                                 >
@@ -202,7 +232,7 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onCl
                                                     {quantity}
                                                 </span>
                                                 <button
-                                                    onClick={() => updateQuantity(product.id, quantity + 1)}
+                                                    onClick={() => updateQuantity(product.id, quantity + 1, size, shape)}
                                                     className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
                                                     aria-label="Increase quantity"
                                                 >
@@ -239,7 +269,7 @@ export default function CartSidebar({ isOpen, onClose }: { isOpen: boolean; onCl
 
                     <div style={{ backgroundColor: theme.colors.dark }} className="rounded-xl p-1 shadow-xl">
                         <a
-                            href={isEmpty ? "/collections/all" : "/checkout"}
+                            href={isEmpty ? "/products" : "/checkout"}
                             className="flex items-center justify-between w-full px-8 py-5 text-white group"
                         >
                             <span className="text-xs font-bold tracking-[0.2em] uppercase">

@@ -12,13 +12,19 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Prevent re-initialization on hot reload
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+// Initialize Firebase only on the client side
+let app: any;
+let auth: any;
+let db: any;
+let googleProvider: any;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
+if (typeof window !== 'undefined') {
+    app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+    googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: "select_account" });
+}
 
-googleProvider.setCustomParameters({ prompt: "select_account" });
-
+export { auth, db, googleProvider };
 export default app;

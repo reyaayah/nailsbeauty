@@ -1,5 +1,3 @@
-
-
 const theme = {
     colors: {
         primary: "#DBA1A2",

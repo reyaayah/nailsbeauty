@@ -109,11 +109,22 @@ export default function ProductCard({ product }: { product: Product }) {
                             }`}
                     />
 
-                    {/* Add to Bag Button */}
                     <button
                         onClick={handleAddToCart}
-                        className={`absolute bottom-6 left-1/2 -translate-x-1/2 w-[80%] py-3.5 rounded-full flex items-center justify-center gap-2 text-[9px] tracking-[0.25em] font-bold transition-all duration-500 backdrop-blur-lg z-10 ${hovered ? "translate-y-0 opacity-100 shadow-xl" : "translate-y-4 opacity-0"
-                            }`}
+                        className={`
+    absolute bottom-6 left-1/2 -translate-x-1/2 w-[80%] py-3.5 rounded-full 
+    flex items-center justify-center gap-2 text-[9px] tracking-[0.25em] font-bold 
+    transition-all duration-500 backdrop-blur-lg z-10
+
+    /* MOBILE: always visible */
+    translate-y-0 opacity-100
+
+    /* DESKTOP: hover behavior */
+    lg:translate-y-4 lg:opacity-0 
+    lg:group-hover:translate-y-0 lg:group-hover:opacity-100
+
+    shadow-xl
+  `}
                         style={{
                             backgroundColor: added
                                 ? `${theme.colors.primary}F2`

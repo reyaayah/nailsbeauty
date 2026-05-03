@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, User, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import theme from "@/theme";
+import RewardsModal from "@/components/modals/RewardsModal";
 
 export default function RegisterPage() {
     const { register, loginWithGoogle, authError, clearError } = useAuth();
@@ -128,7 +129,7 @@ export default function RegisterPage() {
                             onChange={(e) => setDisplayName(e.target.value)}
                             required
                             className="w-full pl-11 pr-4 py-3.5 border-2 rounded-xl text-sm bg-white outline-none transition-all text-black"
-                            style={{ borderColor: theme.colors.muted, }}
+                            style={{ borderColor: theme.colors.muted }}
                         />
                     </div>
 
@@ -235,6 +236,8 @@ export default function RegisterPage() {
                     </Link>
                 </p>
             </div>
+
+            <RewardsModal />
         </div>
     );
 }

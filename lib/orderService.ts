@@ -17,7 +17,7 @@ import {
     Timestamp,
 } from "firebase/firestore";
 import { CartItem } from "@/context/CartContext";
-import { db } from "./firebase/FirebaseConfig";
+import { getDbInstance, initializeFirebase } from "./firebase/FirebaseConfig";
 
 export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
 
@@ -68,6 +68,8 @@ export async function placeOrder(
     shippingAddress: ShippingAddress,
     paymentMethod = "card_ending_4242"
 ): Promise<string> {
+    await initializeFirebase();
+    const db = getDbInstance();
     const orderId = generateOrderId();
     const shipping = subtotal >= 70 ? 0 : 9.99;
     const total = subtotal + shipping;
@@ -105,6 +107,8 @@ export async function placeOrder(
 
 /** Fetch all orders for a user, newest first */
 export async function fetchOrders(uid: string): Promise<Order[]> {
+    await initializeFirebase();
+    const db = getDbInstance();
     const q = query(
         collection(db, "users", uid, "orders"),
         orderBy("createdAt", "desc")

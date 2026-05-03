@@ -17,7 +17,7 @@ import {
     writeBatch,
 } from "firebase/firestore";
 import { Product } from "@/types/product";
-import { db } from "./firebase/FirebaseConfig";
+import { getDbInstance, initializeFirebase } from "./firebase/FirebaseConfig";
 
 export interface CartAPIItem {
     productId: number;
@@ -34,13 +34,15 @@ function cartDocId(productId: number, size: string, shape: string) {
     return `${productId}__${size}__${shape}`.replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
-function cartRef(uid: string) {
+function cartRef(uid: string, db: any) {
     return collection(db, "users", uid, "cart");
 }
 
 /** Fetch all cart items for a user */
 export async function fetchCart(uid: string): Promise<CartAPIItem[]> {
-    const snapshot = await getDocs(query(cartRef(uid)));
+    await initializeFirebase();
+    const db = getDbInstance();
+    const snapshot = await getDocs(query(cartRef(uid, db)));
     return snapshot.docs.map((d) => d.data() as CartAPIItem);
 }
 
@@ -52,12 +54,14 @@ export async function addCartItem(
     size: string,
     shape: string
 ): Promise<void> {
+    await initializeFirebase();
+    const db = getDbInstance();
     const id = cartDocId(product.id, size, shape);
     const ref = doc(db, "users", uid, "cart", id);
 
     // setDoc with merge=true: if the doc exists it merges, so we add to qty
     // We instead read-then-write to properly increment
-    const snapshot = await getDocs(query(cartRef(uid)));
+    const snapshot = await getDocs(query(cartRef(uid, db)));
     const existing = snapshot.docs.find((d) => d.id === id);
 
     if (existing) {
@@ -84,6 +88,8 @@ export async function updateCartItem(
     size: string,
     shape: string
 ): Promise<void> {
+    await initializeFirebase();
+    const db = getDbInstance();
     const id = cartDocId(productId, size, shape);
     const ref = doc(db, "users", uid, "cart", id);
     await updateDoc(ref, { quantity });
@@ -96,6 +102,8 @@ export async function removeCartItem(
     size: string,
     shape: string
 ): Promise<void> {
+    await initializeFirebase();
+    const db = getDbInstance();
     const id = cartDocId(productId, size, shape);
     const ref = doc(db, "users", uid, "cart", id);
     await deleteDoc(ref);
@@ -103,7 +111,9 @@ export async function removeCartItem(
 
 /** Wipe the entire cart (used after successful checkout) */
 export async function clearCart(uid: string): Promise<void> {
-    const snapshot = await getDocs(query(cartRef(uid)));
+    await initializeFirebase();
+    const db = getDbInstance();
+    const snapshot = await getDocs(query(cartRef(uid, db)));
     const batch = writeBatch(db);
     snapshot.docs.forEach((d) => batch.delete(d.ref));
     await batch.commit();

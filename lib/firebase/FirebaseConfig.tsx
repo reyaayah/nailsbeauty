@@ -1,7 +1,3 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,13 +8,21 @@ const firebaseConfig = {
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase only on the client side
+// Lazy initialize Firebase only on the client side
 let app: any;
 let auth: any;
 let db: any;
 let googleProvider: any;
 
-if (typeof window !== 'undefined') {
+async function initializeFirebase() {
+    if (typeof window === 'undefined') return;
+
+    if (app) return;
+
+    const { initializeApp, getApps, getApp } = await import("firebase/app");
+    const { getAuth, GoogleAuthProvider } = await import("firebase/auth");
+    const { getFirestore } = await import("firebase/firestore");
+
     app = getApps().length ? getApp() : initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
@@ -26,5 +30,20 @@ if (typeof window !== 'undefined') {
     googleProvider.setCustomParameters({ prompt: "select_account" });
 }
 
-export { auth, db, googleProvider };
+function getAuthInstance() {
+    if (!auth) throw new Error("Firebase not initialized");
+    return auth;
+}
+
+function getDbInstance() {
+    if (!db) throw new Error("Firebase not initialized");
+    return db;
+}
+
+function getGoogleProvider() {
+    if (!googleProvider) throw new Error("Firebase not initialized");
+    return googleProvider;
+}
+
+export { initializeFirebase, getAuthInstance, getDbInstance, getGoogleProvider };
 export default app;

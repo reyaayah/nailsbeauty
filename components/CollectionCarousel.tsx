@@ -1,3 +1,4 @@
+"use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import theme from "@/theme";
 import { CollectionCard } from "./cards/CollectionCard";

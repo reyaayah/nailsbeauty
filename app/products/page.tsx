@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { MobileFilterBar, DesktopFilterSidebar } from "@/components/FilterBar";
 import ProductCard from "@/components/cards/MainProductCard";
 import { useProducts } from "@/hooks/useProducts";
-
-export default function AllProductsPage() {
+import { Suspense } from "react";
+function ProductsContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -97,5 +97,12 @@ export default function AllProductsPage() {
                 </div>
             </div>
         </main>
+    );
+}
+export default function AllProductsPage() {
+    return (
+        <Suspense fallback={<div>Loading collection...</div>}>
+            <ProductsContent />
+        </Suspense>
     );
 }

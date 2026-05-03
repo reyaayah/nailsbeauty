@@ -3,7 +3,6 @@
 
 import theme from "@/theme";
 import { products } from "@/data/product";
-import { useSearchParams } from "next/navigation";
 import { MobileFilterBar, DesktopFilterSidebar } from "@/components/FilterBar";
 import VacaySection from "@/components/headers/BestSellers";
 import { Product } from "@/types/product";
@@ -29,15 +28,19 @@ const COLLECTION_CONFIG: Record<string, CollectionConfig> = {
     },
 };
 
-export default function CollectionPage({ collection }: { collection: keyof typeof COLLECTION_CONFIG }) {
+export default function CollectionPage({ collection, filters, }: {
+    collection: keyof typeof COLLECTION_CONFIG;
+    filters: {
+        shape?: string | null;
+        length?: string | null;
+        style?: string | null;
+    };
+}) {
     const { collectionName, filter } = COLLECTION_CONFIG[collection];
-    const searchParams = useSearchParams();
 
     const collectionProducts = products.filter(filter);
     const filteredProducts = collectionProducts.filter((product) => {
-        const shape = searchParams.get("shape");
-        const length = searchParams.get("length");
-        const style = searchParams.get("style");
+        const { shape, length, style } = filters;
 
         return (
             (!shape || product.shape?.includes(shape)) &&

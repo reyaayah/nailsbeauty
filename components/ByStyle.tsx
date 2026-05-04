@@ -5,11 +5,11 @@ import { useRef, useState } from "react";
 
 const promos = [
     {
-        image: "/deal1.png",
+        image: "https://media.istockphoto.com/id/1543544136/photo/womans-hand-with-trendy-polka-dot-summer-manicure.jpg?s=612x612&w=0&k=20&c=710sjm-AvbteA8TRkv3zXMYwR_XdOJyBFrQF1K7EtwU=",
         buy: "Hot Girl Summer",
     },
     {
-        image: "/deal2.png",
+        image: "https://images.unsplash.com/photo-1777287852750-53eb2ca506e9?q=80&w=1114&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         buy: "Bloom for yourself",
     },
 ];

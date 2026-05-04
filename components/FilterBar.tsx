@@ -5,16 +5,16 @@ import { Check, ChevronDown, ChevronUp, SlidersHorizontal, X } from "lucide-reac
 import { useState } from "react";
 import theme from "@/theme";
 
+// FilterBar.tsx
 export const filterOptions: Record<string, string[]> = {
-    length: ["Extra-long", "Long", "Med", "Short"],
+    length: ["Extra-long", "Long", "Medium", "Short"],  // "Med" → "Medium"
     shape: ["Almond", "Coffin", "Oval", "Square", "Squoval"],
-    style: ["3D", "Aura", "Cat Eye", "Chrome", "French Tip", "Glitter"],
+    style: ["Glossy", "Metallic", "Matte", "French Tip", "Glitter", "Cat Eye", "Chrome"],
+
 };
 
 const ITEM_HEIGHT = 48;
 const VISIBLE_ITEMS = 3;
-
-// ─── Shared logic hook ────────────────────────────────────────────────────────
 
 export function useFilterState() {
     const searchParams = useSearchParams();

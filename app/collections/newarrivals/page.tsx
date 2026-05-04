@@ -2,28 +2,30 @@
 import { Suspense } from "react";
 import CollectionPage from "@/components/CollectionPage";
 
-function NewArrivalsContent({
+async function NewArrivalsContent({
     searchParams,
 }: {
-    searchParams: { shape?: string; length?: string; style?: string };
+    searchParams: Promise<{ shape?: string; length?: string; style?: string }>;
 }) {
+    const { shape, length, style } = await searchParams;
     return (
         <CollectionPage
             collection="new-arrivals"
             filters={{
-                shape: searchParams.shape ?? null,
-                length: searchParams.length ?? null,
-                style: searchParams.style ?? null,
+                shape: shape ?? null,
+                length: length ?? null,
+                style: style ?? null,
             }}
         />
     );
 }
 
-export default function NewArrivalsPage({
+export default async function NewArrivalsPage({
     searchParams,
 }: {
-    searchParams: { shape?: string; length?: string; style?: string };
+    searchParams: Promise<{ shape?: string; length?: string; style?: string }>;
 }) {
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <NewArrivalsContent searchParams={searchParams} />

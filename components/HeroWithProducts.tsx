@@ -5,10 +5,11 @@ import { Star, ArrowUpRight } from "lucide-react";
 import theme from "@/theme";
 import ProductCard from "./cards/MainProductCard";
 import { useNewArrivals } from "@/hooks/useNewArrivals";
+import { useRouter } from "next/navigation";
 
 export default function HeroWithProducts() {
     const { featured, rest, loading, error } = useNewArrivals();
-
+    const router = useRouter();
     return (
         <div
             id="new-arrivals"
@@ -41,6 +42,7 @@ export default function HeroWithProducts() {
                                 Nail Care <br /> Redefined.
                             </h1>
                             <button
+                                onClick={() => { router.push("/collections/newarrivals") }}
                                 className="flex items-center gap-2 px-8 py-4 rounded-full font-bold transition-transform hover:scale-105 active:scale-95"
                                 style={{ backgroundColor: theme.colors.primary, color: "white" }}
                             >

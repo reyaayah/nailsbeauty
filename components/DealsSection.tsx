@@ -19,7 +19,7 @@ const deals = [
         code: "VACAYREADY20",
     },
     {
-        image: "/deal3.png",
+        image: "https://media.istockphoto.com/id/1543544136/photo/womans-hand-with-trendy-polka-dot-summer-manicure.jpg?s=612x612&w=0&k=20&c=710sjm-AvbteA8TRkv3zXMYwR_XdOJyBFrQF1K7EtwU=",
         buy: "$249",
         get: "25",
         code: "VACAYREADY25",

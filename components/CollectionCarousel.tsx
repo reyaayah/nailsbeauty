@@ -12,7 +12,7 @@ interface CollectionsCarouselProps {
 const COLLECTIONS = [
     { name: "Summer '24", slug: "summer-24", image: "/deal1.png", bg: "#F2DED3", filter: "Summer '24" },
     { name: "G & G Essence", slug: "g-g-essence", image: "/deal2.png", bg: "#EDD9E9", filter: "G & G Essence" },
-    { name: "The Love Edit", slug: "the-love-edit", image: "/deal3.png", bg: "#D9E9E0", filter: "The Love Edit" },
+    { name: "The Love Edit", slug: "the-love-edit", image: "https://images.unsplash.com/photo-1777287852750-53eb2ca506e9?q=80&w=1114&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", bg: "#D9E9E0", filter: "The Love Edit" },
     { name: "LNY Limited", slug: "lny-limited", image: "/deal1.png", bg: "#F5EAD0", filter: "LNY Limited" },
 ];
 

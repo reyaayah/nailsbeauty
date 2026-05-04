@@ -2,27 +2,28 @@
 import { Suspense } from "react";
 import CollectionPage from "@/components/CollectionPage";
 
-function BestSellerContent({
+async function BestSellerContent({
     searchParams,
 }: {
-    searchParams: { shape?: string; length?: string; style?: string };
+    searchParams: Promise<{ shape?: string; length?: string; style?: string }>;
 }) {
+    const { shape, length, style } = await searchParams;
     return (
         <CollectionPage
             collection="best-sellers"
             filters={{
-                shape: searchParams.shape ?? null,
-                length: searchParams.length ?? null,
-                style: searchParams.style ?? null,
+                shape: shape ?? null,
+                length: length ?? null,
+                style: style ?? null,
             }}
         />
     );
 }
 
-export default function BestSellerPage({
+export default async function BestSellerPage({
     searchParams,
 }: {
-    searchParams: { shape?: string; length?: string; style?: string };
+    searchParams: Promise<{ shape?: string; length?: string; style?: string }>;
 }) {
     return (
         <Suspense fallback={<div>Loading...</div>}>

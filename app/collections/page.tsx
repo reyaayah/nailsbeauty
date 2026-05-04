@@ -1,12 +1,13 @@
 import { CollectionsCarousel } from "@/components/CollectionCarousel";
 import theme from "@/theme";
 
-export default function ShopCollection({
+export default async function ShopCollection({
     searchParams,
 }: {
     searchParams: { collection?: string };
 }) {
-    const activeCollection = searchParams.collection ?? null;
+    const { collection } = await searchParams;
+    const activeCollection = collection ?? null;
 
     return (
         <section

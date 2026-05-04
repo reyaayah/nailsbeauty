@@ -26,15 +26,20 @@ const COLLECTION_CONFIG: Record<string, CollectionConfig> = {
         collectionName: "New Arrivals",
         filter: (p) => !!p.isNew,
     },
+    "tools-accessories": {
+        collectionName: "Tools & Accessories",
+        filter: (p) => p.category === "Tools & Accessories",
+    },
 };
 
-export default function CollectionPage({ collection, filters, }: {
+export default function CollectionPage({ collection, filters, showFilters = true }: {
     collection: keyof typeof COLLECTION_CONFIG;
     filters: {
         shape?: string | null;
         length?: string | null;
         style?: string | null;
     };
+    showFilters?: boolean;
 }) {
     const { collectionName, filter } = COLLECTION_CONFIG[collection];
 
@@ -52,10 +57,11 @@ export default function CollectionPage({ collection, filters, }: {
     return (
         <main className="min-h-screen font-sans" style={{ backgroundColor: theme.colors.light }}>
             <VacaySection collectionName={collectionName} />
-            <MobileFilterBar totalCount={collectionProducts.length} />
+            {showFilters &&
+                <MobileFilterBar totalCount={collectionProducts.length} />}
 
             <div className="flex max-w-[1400px] mx-auto pt-10">
-                <DesktopFilterSidebar totalCount={collectionProducts.length} />
+                {showFilters && <DesktopFilterSidebar totalCount={collectionProducts.length} />}
 
                 <div className="flex-1 min-w-0 px-6 lg:px-8 pb-20">
                     {filteredProducts.length === 0 && (

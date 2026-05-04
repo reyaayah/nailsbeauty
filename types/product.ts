@@ -20,4 +20,7 @@ export interface Product {
     length?: string;
     style?: string;
     collection?: string;
+    isKit?: boolean;
+    kitOptions?: string[];
+    isSimple?: boolean;
 }

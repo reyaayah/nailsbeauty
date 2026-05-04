@@ -2,11 +2,11 @@ import theme from "@/theme";
 import Link from "next/link";
 
 const shapes = [
-    { name: "Almond", image: "/shapes/almond.png", href: "/collections/almond", desc: "Elegant & Slender" },
-    { name: "Coffin", image: "/shapes/coffin.png", href: "/collections/coffin", desc: "Bold & Modern" },
-    { name: "Oval", image: "/shapes/oval.png", href: "/collections/oval", desc: "Classic & Timeless" },
-    { name: "Square", image: "/shapes/square.png", href: "/collections/square", desc: "Sharp & Strong" },
-    { name: "Squoval", image: "/shapes/squoval.png", href: "/collections/squoval", desc: "The Best of Both" },
+    { name: "Almond", image: "/shapes/almond.png", href: "/products?shape=Almond", desc: "Elegant & Slender" },
+    { name: "Coffin", image: "/shapes/coffin.png", href: "/products?shape=Coffin", desc: "Bold & Modern" },
+    { name: "Oval", image: "/shapes/oval.png", href: "/products?shape=Oval", desc: "Classic & Timeless" },
+    { name: "Square", image: "/shapes/square.png", href: "/products?shape=Square", desc: "Sharp & Strong" },
+    { name: "Squoval", image: "/shapes/squoval.png", href: "/products?shape=Squoval", desc: "The Best of Both" },
 ];
 
 export default function ShopByShape() {

@@ -28,13 +28,13 @@ const Footer = () => {
         {
             title: "SHOP",
             links: [
-                { name: "BEST SELLERS", href: "/shop/best-sellers" },
-                { name: "NEW ARRIVALS", href: "/shop/new-arrivals" },
-                { name: "SALES", href: "/shop/sales" },
+                { name: "BEST SELLERS", href: "/collections/bestseller" },
+                { name: "NEW ARRIVALS", href: "/collections/newarrivals" },
+                { name: "SALES", href: "/collections/flashsale" },
                 { name: "SHOP BY COLLECTIONS", href: "/collections" },
-                { name: "SHOP BY SHAPE", href: "/shop/shape" },
-                { name: "SHOP BY LENGTH", href: "/shop/length" },
-                { name: "TOOLS & ACCESSORIES", href: "/shop/accessories" }
+                { name: "SHOP BY SHAPE", href: "/products?shape=Almond" },
+                { name: "SHOP BY LENGTH", href: "/products" },
+                { name: "TOOLS & ACCESSORIES", href: "/collections/toolsandaccessories" }
             ]
         }
     ];

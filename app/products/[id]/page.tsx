@@ -3,7 +3,10 @@
 
 import { useState, useEffect } from "react";
 import {
-    Plus, Minus, Heart, Ruler, Loader2, ShoppingBag, X
+    Plus, Minus, Heart, Ruler, Loader2, ShoppingBag, X,
+    Truck,
+    RefreshCw,
+    TrendingUp
 } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -417,17 +420,17 @@ export default function ProductDetails() {
                     {/* Trust Badges */}
                     <div className="grid grid-cols-3 gap-3 pt-4 border-t" style={{ borderColor: `${theme.colors.dark}10` }}>
                         <div className="text-center">
-                            <p className="text-2xl mb-1">🚚</p>
+                            <Truck />
                             <p className="text-[10px] font-bold uppercase">Free Shipping</p>
                             <p className="text-[10px] opacity-50">Orders over $70</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-2xl mb-1">↩️</p>
+                            <RefreshCw />
                             <p className="text-[10px] font-bold uppercase">Easy Returns</p>
                             <p className="text-[10px] opacity-50">30 days guaranteed</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-2xl mb-1">✓</p>
+                            <TrendingUp />
                             <p className="text-[10px] font-bold uppercase">Cruelty Free</p>
                             <p className="text-[10px] opacity-50">100% Vegan</p>
                         </div>

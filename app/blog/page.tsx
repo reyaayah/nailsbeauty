@@ -305,18 +305,7 @@ function BlogList({ onSelectPost }: { onSelectPost: (slug: string) => void }) {
         <main className="min-h-screen font-sans" style={{ backgroundColor: theme.colors.light }}>
             {/* Header */}
             <div className="max-w-[1400px] mx-auto px-6 pt-24 pb-10">
-                <nav
-                    className="text-[11px] uppercase tracking-[0.3em] flex gap-3 items-center mb-10"
-                    style={{ color: theme.colors.muted }}
-                >
-                    <span className="cursor-pointer hover:underline" onClick={() => router.push("/")}>
-                        Home
-                    </span>
-                    <span>/</span>
-                    <span style={{ color: theme.colors.dark }} className="font-semibold">
-                        Journal
-                    </span>
-                </nav>
+
 
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
                     <div>

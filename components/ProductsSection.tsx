@@ -38,7 +38,7 @@ export default function BestSellers() {
                 </div>
 
                 <a
-                    href="/collections/best-sellers"
+                    href="/collections/bestseller"
                     className="group flex items-center gap-6 text-[10px] tracking-[0.4em] font-bold uppercase transition-all"
                     style={{ color: theme.colors.dark }}
                 >

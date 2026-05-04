@@ -142,8 +142,8 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                     <div className="mt-10 pt-8 border-t border-gray-100">
                         <div className="space-y-5">
                             <div className="flex items-center justify-between text-[14px] cursor-pointer group">
-                                <span className={`font-semibold tracking-wide `} style={{ color: theme.colors.dark }}>
-                                    VACAY SELECTION
+                                <span onClick={() => { router.push("/collections/toolsandaccessories") }} className={`font-semibold tracking-wide `} style={{ color: theme.colors.dark }}>
+                                    Tools & Accessories
                                 </span>
                                 <span className="h-1 w-1 rounded-full bg-primary" />
                             </div>

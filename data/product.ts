@@ -86,5 +86,33 @@ export const products: Product[] = [
         style: "Glossy",
         collection: "Summer '24",
     },
+    {
+        id: 6,
+        name: "Crystal Clear Nail Glue",
+        image: "/glue.png",
+        price: 12.00,
+        reviews: 78,
+        rating: 4.5,
+        category: "Tools & Accessories",
+        isSimple: true,
+        description: "Our Crystal Clear Nail Glue offers a strong, long-lasting hold for all your press-on nail needs. With its quick-drying formula and precision applicator, it ensures a secure fit that lasts up to 2 weeks. Perfect for both beginners and nail enthusiasts, this glue is designed to keep your nails looking flawless without any mess.",
+
+    },
+    {
+        id: 7,
+        name: "Pro Touch Kit",
+        category: "Tools & Accessories",
+        image: "/kit.png",
+        isKit: true,
+        kitOptions: [
+            "Starter Kit — 5 tools",
+            "Pro Kit — 10 tools",
+            "Salon Kit — 15 tools",
+        ],
+        price: 39.00,
+        reviews: 34,
+        rating: 4.8,
+        description: "The Pro Touch Kit is your all-in-one solution for flawless nail application and maintenance. Whether you're a beginner or a seasoned pro, our carefully curated kits include everything you need to achieve salon-quality results at home. From essential tools for prepping and applying press-on nails to advanced accessories for shaping and finishing, the Pro Touch Kit is designed to elevate your nail game and keep your hands looking their best."
+    }
 
 ];

@@ -22,7 +22,7 @@ const Footer = () => {
             links: [
                 { name: "ABOUT US", href: "/aboutus" },
                 { name: "CONTACT US", href: "/contact" },
-                { name: "BLOGS", href: "/blogs" }
+                { name: "BLOGS", href: "/blog" }
             ]
         },
         {

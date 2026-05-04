@@ -5,6 +5,7 @@ const theme = {
         light: "#F7F3ED",
         muted: "#C2C6B9",
         subtitle: "#EFD8D6",
+        pink: "#EF7575",
     },
 };
 

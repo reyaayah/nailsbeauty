@@ -47,20 +47,39 @@ export default function SizeGuidePage() {
             className="min-h-screen"
             style={{ backgroundColor: theme.colors.light, fontFamily: "'DM Sans', sans-serif", color: theme.colors.dark }}
         >
-            {/* Hero */}
-            <section className="py-24 px-6 text-center" style={{ backgroundColor: "#FAF5F0" }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.3em] mb-4" style={{ color: theme.colors.primary }}>
-                    Find Your Fit
-                </p>
-                <h1
-                    className="text-5xl md:text-6xl font-bold leading-none mb-6"
-                    style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                    Nail <em className="italic" style={{ color: theme.colors.primary }}>Size</em> Guide
-                </h1>
-                <p className="max-w-md mx-auto text-sm leading-relaxed opacity-60">
-                    The perfect press-on starts with the perfect fit. Follow our guide to find your exact size — no guessing required.
-                </p>
+            {/* Hero with Background Image */}
+            <section className="relative px-6 py-28 text-center overflow-hidden">
+                {/* 1. Background Image */}
+                <img
+                    src="https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bmFpbHN8ZW58MHwwfDB8fHww" // <-- Replace with your image path
+                    alt="Nail size measurement"
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+
+                {/* 2. Gradient Overlay for text contrast and blending */}
+                <div
+                    className="absolute inset-0"
+                    style={{
+                        background: `linear-gradient(to right, ${theme.colors.light}, transparent 60%, ${theme.colors.light})`,
+                        opacity: 0.8 // Blend slightly
+                    }}
+                />
+
+                {/* 3. Hero Content (Text) */}
+                <div className="relative z-10"> {/* Ensure text stays on top */}
+                    <p className="text-[11px] font-medium uppercase tracking-[0.3em] mb-4" style={{ color: theme.colors.primary }}>
+                        Find Your Fit
+                    </p>
+                    <h1
+                        className="text-5xl md:text-6xl font-bold leading-none mb-6"
+                        style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
+                        Nail <em className="italic" style={{ color: theme.colors.primary }}>Size</em> Guide
+                    </h1>
+                    <p className="max-w-md mx-auto text-sm leading-relaxed opacity-60">
+                        The perfect press-on starts with the perfect fit. Follow our guide to find your exact size — no guessing required.
+                    </p>
+                </div>
             </section>
 
             {/* How to measure */}

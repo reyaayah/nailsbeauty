@@ -31,77 +31,85 @@ export default function ForgotPasswordPage() {
             className="min-h-screen flex items-center justify-center px-4 py-20"
             style={{ backgroundColor: theme.colors.light }}
         >
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-md bg-white p-8 md:p-10 rounded-[2rem] shadow-xl shadow-black/5">
 
-                {/* Back */}
+                {/* Back Navigation */}
                 <Link
                     href="/auth/login"
-                    className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-50 hover:opacity-100 mb-10 transition-opacity"
+                    className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] mb-10 transition-colors group"
+                    style={{ color: theme.colors.dark }}
                 >
-                    <ArrowLeft size={14} /> Back to login
+                    <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                    Back to login
                 </Link>
 
                 {sent ? (
-                    /* ── Success state ── */
-                    <div className="text-center">
+                    /* ── Success State ── */
+                    <div className="text-center animate-in fade-in zoom-in duration-300">
                         <div
-                            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                            style={{ backgroundColor: theme.colors.primary + "20" }}
+                            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner"
+                            style={{ backgroundColor: theme.colors.primary + "15" }}
                         >
-                            <CheckCircle2 size={32} style={{ color: theme.colors.primary }} />
+                            <CheckCircle2 size={40} style={{ color: theme.colors.primary }} />
                         </div>
-                        <h1 className="text-3xl font-serif mb-3" style={{ color: theme.colors.dark }}>
+                        <h1 className="text-3xl font-serif mb-4" style={{ color: theme.colors.dark }}>
                             Check your inbox
                         </h1>
-                        <p className="text-sm opacity-60 leading-relaxed mb-8">
+                        <p className="text-sm text-slate-600 leading-relaxed mb-10 font-medium">
                             We&apos;ve sent a password reset link to{" "}
-                            <span className="font-bold opacity-100">{email}</span>. Check your spam
-                            folder if you don&apos;t see it.
+                            <span className="font-bold text-slate-900 border-b border-slate-200">{email}</span>.
+                            Please check your spam folder if it doesn&apos;t arrive soon.
                         </p>
                         <button
                             onClick={() => { setSent(false); setEmail(""); }}
-                            className="text-xs font-bold underline opacity-60 hover:opacity-100"
+                            className="text-xs font-black uppercase tracking-widest border-b-2 pb-1 transition-all hover:opacity-70"
+                            style={{ color: theme.colors.dark, borderColor: theme.colors.primary }}
                         >
                             Send again
                         </button>
                     </div>
                 ) : (
-                    /* ── Form state ── */
+                    /* ── Form State ── */
                     <>
                         <div className="mb-10">
-                            <h1 className="text-4xl font-serif tracking-tight mb-2" style={{ color: theme.colors.dark }}>
+                            <h1 className="text-4xl font-serif tracking-tight mb-3" style={{ color: theme.colors.dark }}>
                                 Forgot password?
                             </h1>
-                            <p className="text-sm opacity-60">
-                                Enter your email and we&apos;ll send you a reset link.
+                            <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                                Enter your email below and we&apos;ll send you instructions to reset your password.
                             </p>
                         </div>
 
                         {authError && (
-                            <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">
+                            <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-800 rounded-xl px-4 py-3 mb-8 text-sm font-medium">
                                 <AlertCircle size={16} className="mt-0.5 shrink-0" />
                                 <span>{authError}</span>
                             </div>
                         )}
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div className="relative">
-                                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-40" />
-                                <input
-                                    type="email"
-                                    placeholder="Email address"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                    className="w-full pl-11 pr-4 py-3.5 border-2 rounded-xl text-sm bg-white outline-none transition-all"
-                                    style={{ borderColor: theme.colors.muted }}
-                                />
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 ml-1" style={{ color: theme.colors.dark }}>
+                                    Email Address
+                                </label>
+                                <div className="relative">
+                                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                    <input
+                                        type="email"
+                                        placeholder="yourname@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                        className="w-full pl-12 pr-4 py-4 border-2 rounded-xl text-sm bg-gray-50 outline-none focus:bg-white focus:border-black transition-all placeholder:text-slate-400 text-slate-900 font-medium"
+                                        style={{ borderColor: theme.colors.muted }}
+                                    />
+                                </div>
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={submitting}
-                                className="w-full py-4 rounded-full text-white text-sm font-black uppercase tracking-widest transition-all disabled:opacity-50 hover:opacity-90 shadow-lg"
+                                className="w-full py-4 rounded-xl text-white text-xs font-black uppercase tracking-[0.15em] transition-all disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-black/10"
                                 style={{ backgroundColor: theme.colors.primary }}
                             >
                                 {submitting ? "Sending..." : "Send Reset Link"}

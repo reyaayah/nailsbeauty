@@ -16,7 +16,6 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { Product } from "@/types/product";
 import { useWishlist } from "@/context/WIshlistContext";
-import { a } from "framer-motion/client";
 
 // Product data - replace with API call in production
 const PRODUCTS: Record<number, Product & { sizes: string[], features: string[] }> = {
@@ -47,7 +46,32 @@ const PRODUCTS: Record<number, Product & { sizes: string[], features: string[] }
 // Shape options for all products
 const SHAPE_OPTIONS = ["Almond", "Square", "Coffin", "Oval"];
 
+function useProduct(id: string) {
+    const [product, setProduct] = useState<Product | null>(null);
+    const [related, setRelated] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (!id) return;
+        setLoading(true);
+        setError(null);
+
+        fetch(`/api/products/${id}`)
+            .then((res) => {
+                if (!res.ok) throw new Error("Product not found");
+                return res.json();
+            })
+            .then((data) => {
+                setProduct(data.product);
+                setRelated(data.related ?? []);
+            })
+            .catch((err) => setError(err.message))
+            .finally(() => setLoading(false));
+    }, [id]);
+
+    return { product, related, loading, error };
+}
 
 export default function ProductDetails() {
     const router = useRouter();
@@ -56,11 +80,12 @@ export default function ProductDetails() {
     const { isInWishlist, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist();
     const params = useParams();
     const productId = parseInt(params.id as string);
-    const product = PRODUCTS[productId];
+    // const product = PRODUCTS[productId];
+    const { product } = useProduct(params.id as string);
 
     const [quantity, setQuantity] = useState(1);
     const [activeImage, setActiveImage] = useState(0);
-    const [selectedSize, setSelectedSize] = useState(product?.sizes[2] || "M");
+    const [selectedSize, setSelectedSize] = useState(product?.sizes?.[2] || "M");
     const [selectedShape, setSelectedShape] = useState(SHAPE_OPTIONS[0]);
     const [addingToCart, setAddingToCart] = useState(false);
     const [wishlisted, setWishlisted] = useState(false);
@@ -160,60 +185,7 @@ export default function ProductDetails() {
             className="w-full mx-auto px-6 py-10 font-sans"
             style={{ backgroundColor: theme.colors.light, color: theme.colors.dark }}
         >
-            {/* Size Guide Modal */}
-            {showSizeGuide && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-serif" style={{ color: theme.colors.dark }}>
-                                Size Guide
-                            </h2>
-                            <button
-                                onClick={() => setShowSizeGuide(false)}
-                                className="p-2 hover:bg-gray-100 rounded-lg"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
 
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="font-bold mb-3" style={{ color: theme.colors.dark }}>
-                                    Nail Size Measurements
-                                </h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {[
-                                        { size: "XS", length: "16-18mm", width: "8-10mm" },
-                                        { size: "S", length: "18-20mm", width: "10-12mm" },
-                                        { size: "M", length: "20-22mm", width: "12-14mm" },
-                                        { size: "L", length: "22-24mm", width: "14-16mm" },
-                                    ].map((item) => (
-                                        <div key={item.size} className="border rounded-lg p-4">
-                                            <p className="font-bold text-lg" style={{ color: theme.colors.primary }}>
-                                                {item.size}
-                                            </p>
-                                            <p className="text-xs opacity-60">Length: {item.length}</p>
-                                            <p className="text-xs opacity-60">Width: {item.width}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="font-bold mb-3" style={{ color: theme.colors.dark }}>
-                                    How to Find Your Size
-                                </h3>
-                                <ol className="space-y-2 text-sm opacity-70">
-                                    <li>1. Measure your natural nail from cuticle to tip</li>
-                                    <li>2. Compare with our size chart above</li>
-                                    <li>3. If between sizes, choose the larger one</li>
-                                    <li>4. We include extra sizing stickers in every set</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-2 text-sm mb-8 font-medium opacity-70 mt-20">
@@ -329,14 +301,14 @@ export default function ProductDetails() {
                                 Select Size
                             </span>
                             <button
-                                onClick={() => setShowSizeGuide(true)}
+                                onClick={() => router.push("/size-guide")}
                                 className="flex items-center gap-1 text-[10px] font-bold underline opacity-70 hover:opacity-100 transition-opacity"
                             >
                                 <Ruler size={12} /> Size Guide
                             </button>
                         </div>
                         <div className="flex gap-3 flex-wrap">
-                            {product.sizes.map((size) => (
+                            {product?.sizes?.map((size) => (
                                 <button
                                     key={size}
                                     onClick={() => setSelectedSize(size)}

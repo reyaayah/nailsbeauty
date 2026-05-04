@@ -109,9 +109,9 @@ export async function GET(req: NextRequest) {
     const filtered = products.filter((p) => {
         if (!shape && !length && !style) return true;
         return (
-            (!shape  || p.shape?.toLowerCase()  === shape.toLowerCase())  &&
+            (!shape || p.shape?.toLowerCase() === shape.toLowerCase()) &&
             (!length || p.length?.toLowerCase() === length.toLowerCase()) &&
-            (!style  || p.style?.toLowerCase()  === style.toLowerCase())
+            (!style || p.style?.toLowerCase() === style.toLowerCase())
         );
     });
 

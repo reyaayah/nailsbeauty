@@ -8,6 +8,8 @@ import { Product } from "@/types/product";
 import Link from "next/link";
 import Image from "next/image";
 import SizeShapeSelector from "../modals/SizeShapeSelector";
+import { useWishlist } from "@/context/WIshlistContext";
+import toast from "react-hot-toast";
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
     return (
@@ -34,8 +36,9 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
-    const [wished, setWished] = useState(false);
-    const [hovered, setHovered] = useState(false);
+    const { addItem, removeItem, isInWishlist } = useWishlist();
+
+    const wished = isInWishlist(product.id); const [hovered, setHovered] = useState(false);
     const [added, setAdded] = useState(false);
     const [selectorOpen, setSelectorOpen] = useState(false);
 
@@ -71,10 +74,21 @@ export default function ProductCard({ product }: { product: Product }) {
 
                     {/* Wishlist Button */}
                     <button
-                        onClick={(e) => {
+                        onClick={async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setWished(!wished);
+
+                            try {
+                                if (wished) {
+                                    await removeItem(product.id);
+                                    toast.success("Removed from wishlist 💔");
+                                } else {
+                                    await addItem(product.id);
+                                    toast.success("Added to wishlist ❤️");
+                                }
+                            } catch (error) {
+                                toast.error("Something went wrong 😢");
+                            }
                         }}
                         className="absolute top-4 right-4 z-20 transition-all hover:scale-110 active:scale-90 bg-white/50 backdrop-blur-sm p-2 rounded-full"
                         aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}

@@ -1,3 +1,4 @@
+// app/checkout/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -9,7 +10,6 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { placeOrder, ShippingAddress } from "@/lib/orderService";
 
-// ─── Dummy payment methods (replace with Stripe, etc.) ───────────────────────
 const DUMMY_PAYMENT_METHODS = [
     { id: "card_ending_4242", label: "Visa ending in 4242", icon: "💳" },
     { id: "card_ending_5555", label: "Mastercard ending in 5555", icon: "💳" },
@@ -43,7 +43,6 @@ export default function CheckoutPage() {
     const shippingCost = subtotal >= 70 ? 0 : 9.99;
     const total = subtotal + shippingCost;
 
-    // Redirect empty cart
     if (items.length === 0 && step !== "success") {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6"
@@ -53,7 +52,7 @@ export default function CheckoutPage() {
                     Your bag is empty
                 </h2>
                 <button
-                    onClick={() => router.push("/collections/all")}
+                    onClick={() => router.push("/collections")}
                     className="px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase"
                     style={{ backgroundColor: theme.colors.dark, color: theme.colors.light }}
                 >
@@ -63,7 +62,6 @@ export default function CheckoutPage() {
         );
     }
 
-    // ── Validation ────────────────────────────────────────────────────────────
     function validateAddress(): boolean {
         const e: Partial<ShippingAddress> = {};
         if (!address.fullName.trim()) e.fullName = "Required";
@@ -75,10 +73,9 @@ export default function CheckoutPage() {
         return Object.keys(e).length === 0;
     }
 
-    // ── Place order ───────────────────────────────────────────────────────────
     async function handlePlaceOrder() {
         if (!user) {
-            router.push("/login?redirect=/checkout");
+            router.push("/auth/login?redirect=/checkout");
             return;
         }
         setPlacing(true);
@@ -95,7 +92,6 @@ export default function CheckoutPage() {
         }
     }
 
-    // ── Step indicators ───────────────────────────────────────────────────────
     const STEPS: { key: Step; label: string }[] = [
         { key: "shipping", label: "Shipping" },
         { key: "payment", label: "Payment" },
@@ -106,10 +102,8 @@ export default function CheckoutPage() {
 
     return (
         <div className="min-h-screen" style={{ backgroundColor: theme.colors.light }}>
-            {/* Top accent */}
             <div className="h-1.5 w-full" style={{ backgroundColor: theme.colors.primary }} />
 
-            {/* Nav */}
             <header className="flex items-center justify-between px-6 md:px-16 py-6 border-b border-black/5">
                 <button
                     onClick={() => router.back()}
@@ -121,11 +115,10 @@ export default function CheckoutPage() {
                 <h1 className="text-xl font-serif italic" style={{ color: theme.colors.dark }}>
                     Checkout
                 </h1>
-                <div className="w-16" /> {/* spacer */}
+                <div className="w-16" />
             </header>
 
             {step === "success" ? (
-                // ── Success screen ──────────────────────────────────────────────────
                 <div className="flex flex-col items-center justify-center min-h-[70vh] px-6 text-center">
                     <div
                         className="w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-lg"
@@ -164,9 +157,7 @@ export default function CheckoutPage() {
                 </div>
             ) : (
                 <div className="max-w-6xl mx-auto px-6 md:px-16 py-10 grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-10">
-                    {/* ── LEFT: Steps ─────────────────────────────────────────────────── */}
                     <div>
-                        {/* Step progress */}
                         <div className="flex items-center gap-0 mb-10">
                             {STEPS.map((s, i) => (
                                 <div key={s.key} className="flex items-center">
@@ -209,7 +200,6 @@ export default function CheckoutPage() {
                             ))}
                         </div>
 
-                        {/* ── STEP: Shipping ───────────────────────────────────────────── */}
                         {step === "shipping" && (
                             <div className="space-y-5">
                                 <SectionHeader icon={<MapPin size={16} />} title="Shipping Address" />
@@ -273,7 +263,6 @@ export default function CheckoutPage() {
                                             <option value="AU">Australia</option>
                                             <option value="NP">Nepal</option>
                                             <option value="IN">India</option>
-                                            <option value="OTHER">Other</option>
                                         </select>
                                     </div>
                                 </div>
@@ -286,7 +275,6 @@ export default function CheckoutPage() {
                             </div>
                         )}
 
-                        {/* ── STEP: Payment ────────────────────────────────────────────── */}
                         {step === "payment" && (
                             <div className="space-y-5">
                                 <SectionHeader icon={<CreditCard size={16} />} title="Payment Method" />
@@ -315,7 +303,6 @@ export default function CheckoutPage() {
                                                 value={pm.id}
                                                 checked={paymentMethod === pm.id}
                                                 onChange={() => setPaymentMethod(pm.id)}
-                                                className="accent-current"
                                                 style={{ accentColor: theme.colors.primary }}
                                             />
                                             <span className="text-lg">{pm.icon}</span>
@@ -329,12 +316,10 @@ export default function CheckoutPage() {
                             </div>
                         )}
 
-                        {/* ── STEP: Review ─────────────────────────────────────────────── */}
                         {step === "review" && (
                             <div className="space-y-6">
                                 <SectionHeader icon={<Package size={16} />} title="Review Your Order" />
 
-                                {/* Shipping summary */}
                                 <ReviewCard title="Shipping To">
                                     <p className="text-sm" style={{ color: theme.colors.dark }}>
                                         {address.fullName}
@@ -354,7 +339,6 @@ export default function CheckoutPage() {
                                     </button>
                                 </ReviewCard>
 
-                                {/* Payment summary */}
                                 <ReviewCard title="Payment">
                                     <p className="text-sm" style={{ color: theme.colors.dark }}>
                                         {DUMMY_PAYMENT_METHODS.find((p) => p.id === paymentMethod)?.label}
@@ -368,7 +352,6 @@ export default function CheckoutPage() {
                                     </button>
                                 </ReviewCard>
 
-                                {/* Items review */}
                                 <ReviewCard title="Items">
                                     <div className="space-y-3">
                                         {items.map(({ product, quantity, size, shape }) => (
@@ -409,7 +392,6 @@ export default function CheckoutPage() {
                         )}
                     </div>
 
-                    {/* ── RIGHT: Order Summary ─────────────────────────────────────── */}
                     <div className="lg:sticky lg:top-10 self-start">
                         <div className="rounded-2xl p-6 space-y-4 border" style={{ borderColor: `${theme.colors.dark}10` }}>
                             <h3 className="text-sm font-bold uppercase tracking-widest opacity-50"
@@ -465,8 +447,6 @@ export default function CheckoutPage() {
         </div>
     );
 }
-
-// ─── Shared sub-components ────────────────────────────────────────────────────
 
 function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
     return (

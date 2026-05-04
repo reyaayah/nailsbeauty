@@ -1,3 +1,4 @@
+// context/CartContext.tsx (UPDATED)
 "use client";
 
 import {
@@ -27,7 +28,7 @@ export interface CartItem {
 
 interface CartContextValue {
     items: CartItem[];
-    addToCart: (product: Product, size: string, shape: string) => Promise<void>;
+    addToCart: (product: Product, size: string, shape: string, quantity?: number) => Promise<void>;
     removeFromCart: (productId: number, size?: string, shape?: string) => Promise<void>;
     updateQuantity: (productId: number, quantity: number, size?: string, shape?: string) => Promise<void>;
     clearCart: () => Promise<void>;
@@ -42,8 +43,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
     const STORAGE_KEY = "gg_guest_cart";
 
-    // Always start empty on the server — localStorage is loaded client-side
-    // in a useEffect below to avoid SSR/client hydration mismatch.
     const [items, setItems] = useState<CartItem[]>([]);
     const [syncing, setSyncing] = useState(false);
     const [hydrated, setHydrated] = useState(false);
@@ -51,33 +50,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
     const subtotal = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
 
-    // Hydrate guest cart from localStorage once on the client after mount
+    // Hydrate guest cart from localStorage
     useEffect(() => {
-        if (user) return; // logged-in users get their cart from the API
+        if (user) return;
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) setItems(JSON.parse(stored) as CartItem[]);
         } catch {
-            // corrupted storage — start fresh
+            // corrupted storage
         }
         setHydrated(true);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
-    // Persist guest cart to localStorage after hydration (skip the initial empty render)
+    // Persist guest cart to localStorage
     useEffect(() => {
         if (!hydrated || user) return;
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
         } catch {
-            // storage quota exceeded or private mode — fail silently
+            // storage quota exceeded
         }
     }, [items, user, hydrated]);
 
-    // Load server cart when user logs in, clear localStorage on logout
+    // Load server cart when user logs in
     useEffect(() => {
         if (!user) {
-            // On logout: restore guest cart from localStorage (safe here — this
-            // effect only runs client-side after mount, never on the server).
             try {
                 const stored = localStorage.getItem(STORAGE_KEY);
                 setItems(stored ? (JSON.parse(stored) as CartItem[]) : []);
@@ -88,11 +85,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        // User just logged in — merge guest cart into server cart, then load
         setSyncing(true);
         const mergeAndLoad = async () => {
             try {
-                // Push any guest items to the server first
                 const guestItems: CartItem[] = (() => {
                     try {
                         const stored = localStorage.getItem(STORAGE_KEY);
@@ -106,10 +101,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     await addCartItem(user.uid, product, quantity, size, shape);
                 }
 
-                // Clear guest localStorage after merge
                 localStorage.removeItem(STORAGE_KEY);
 
-                // Load the final server cart
                 const apiItems = await fetchCart(user.uid);
                 setItems(
                     apiItems.map((i) => ({
@@ -136,8 +129,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }, [user]);
 
     const addToCart = useCallback(
-        async (product: Product, size: string, shape: string) => {
-            // Optimistic update first — same product+size+shape = increment qty
+        async (product: Product, size: string, shape: string, quantity: number = 1) => {
+            // Optimistic update
             setItems((prev) => {
                 const existing = prev.find(
                     (i) => i.product.id === product.id && i.size === size && i.shape === shape
@@ -145,17 +138,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 if (existing) {
                     return prev.map((i) =>
                         i.product.id === product.id && i.size === size && i.shape === shape
-                            ? { ...i, quantity: i.quantity + 1 }
+                            ? { ...i, quantity: i.quantity + quantity }
                             : i
                     );
                 }
-                return [...prev, { product, quantity: 1, size, shape }];
+                return [...prev, { product, quantity, size, shape }];
             });
+
             if (user) {
                 try {
-                    await addCartItem(user.uid, product, 1, size, shape);
+                    await addCartItem(user.uid, product, quantity, size, shape);
                 } catch (err) {
                     console.error("Cart sync failed:", err);
+                    // Could revert optimistic update here if needed
                 }
             }
         },

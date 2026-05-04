@@ -1,35 +1,19 @@
-/**
- * orderService.ts
- * Creates and fetches orders in Firestore.
- *
- * Collection path: users/{uid}/orders/{orderId}
- * Also mirrored to: orders/{orderId}  (for admin access)
- */
-
+// lib/orderService.ts
 import {
-    collection,
     doc,
     setDoc,
     getDocs,
-    orderBy,
+    collection,
     query,
-    serverTimestamp,
+    where,
+    orderBy,
     Timestamp,
+    writeBatch,
 } from "firebase/firestore";
+import { getDbInstance } from "@/lib/firebase/FirebaseConfig";
 import { CartItem } from "@/context/CartContext";
-import { getDbInstance, initializeFirebase } from "./firebase/FirebaseConfig";
 
 export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
-
-export interface OrderItem {
-    productId: number;
-    name: string;
-    image: string;
-    price: number;
-    quantity: number;
-    size: string;
-    shape: string;
-}
 
 export interface ShippingAddress {
     fullName: string;
@@ -41,40 +25,49 @@ export interface ShippingAddress {
     country: string;
 }
 
+export interface OrderItem {
+    productId: number;
+    name: string;
+    image: string;
+    price: number;
+    quantity: number;
+    size: string;
+    shape: string;
+}
+
 export interface Order {
     id: string;
-    uid: string;
+    userId: string;
     items: OrderItem[];
     subtotal: number;
     shipping: number;
     total: number;
     status: OrderStatus;
+    paymentMethod: string;
     shippingAddress: ShippingAddress;
-    paymentMethod: string; // e.g. "card_ending_4242"
-    createdAt: Timestamp | null;
+    notes?: string;
+    createdAt: { seconds: number; nanoseconds: number };
+    updatedAt: { seconds: number; nanoseconds: number };
 }
 
-function generateOrderId(): string {
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-    return `ORD-${timestamp}-${random}`;
-}
-
-/** Place a new order and return the order ID */
+/**
+ * Place an order and clear the user's cart
+ */
 export async function placeOrder(
-    uid: string,
-    cartItems: CartItem[],
+    userId: string,
+    items: CartItem[],
     subtotal: number,
     shippingAddress: ShippingAddress,
-    paymentMethod = "card_ending_4242"
+    paymentMethod: string
 ): Promise<string> {
-    await initializeFirebase();
     const db = getDbInstance();
-    const orderId = generateOrderId();
-    const shipping = subtotal >= 70 ? 0 : 9.99;
-    const total = subtotal + shipping;
+    const batch = writeBatch(db);
 
-    const orderItems: OrderItem[] = cartItems.map(({ product, quantity, size, shape }) => ({
+    // Generate unique order ID
+    const orderId = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Prepare order items
+    const orderItems: OrderItem[] = items.map(({ product, quantity, size, shape }) => ({
         productId: product.id,
         name: product.name,
         image: product.image,
@@ -84,35 +77,118 @@ export async function placeOrder(
         shape,
     }));
 
-    const orderData: Omit<Order, "id"> = {
-        uid,
+    // Calculate shipping
+    const shippingCost = subtotal >= 70 ? 0 : 9.99;
+
+    // Create order document in /users/{uid}/orders/{orderId}
+    const orderRef = doc(db, "users", userId, "orders", orderId);
+    batch.set(orderRef, {
+        id: orderId,
+        userId,
         items: orderItems,
         subtotal,
-        shipping,
-        total,
-        status: "confirmed",
-        shippingAddress,
+        shipping: shippingCost,
+        total: subtotal + shippingCost,
+        status: "pending" as OrderStatus,
         paymentMethod,
-        createdAt: serverTimestamp() as Timestamp,
-    };
+        shippingAddress,
+        notes: null,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+    } as unknown as Order);
 
-    // Write to user's sub-collection
-    await setDoc(doc(db, "users", uid, "orders", orderId), orderData);
+    // Also add to global orders collection for admin queries
+    const globalOrderRef = doc(db, "orders", orderId);
+    batch.set(globalOrderRef, {
+        id: orderId,
+        userId,
+        items: orderItems,
+        subtotal,
+        shipping: shippingCost,
+        total: subtotal + shippingCost,
+        status: "pending" as OrderStatus,
+        paymentMethod,
+        shippingAddress,
+        notes: null,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+    } as unknown as Order);
 
-    // Mirror to top-level orders collection (for admin/fulfillment)
-    await setDoc(doc(db, "orders", orderId), { ...orderData, uid });
+    // Clear cart items
+    const cartQuery = query(collection(db, "users", userId, "cart"));
+    const cartSnap = await getDocs(cartQuery);
+    cartSnap.docs.forEach((doc) => batch.delete(doc.ref));
 
+    // Update user's orderHistory array
+    const userRef = doc(db, "users", userId);
+    batch.update(userRef, {
+        orderHistory: (await getDocs(query(collection(db, "users", userId, "orders")))).docs.map(
+            (d) => d.id
+        ),
+    });
+
+    await batch.commit();
     return orderId;
 }
 
-/** Fetch all orders for a user, newest first */
-export async function fetchOrders(uid: string): Promise<Order[]> {
-    await initializeFirebase();
+/**
+ * Fetch all orders for a user
+ */
+export async function fetchOrders(userId: string): Promise<Order[]> {
     const db = getDbInstance();
-    const q = query(
-        collection(db, "users", uid, "orders"),
+    const ordersQuery = query(
+        collection(db, "users", userId, "orders"),
         orderBy("createdAt", "desc")
     );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Order));
+    const snap = await getDocs(ordersQuery);
+    return snap.docs.map((doc) => doc.data() as Order);
+}
+
+/**
+ * Fetch a single order by ID
+ */
+export async function fetchOrder(userId: string, orderId: string): Promise<Order | null> {
+    const db = getDbInstance();
+    const orderRef = doc(db, "users", userId, "orders", orderId);
+    const snap = await getDocs(query(collection(db, "users", userId, "orders")));
+
+    const orderDoc = snap.docs.find((d) => d.id === orderId);
+    return orderDoc ? (orderDoc.data() as Order) : null;
+}
+
+/**
+ * Update order status (admin/server only)
+ */
+export async function updateOrderStatus(
+    orderId: string,
+    status: OrderStatus
+): Promise<void> {
+    const db = getDbInstance();
+    const globalOrderRef = doc(db, "orders", orderId);
+
+    await getDocs(query(collection(db, "orders"))).then((snap) => {
+        const orderDoc = snap.docs.find((d) => d.id === orderId);
+        if (orderDoc) {
+            const batch = writeBatch(db);
+            const userRef = doc(db, "users", orderDoc.data().userId, "orders", orderId);
+
+            batch.update(globalOrderRef, { status, updatedAt: Timestamp.now() });
+            batch.update(userRef, { status, updatedAt: Timestamp.now() });
+
+            return batch.commit();
+        }
+    });
+}
+
+/**
+ * Fetch all orders (admin only)
+ */
+export async function fetchAllOrders(): Promise<Order[]> {
+    const db = getDbInstance();
+    const ordersQuery = query(
+        collection(db, "orders"),
+        orderBy("createdAt", "desc")
+    );
+    const snap = await getDocs(ordersQuery);
+    return snap.docs.map((doc) => doc.data() as Order);
 }

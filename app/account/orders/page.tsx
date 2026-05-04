@@ -43,7 +43,7 @@ export default function OrdersPage() {
     }
 
     return (
-        <div className="min-h-screen" style={{ backgroundColor: theme.colors.light }}>
+        <div className="min-h-screen pt-10" style={{ backgroundColor: theme.colors.light }}>
             <div className="h-1.5 w-full" style={{ backgroundColor: theme.colors.primary }} />
 
             <div className="max-w-3xl mx-auto px-6 py-12">

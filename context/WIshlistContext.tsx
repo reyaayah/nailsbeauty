@@ -10,6 +10,7 @@ import {
     ReactNode,
 } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { User } from "firebase/auth";
 
 interface WishlistContextValue {
     wishlist: number[];
@@ -21,42 +22,49 @@ interface WishlistContextValue {
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper: builds headers with the Firebase user uid for API auth
-// ─────────────────────────────────────────────────────────────────────────────
-function buildHeaders(userId: string): HeadersInit {
+// ── Auth header helper — takes user explicitly so it's always in scope ────────
+async function getAuthHeaders(user: User): Promise<HeadersInit> {
+    const token = await user.getIdToken();
+    console.log("TOKEN:", token ? token.slice(0, 20) + "..." : "NULL"); // ← add this
     return {
         "Content-Type": "application/json",
-        "x-user-id": userId,
+        "Authorization": `Bearer ${token}`,
     };
 }
 
+// ── Provider is a normal (non-async) component ────────────────────────────────
 export function WishlistProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
     const [wishlist, setWishlist] = useState<number[]>([]);
     const [loading, setLoading] = useState(false);
 
-    // ── Load wishlist from API when user logs in ──────────────────────────────
+    // ── Load wishlist when user logs in ───────────────────────────────────────
     useEffect(() => {
         if (!user) {
             setWishlist([]);
             return;
         }
 
+        let cancelled = false;
         setLoading(true);
 
-        fetch("/api/wishlist", {
-            method: "GET",
-            headers: buildHeaders(user.uid),
-        })
-            .then((res) => {
+        (async () => {
+            try {
+                const headers = await getAuthHeaders(user);
+                const res = await fetch("/api/wishlist", { method: "GET", headers });
                 if (!res.ok) throw new Error("Failed to fetch wishlist");
-                return res.json();
-            })
-            .then((json) => setWishlist(json.data ?? []))
-            .catch((err) => console.error("Failed to load wishlist:", err))
-            .finally(() => setLoading(false));
-    }, [user]);
+                const json = await res.json();
+                if (!cancelled) setWishlist(json.data ?? []);
+            } catch (err) {
+                console.error("Failed to load wishlist:", err);
+            } finally {
+                if (!cancelled) setLoading(false);
+            }
+        })();
+
+        // Cleanup: ignore result if user changes mid-flight
+        return () => { cancelled = true; };
+    }, [user?.uid]); // ← uid, not user object — prevents stale re-runs
 
     // ── Add item ──────────────────────────────────────────────────────────────
     const addItem = useCallback(
@@ -67,9 +75,10 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
             setWishlist((prev) => [...new Set([...prev, productId])]);
 
             try {
+                const headers = await getAuthHeaders(user);
                 const res = await fetch("/api/wishlist", {
                     method: "POST",
-                    headers: buildHeaders(user.uid),
+                    headers,
                     body: JSON.stringify({ productId }),
                 });
 
@@ -95,9 +104,10 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
             setWishlist((prev) => prev.filter((id) => id !== productId));
 
             try {
+                const headers = await getAuthHeaders(user);
                 const res = await fetch(`/api/wishlist/${productId}`, {
                     method: "DELETE",
-                    headers: buildHeaders(user.uid),
+                    headers,
                 });
 
                 if (!res.ok) {

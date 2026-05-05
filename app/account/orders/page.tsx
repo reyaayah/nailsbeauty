@@ -67,7 +67,7 @@ export default function OrdersPage() {
                             When you place an order, it will appear here.
                         </p>
                         <button
-                            onClick={() => router.push("/collections/all")}
+                            onClick={() => router.push("/products")}
                             className="px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase mt-2"
                             style={{ backgroundColor: theme.colors.dark, color: theme.colors.light }}
                         >

@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchWishlist, addToWishlist } from "@/lib/wishlistService";
-
-function getUserId(request: NextRequest): string | null {
-    return request.headers.get("x-user-id");
-}
+import { verifyUser } from "@/lib/verifyAuth";
 
 // GET
 export async function GET(request: NextRequest) {
     try {
-        const userId = getUserId(request);
+        const userId = await verifyUser(request);
 
         if (!userId) {
             return NextResponse.json(
@@ -36,7 +33,7 @@ export async function GET(request: NextRequest) {
 // POST
 export async function POST(request: NextRequest) {
     try {
-        const userId = getUserId(request);
+        const userId = await verifyUser(request); // ← was getUserId(), now verifyUser()
 
         if (!userId) {
             return NextResponse.json(
@@ -45,10 +42,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const body = await request.json();
+        let body;
+        try {
+            body = await request.json();
+        } catch {
+            return NextResponse.json(
+                { success: false, error: "Invalid JSON body" },
+                { status: 400 }
+            );
+        }
+
         const productId = Number(body?.productId);
 
-        if (!productId || isNaN(productId)) {
+        if (isNaN(productId) || productId <= 0) {
             return NextResponse.json(
                 { success: false, error: "Invalid productId" },
                 { status: 400 }

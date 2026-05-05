@@ -11,8 +11,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 import toast from "react-hot-toast";
-import WishlistCard from "@/components/cards/WishlistCard";
 import { products } from "@/data/product";
+import MainProductCard from "@/components/cards/MainProductCard";
 
 export default function WishlistPage() {
     const router = useRouter();
@@ -135,7 +135,7 @@ export default function WishlistPage() {
                 {!loading && wishlistProducts.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
                         {wishlistProducts.map((product) => (
-                            <WishlistCard key={product.id} product={product} />
+                            <MainProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 )}

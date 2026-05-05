@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { removeFromWishlist } from "@/lib/wishlistService";
+import { verifyUser } from "@/lib/verifyAuth";
 
-function getUserId(request: NextRequest): string | null {
-    return request.headers.get("x-user-id");
-}
+
 
 export async function DELETE(
     request: NextRequest,
     context: { params: Promise<{ productId: string }> }
 ) {
     try {
-        const userId = getUserId(request);
+       const userId = await verifyUser(request);
 
         if (!userId) {
             return NextResponse.json(

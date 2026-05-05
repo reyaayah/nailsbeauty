@@ -13,7 +13,7 @@ export async function verifyUser(request: NextRequest): Promise<string | null> {
         const decoded = await auth.verifyIdToken(token);
         return decoded.uid;
     } catch (err) {
-        console.error("[verifyUser] Token verification failed:", err); // ← check Vercel logs for this
+        console.error("[verifyUser] Token verification failed:", err);
         return null;
     }
 }

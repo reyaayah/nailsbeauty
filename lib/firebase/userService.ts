@@ -1,6 +1,7 @@
 import {
     doc,
     updateDoc,
+    setDoc,
     arrayUnion,
     arrayRemove,
     serverTimestamp,
@@ -15,17 +16,17 @@ const userRef = (uid: string, db: any) => doc(db, "users", uid);
 export async function updateUserProfile(uid: string, data: Partial<Pick<UserProfile, "displayName" | "phoneNumber">>) {
     await initializeFirebase();
     const db = getDbInstance();
-    await updateDoc(userRef(uid, db), { ...data, updatedAt: serverTimestamp() });
+    await setDoc(userRef(uid, db), { ...data, updatedAt: serverTimestamp() }, { merge: true });
 }
 
 /* ── Wishlist ─────────────────────────────────────────────── */
 export async function addToWishlist(uid: string, productId: number) {
     await initializeFirebase();
     const db = getDbInstance();
-    await updateDoc(userRef(uid, db), {
+    await setDoc(userRef(uid, db), {
         wishlist: arrayUnion(productId),
         updatedAt: serverTimestamp(),
-    });
+    }, { merge: true });
 }
 
 export async function removeFromWishlist(uid: string, productId: number) {
@@ -48,7 +49,6 @@ export async function getWishlist(uid: string): Promise<number[]> {
 export async function addAddress(uid: string, address: Address) {
     await initializeFirebase();
     const db = getDbInstance();
-    // If this is the first or marked as default, clear others
     const snap = await getDoc(userRef(uid, db));
     const existing = snap.exists() ? ((snap.data() as UserProfile).addresses ?? []) : [];
 
@@ -56,10 +56,10 @@ export async function addAddress(uid: string, address: Address) {
         ? existing.map((a) => ({ ...a, isDefault: false }))
         : existing;
 
-    await updateDoc(userRef(uid, db), {
+    await setDoc(userRef(uid, db), {
         addresses: [...updated, address],
         updatedAt: serverTimestamp(),
-    });
+    }, { merge: true });
 }
 
 export async function removeAddress(uid: string, addressId: string) {
@@ -75,8 +75,8 @@ export async function removeAddress(uid: string, addressId: string) {
 export async function addOrderToHistory(uid: string, orderId: string) {
     await initializeFirebase();
     const db = getDbInstance();
-    await updateDoc(userRef(uid, db), {
+    await setDoc(userRef(uid, db), {
         orderHistory: arrayUnion(orderId),
         updatedAt: serverTimestamp(),
-    });
+    }, { merge: true });
 }

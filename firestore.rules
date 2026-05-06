@@ -2,13 +2,64 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users can only read/write their own document
-    match /users/{uid} {
-      allow read, update, delete: if request.auth != null && request.auth.uid == uid;
-      allow create: if request.auth != null && request.auth.uid == uid;
+    // ─── Helper functions ──────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // Deny everything else by default
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ─── Users: own data only ──────────────────────────────────────
+    match /users/{uid} {
+      allow read, update: if isOwner(uid);
+      allow create: if isSignedIn() && request.auth.uid == uid;
+
+      // User subcollections (orders, cart, etc.)
+      match /orders/{orderId} {
+        allow read: if isOwner(uid);
+      }
+      match /cart/{itemId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ─── Global orders: user can read own orders ──────────────────
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Wishlists ────────────────────────────────────────────────
+    match /wishlists/{uid} {
+      allow read: if isOwner(uid);
+      match /items/{itemId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ─── Products: public read, admin write (via server SDK) ───────
+    match /products/{productId} {
+      allow read: if true;
+      // Writes only via Admin SDK (server-side) — never allow client writes
+    }
+
+    // ─── Collections: public read ─────────────────────────────────
+    match /collections/{collectionId} {
+      allow read: if true;
+    }
+
+    // ─── Blog: published posts are public ─────────────────────────
+    match /blog/{postId} {
+      allow read: if resource.data.isPublished == true;
+    }
+
+    // ─── Admins: no client reads (admin SDK only) ─────────────────
+    match /admins/{adminId} {
+      allow read: if isOwner(adminId);
+    }
+
+    // ─── Default deny ─────────────────────────────────────────────
     match /{document=**} {
       allow read, write: if false;
     }

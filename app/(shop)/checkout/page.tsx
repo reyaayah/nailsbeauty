@@ -65,10 +65,10 @@ export default function CheckoutPage() {
     function validateAddress(): boolean {
         const e: Partial<ShippingAddress> = {};
         if (!address.fullName.trim()) e.fullName = "Required";
-        if (!address.line1.trim()) e.line1 = "Required";
-        if (!address.city.trim()) e.city = "Required";
-        if (!address.state.trim()) e.state = "Required";
-        if (!address.zip.trim()) e.zip = "Required";
+        if (!address.line1?.trim()) e.line1 = "Required";
+        if (!address.city?.trim()) e.city = "Required";
+        if (!address.state?.trim()) e.state = "Required";
+        if (!address.zip?.trim()) e.zip = "Required";
         setErrors(e);
         return Object.keys(e).length === 0;
     }
@@ -213,7 +213,7 @@ export default function CheckoutPage() {
                                     />
                                     <Field
                                         label="Address Line 1"
-                                        value={address.line1}
+                                        value={address.line1 ?? ""}
                                         error={errors.line1}
                                         onChange={(v) => setAddress({ ...address, line1: v })}
                                         colSpan="sm:col-span-2"

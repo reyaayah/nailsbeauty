@@ -22,23 +22,19 @@ interface WishlistContextValue {
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
-// ── Auth header helper — takes user explicitly so it's always in scope ────────
 async function getAuthHeaders(user: User): Promise<HeadersInit> {
     const token = await user.getIdToken();
-    console.log("TOKEN:", token ? token.slice(0, 20) + "..." : "NULL"); // ← add this
     return {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
     };
 }
 
-// ── Provider is a normal (non-async) component ────────────────────────────────
 export function WishlistProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
     const [wishlist, setWishlist] = useState<number[]>([]);
     const [loading, setLoading] = useState(false);
 
-    // ── Load wishlist when user logs in ───────────────────────────────────────
     useEffect(() => {
         if (!user) {
             setWishlist([]);
@@ -54,7 +50,12 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
                 const res = await fetch("/api/wishlist", { method: "GET", headers });
                 if (!res.ok) throw new Error("Failed to fetch wishlist");
                 const json = await res.json();
-                if (!cancelled) setWishlist(json.data ?? []);
+
+                // ✅ Coerce to number[] — JSON serialisation can silently
+                //    turn numbers to strings, which breaks wishlist.includes(p.id)
+                const ids: number[] = (json.data ?? []).map(Number);
+
+                if (!cancelled) setWishlist(ids);
             } catch (err) {
                 console.error("Failed to load wishlist:", err);
             } finally {
@@ -62,11 +63,9 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
             }
         })();
 
-        // Cleanup: ignore result if user changes mid-flight
         return () => { cancelled = true; };
-    }, [user?.uid]); // ← uid, not user object — prevents stale re-runs
+    }, [user?.uid]);
 
-    // ── Add item ──────────────────────────────────────────────────────────────
     const addItem = useCallback(
         async (productId: number) => {
             if (!user) throw new Error("You must be logged in to add to wishlist");
@@ -79,7 +78,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
                 const res = await fetch("/api/wishlist", {
                     method: "POST",
                     headers,
-                    body: JSON.stringify({ productId }),
+                    // ✅ Explicitly send as number — route does Number(body.productId)
+                    body: JSON.stringify({ productId: Number(productId) }),
                 });
 
                 if (!res.ok) {
@@ -87,7 +87,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
                     throw new Error(err.error ?? "Failed to add to wishlist");
                 }
             } catch (error) {
-                // Revert optimistic update on failure
+                // Revert on failure
                 setWishlist((prev) => prev.filter((id) => id !== productId));
                 throw error;
             }
@@ -95,7 +95,6 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         [user]
     );
 
-    // ── Remove item ───────────────────────────────────────────────────────────
     const removeItem = useCallback(
         async (productId: number) => {
             if (!user) throw new Error("You must be logged in to remove from wishlist");
@@ -115,7 +114,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
                     throw new Error(err.error ?? "Failed to remove from wishlist");
                 }
             } catch (error) {
-                // Revert optimistic update on failure
+                // Revert on failure
                 setWishlist((prev) => [...new Set([...prev, productId])]);
                 throw error;
             }
@@ -123,9 +122,9 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         [user]
     );
 
-    // ── Check membership ──────────────────────────────────────────────────────
+    // ✅ Coerce here too so MainProductCard comparisons always work
     const isInWishlist = useCallback(
-        (productId: number) => wishlist.includes(productId),
+        (productId: number) => wishlist.includes(Number(productId)),
         [wishlist]
     );
 

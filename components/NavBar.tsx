@@ -46,7 +46,16 @@ export default function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  // 1. Add 'useState' for the modal
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
+  // 2. Add the actual logout handler
+  const handleConfirmLogout = async () => {
+    setShowSignOutModal(false);
+    setUserMenuOpen(false);
+    await logout();
+    router.push("/");
+  };
   const { totalItems } = useCart();
   const { user, userProfile, logout } = useAuth();
   const router = useRouter();
@@ -221,8 +230,12 @@ export default function Navbar() {
                     >
                       Wishlist
                     </button>
+                    {/* User dropdown - Sign Out Button Section */}
                     <button
-                      onClick={async () => { setUserMenuOpen(false); await logout(); router.push("/"); }}
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        setShowSignOutModal(true); // Open modal instead of logging out
+                      }}
                       className="w-full text-left px-4 py-3 text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-gray-50"
                     >
                       <LogOut size={12} /> Sign Out
@@ -295,6 +308,54 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
+      {/* ── SIGN OUT CONFIRMATION MODAL ── */}
+      {showSignOutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
+            onClick={() => setShowSignOutModal(false)}
+          />
+
+          {/* Modal Content */}
+          <div className="relative bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="flex flex-col items-center text-center">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
+                style={{ backgroundColor: `${theme.colors.pink}15` }}
+              >
+                <LogOut size={28} style={{ color: theme.colors.pink }} />
+              </div>
+
+              <h3 className="text-xl font-serif mb-2" style={{ color: theme.colors.dark }}>
+                Sign Out?
+              </h3>
+              <p className="text-sm text-gray-500 font-light leading-relaxed mb-8">
+                Are you sure you want to sign out of your <br />
+                <strong>Gloss & Grace</strong> account?
+              </p>
+
+              <div className="flex flex-col w-full gap-3">
+                <button
+                  onClick={handleConfirmLogout}
+                  className="w-full py-4 rounded-2xl text-white text-xs font-bold uppercase tracking-widest transition-transform active:scale-95 shadow-lg shadow-black/10"
+                  style={{ backgroundColor: theme.colors.dark }}
+                >
+                  Yes, Sign Me Out
+                </button>
+
+                <button
+                  onClick={() => setShowSignOutModal(false)}
+                  className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-colors hover:bg-gray-50"
+                  style={{ color: theme.colors.muted }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {searchOpen && <div className="fixed inset-0 z-30" onClick={closeSearch} />}
     </>

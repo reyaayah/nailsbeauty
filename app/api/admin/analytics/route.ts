@@ -3,6 +3,9 @@ import { adminDb } from "@/lib/firebase/admin";
 import { requireAdmin, isNextResponse } from "@/lib/requireAdmin";
 
 export async function GET(req: NextRequest) {
+  console.log("FIREBASE_PROJECT_ID:", process.env.FIREBASE_PROJECT_ID);
+  console.log("CLIENT_EMAIL set:", !!process.env.FIREBASE_CLIENT_EMAIL);
+  console.log("PRIVATE_KEY set:", !!process.env.FIREBASE_PRIVATE_KEY);
   const auth = await requireAdmin(req);
   if (isNextResponse(auth)) return auth;
 

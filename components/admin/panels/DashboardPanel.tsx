@@ -18,6 +18,7 @@ export default function DashboardPanel() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     apiFetch("/api/admin/analytics")
       .then(setAnalytics)
@@ -27,10 +28,10 @@ export default function DashboardPanel() {
 
   const STAT_CARDS = analytics
     ? [
-      { label: "Total Revenue",   value: formatCurrency(analytics.totalRevenue),          change: analytics.revenueGrowth, icon: <DollarSign size={18} />, iconBg: "#D1FAE5", iconColor: "#10B981" },
-      { label: "Total Orders",    value: analytics.totalOrders.toLocaleString(),           change: analytics.ordersGrowth,  icon: <ShoppingBag size={18} />, iconBg: "#F0F0F0", iconColor: "#0EA5E9" },
-      { label: "Customers",       value: analytics.totalCustomers.toLocaleString(),                                         icon: <Users size={18} />,       iconBg: "#E0E7FF", iconColor: "#4338CA" },
-      { label: "Products Listed", value: analytics.totalProducts.toLocaleString(),                                           icon: <Package size={18} />,     iconBg: "#FEF3C7", iconColor: "#B45309" },
+      { label: "Total Revenue", value: formatCurrency(analytics.totalRevenue), change: analytics.revenueGrowth, icon: <DollarSign size={18} />, iconBg: "#D1FAE5", iconColor: "#10B981" },
+      { label: "Total Orders", value: analytics.totalOrders.toLocaleString(), change: analytics.ordersGrowth, icon: <ShoppingBag size={18} />, iconBg: "#F0F0F0", iconColor: "#0EA5E9" },
+      { label: "Customers", value: analytics.totalCustomers.toLocaleString(), icon: <Users size={18} />, iconBg: "#E0E7FF", iconColor: "#4338CA" },
+      { label: "Products Listed", value: analytics.totalProducts.toLocaleString(), icon: <Package size={18} />, iconBg: "#FEF3C7", iconColor: "#B45309" },
     ]
     : [];
 
@@ -51,8 +52,8 @@ export default function DashboardPanel() {
         </button>
       ),
     },
-    { key: "status", label: "Status",  render: (o: Order) => <StatusBadge status={o.status} /> },
-    { key: "total",  label: "Total",   render: (o: Order) => <span style={{ color: theme.colors.dark }} className="font-medium">{formatCurrency(o.total)}</span> },
+    { key: "status", label: "Status", render: (o: Order) => <StatusBadge status={o.status} /> },
+    { key: "total", label: "Total", render: (o: Order) => <span style={{ color: theme.colors.dark }} className="font-medium">{formatCurrency(o.total)}</span> },
     { key: "createdAt", label: "Date", render: (o: Order) => <span style={{ color: theme.colors.muted }} className="text-xs">{formatDate(o.createdAt)}</span> },
   ];
 
@@ -85,7 +86,7 @@ export default function DashboardPanel() {
             <AreaChart data={analytics?.revenueByDay ?? []}>
               <defs>
                 <linearGradient id="rev-gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor={theme.colors.primary} stopOpacity={0.2} />
+                  <stop offset="0%" stopColor={theme.colors.primary} stopOpacity={0.2} />
                   <stop offset="100%" stopColor={theme.colors.primary} stopOpacity={0} />
                 </linearGradient>
               </defs>

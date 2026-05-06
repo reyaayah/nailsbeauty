@@ -62,10 +62,13 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false);
   }, []);
 
+
   const getToken = useCallback(async (): Promise<string> => {
+    const auth = getClientAuth();
+    const user = auth.currentUser; // ← always fresh, no stale closure
     if (!user) throw new Error("Not authenticated");
-    return user.getIdToken();
-  }, [user]);
+    return user.getIdToken(true); // true = force refresh if near expiry
+  }, []); // no deps needed
 
   return (
     <Ctx.Provider value={{ user, isAdmin, loading, login, logout, getToken }}>

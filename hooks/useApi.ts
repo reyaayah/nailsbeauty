@@ -7,7 +7,14 @@ export function useApi() {
 
   const apiFetch = useCallback(
     async (url: string, options: RequestInit = {}) => {
-      const token = await getToken();
+      let token: string;
+      try {
+        token = await getToken();
+      } catch (e) {
+        console.error("apiFetch: failed to get token", e);
+        throw e; // don't swallow — let the caller know why
+      }
+
       const res = await fetch(url, {
         ...options,
         headers: {

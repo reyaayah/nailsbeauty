@@ -3,10 +3,8 @@
 
 import { useState, useEffect } from "react";
 import {
-    Plus, Minus, Heart, Ruler, Loader2, ShoppingBag, X,
-    Truck,
-    RefreshCw,
-    TrendingUp
+    Plus, Minus, Heart, Ruler, Loader2, ShoppingBag,
+    Truck, RefreshCw, TrendingUp, ChevronDown, ChevronUp
 } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -19,35 +17,6 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { Product } from "@/types/product";
 import { useWishlist } from "@/context/WIshlistContext";
-
-// Product data - replace with API call in production
-const PRODUCTS: Record<number, Product & { sizes: string[], features: string[] }> = {
-    1: {
-        id: 1,
-        name: "Midnight Muse",
-        price: 64.00,
-        description: "A deep, high-gloss obsidian finish meeting an almond silhouette. These aren't just nails; they're an evening mood. Engineered with reinforced gel technology for a glass-like shine that withstands the chaos of daily life.",
-        image: "/product1.png",
-        hoverImage: "/backimg1.png",
-        images: ["/product1.png", "/backimg1.png"],
-        features: [
-            "Salon-grade finish",
-            "Reinforcement Gel Layer",
-            "Waterproof & Chip-proof",
-            "Eco-friendly & Vegan"
-        ],
-        sizes: ["XS", "S", "M", "L"],
-        category: "Press-on Nails",
-        isNew: true,
-        isBestSeller: true,
-        reviews: 124,
-        rating: 5,
-    },
-    // Add more products as needed
-};
-
-// Shape options for all products
-const SHAPE_OPTIONS = ["Almond", "Square", "Coffin", "Oval"];
 
 function useProduct(id: string) {
     const [product, setProduct] = useState<Product | null>(null);
@@ -76,6 +45,11 @@ function useProduct(id: string) {
     return { product, related, loading, error };
 }
 
+const SHAPE_OPTIONS = ["Almond", "Square", "Coffin", "Oval"];
+
+// Max features visible before "View more"
+const FEATURES_PREVIEW = 3;
+
 export default function ProductDetails() {
     const router = useRouter();
     const { addToCart } = useCart();
@@ -83,19 +57,19 @@ export default function ProductDetails() {
     const { isInWishlist, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist();
     const params = useParams();
     const productId = parseInt(params.id as string);
-    // const product = PRODUCTS[productId];
     const { product } = useProduct(params.id as string);
 
     const [quantity, setQuantity] = useState(1);
+    // Only show first 2 images in the thumbnail strip
     const [activeImage, setActiveImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState(product?.sizes?.[2] || "M");
     const [selectedShape, setSelectedShape] = useState(SHAPE_OPTIONS[0]);
     const [addingToCart, setAddingToCart] = useState(false);
     const [wishlisted, setWishlisted] = useState(false);
     const [wishlistLoading, setWishlistLoading] = useState(false);
-    const [showSizeGuide, setShowSizeGuide] = useState(false);
+    const [descExpanded, setDescExpanded] = useState(false);
+    const [featuresExpanded, setFeaturesExpanded] = useState(false);
 
-    // Initialize wishlist state
     useEffect(() => {
         if (user && product) {
             setWishlisted(isInWishlist(product.id));
@@ -113,7 +87,7 @@ export default function ProductDetails() {
                         Product Not Found
                     </h1>
                     <button
-                        onClick={() => router.push("/products ")}
+                        onClick={() => router.push("/products")}
                         className="px-6 py-2 rounded-full text-sm font-bold"
                         style={{ backgroundColor: theme.colors.primary, color: "white" }}
                     >
@@ -124,44 +98,30 @@ export default function ProductDetails() {
         );
     }
 
-    // Handle add to cart
     const handleAddToCart = async () => {
         if (!user) {
-            // Store cart state and redirect to login
             sessionStorage.setItem("redirectAfterLogin", "/products/" + productId);
             router.push("/auth/login");
             return;
         }
-
         if (!selectedSize || !selectedShape) {
             toast.error("Please select a size and shape");
             return;
         }
-
         setAddingToCart(true);
         try {
             await addToCart(product, selectedSize, selectedShape);
-            toast.success(`Added ${quantity} to cart`, {
-                icon: <ShoppingBag size={16} />,
-            });
-
-            // Reset quantity after adding
+            toast.success(`Added ${quantity} to cart`, { icon: <ShoppingBag size={16} /> });
             setQuantity(1);
         } catch (error) {
             toast.error("Failed to add to cart. Please try again.");
-            console.error("Add to cart error:", error);
         } finally {
             setAddingToCart(false);
         }
     };
 
-    // Handle wishlist toggle
     const handleWishlistToggle = async () => {
-        if (!user) {
-            router.push("/auth/login");
-            return;
-        }
-
+        if (!user) { router.push("/auth/login"); return; }
         setWishlistLoading(true);
         try {
             if (wishlisted) {
@@ -171,67 +131,66 @@ export default function ProductDetails() {
             } else {
                 await addToWishlist(product.id);
                 setWishlisted(true);
-                toast.success("Added to wishlist", {
-                    icon: <Heart size={16} />,
-                });
+                toast.success("Added to wishlist", { icon: <Heart size={16} /> });
             }
-        } catch (error) {
+        } catch {
             toast.error("Failed to update wishlist");
-            console.error("Wishlist error:", error);
         } finally {
             setWishlistLoading(false);
         }
     };
+
+    // Only use first 2 images for the thumbnail strip
+    const thumbnailImages = (product.images ?? [product.image]).slice(0, 2);
+    const allFeatures = product.features ?? [];
+    const visibleFeatures = featuresExpanded ? allFeatures : allFeatures.slice(0, FEATURES_PREVIEW);
+    const hasMoreFeatures = allFeatures.length > FEATURES_PREVIEW;
+
+    // Description: clamp to 2 lines via JS word-split (≈120 chars)
+    const fullDesc = product.description ?? "";
+    const descPreview = fullDesc.length > 120 ? fullDesc.slice(0, 120).trimEnd() + "…" : fullDesc;
+    const hasMoreDesc = fullDesc.length > 120;
 
     return (
         <main
             className="w-full mx-auto px-6 py-10 font-sans"
             style={{ backgroundColor: theme.colors.light, color: theme.colors.dark }}
         >
-
-
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-2 text-sm mb-8 font-medium opacity-70 mt-20">
-                <span onClick={() => router.push("/")} className="hover:opacity-100 cursor-pointer">
-                    Home
-                </span> /
-                <span
-                    onClick={() => router.push("/collections/all")}
-                    className="hover:opacity-100 cursor-pointer"
-                >
-                    {product.category}
-                </span> /
+                <span onClick={() => router.push("/")} className="hover:opacity-100 cursor-pointer">Home</span> /
+                <span onClick={() => router.push("/collections/all")} className="hover:opacity-100 cursor-pointer">{product.category}</span> /
                 <span className="font-bold">{product.name}</span>
             </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                {/* Product Images */}
-                <div className="lg:col-span-7 flex gap-4">
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="flex flex-col gap-3">
-                            {product.images?.map((img, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => setActiveImage(idx)}
-                                    className="w-20 h-24 rounded-lg overflow-hidden border-2 transition-all hover:opacity-100"
-                                    style={{
-                                        borderColor: activeImage === idx ? theme.colors.primary : "transparent",
-                                        opacity: activeImage === idx ? 1 : 0.6,
-                                    }}
-                                >
-                                    <Image
-                                        src={img}
-                                        alt={`${product.name} view ${idx + 1}`}
-                                        width={80}
-                                        height={96}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </button>
-                            ))}
-                        </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* ── Product Images ── */}
+                <div className="lg:col-span-6 flex gap-3">
+                    {/* Thumbnail strip — max 2 images */}
+                    <div className="flex flex-col gap-2.5 flex-shrink-0">
+                        {thumbnailImages.map((img, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => setActiveImage(idx)}
+                                className="w-16 h-20 rounded-xl overflow-hidden border-2 transition-all hover:opacity-100 flex-shrink-0"
+                                style={{
+                                    borderColor: activeImage === idx ? theme.colors.primary : "transparent",
+                                    opacity: activeImage === idx ? 1 : 0.55,
+                                }}
+                            >
+                                <Image
+                                    src={img}
+                                    alt={`${product.name} view ${idx + 1}`}
+                                    width={64}
+                                    height={80}
+                                    className="w-full h-full object-cover"
+                                />
+                            </button>
+                        ))}
                     </div>
 
-                    <div className="relative flex-1 rounded-2xl overflow-hidden bg-white shadow-sm">
+                    {/* Main image — fixed height so it never overflows */}
+                    <div className="relative flex-1 rounded-2xl overflow-hidden bg-white shadow-sm" style={{ maxHeight: "480px" }}>
                         {product.isNew && (
                             <span
                                 className="absolute top-4 right-4 text-white text-[10px] font-black px-4 py-1.5 rounded-full z-10 tracking-widest"
@@ -241,19 +200,19 @@ export default function ProductDetails() {
                             </span>
                         )}
                         <Image
-                            src={product.images ? product.images[activeImage] : product.image}
+                            src={thumbnailImages[activeImage] ?? product.image}
                             alt={product.name}
                             fill
-                            className="object-cover"
+                            className="object-cover object-top"
                             priority
                         />
                     </div>
                 </div>
 
-                {/* Product Details */}
-                <div className="lg:col-span-5 flex flex-col gap-6">
+                {/* ── Product Details ── */}
+                <div className="lg:col-span-6 flex flex-col gap-5">
                     <div>
-                        <h1 className="text-5xl font-serif tracking-tight mb-2" style={{ color: theme.colors.dark }}>
+                        <h1 className="text-4xl font-serif tracking-tight mb-2" style={{ color: theme.colors.dark }}>
                             {product.name}
                         </h1>
                         {product.rating && (
@@ -263,46 +222,70 @@ export default function ProductDetails() {
                                         <span key={i} className="text-yellow-400">★</span>
                                     ))}
                                 </div>
-                                <span className="text-xs opacity-60">
-                                    {product.reviews} reviews
-                                </span>
+                                <span className="text-xs opacity-60">{product.reviews} reviews</span>
                             </div>
                         )}
                     </div>
 
                     <div className="text-3xl font-bold flex items-baseline gap-2">
-                        <span style={{ color: theme.colors.primary }}>
-                            ${product.price.toFixed(2)}
-                        </span>
+                        <span style={{ color: theme.colors.primary }}>${product.price.toFixed(2)}</span>
                         <span className="text-xs font-normal italic opacity-50">inc. VAT</span>
                     </div>
 
-                    <div className="space-y-4">
-                        <p className="leading-relaxed opacity-80">
-                            {product.description}
+                    {/* Description — 2-line preview */}
+                    <div className="space-y-1">
+                        <p className="leading-relaxed opacity-80 text-sm">
+                            {descExpanded ? fullDesc : descPreview}
                         </p>
+                        {hasMoreDesc && (
+                            <button
+                                onClick={() => setDescExpanded((v) => !v)}
+                                className="flex items-center gap-1 text-xs font-bold transition-opacity hover:opacity-70"
+                                style={{ color: theme.colors.primary }}
+                            >
+                                {descExpanded ? (
+                                    <><ChevronUp size={13} /> View less</>
+                                ) : (
+                                    <><ChevronDown size={13} /> View more</>
+                                )}
+                            </button>
+                        )}
+                    </div>
 
-                        {product.features && (
-                            <ul className="space-y-3 pt-2">
-                                {product.features.map((feature, i) => (
+                    {/* Features — 3 visible, rest behind toggle */}
+                    {allFeatures.length > 0 && (
+                        <div className="space-y-2">
+                            <ul className="space-y-2">
+                                {visibleFeatures.map((feature, i) => (
                                     <li key={i} className="flex items-center gap-3 font-semibold text-sm">
                                         <span
-                                            className="w-1.5 h-1.5 rounded-full"
+                                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                                             style={{ backgroundColor: theme.colors.primary }}
                                         />
                                         {feature}
                                     </li>
                                 ))}
                             </ul>
-                        )}
-                    </div>
+                            {hasMoreFeatures && (
+                                <button
+                                    onClick={() => setFeaturesExpanded((v) => !v)}
+                                    className="flex items-center gap-1 text-xs font-bold transition-opacity hover:opacity-70 mt-1"
+                                    style={{ color: theme.colors.primary }}
+                                >
+                                    {featuresExpanded ? (
+                                        <><ChevronUp size={13} /> Show less</>
+                                    ) : (
+                                        <><ChevronDown size={13} /> +{allFeatures.length - FEATURES_PREVIEW} more features</>
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                    )}
 
                     {/* Size Selection */}
-                    <div className="mt-2">
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-black uppercase tracking-widest">
-                                Select Size
-                            </span>
+                    <div>
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-black uppercase tracking-widest">Select Size</span>
                             <button
                                 onClick={() => router.push("/size-guide")}
                                 className="flex items-center gap-1 text-[10px] font-bold underline opacity-70 hover:opacity-100 transition-opacity"
@@ -310,12 +293,12 @@ export default function ProductDetails() {
                                 <Ruler size={12} /> Size Guide
                             </button>
                         </div>
-                        <div className="flex gap-3 flex-wrap">
+                        <div className="flex gap-2.5 flex-wrap">
                             {product?.sizes?.map((size) => (
                                 <button
                                     key={size}
                                     onClick={() => setSelectedSize(size)}
-                                    className="w-12 h-12 rounded-full border-2 font-bold text-xs transition-all"
+                                    className="w-11 h-11 rounded-full border-2 font-bold text-xs transition-all"
                                     style={{
                                         backgroundColor: selectedSize === size ? theme.colors.primary : "transparent",
                                         borderColor: selectedSize === size ? theme.colors.primary : theme.colors.muted,
@@ -330,12 +313,10 @@ export default function ProductDetails() {
 
                     {/* Shape Selection */}
                     <div>
-                        <div className="flex justify-between items-center mb-3">
-                            <span className="text-xs font-black uppercase tracking-widest">
-                                Select Shape
-                            </span>
+                        <div className="mb-2">
+                            <span className="text-xs font-black uppercase tracking-widest">Select Shape</span>
                         </div>
-                        <div className="flex gap-3 flex-wrap">
+                        <div className="flex gap-2.5 flex-wrap">
                             {SHAPE_OPTIONS.map((shape) => (
                                 <button
                                     key={shape}
@@ -353,8 +334,8 @@ export default function ProductDetails() {
                         </div>
                     </div>
 
-                    {/* Quantity and Add to Cart */}
-                    <div className="flex items-center gap-4 mt-2">
+                    {/* Quantity + Add to Cart */}
+                    <div className="flex items-center gap-4">
                         <div
                             className="flex items-center border-2 rounded-lg bg-white overflow-hidden"
                             style={{ borderColor: theme.colors.muted }}
@@ -362,42 +343,34 @@ export default function ProductDetails() {
                             <button
                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                                 disabled={addingToCart}
-                                className="px-4 py-3 hover:bg-gray-50 disabled:opacity-50"
+                                className="px-3 py-2.5 hover:bg-gray-50 disabled:opacity-50"
                             >
-                                <Minus size={16} strokeWidth={2.5} />
+                                <Minus size={15} strokeWidth={2.5} />
                             </button>
-                            <span className="w-12 text-center font-bold text-lg">
-                                {quantity}
-                            </span>
+                            <span className="w-10 text-center font-bold">{quantity}</span>
                             <button
                                 onClick={() => setQuantity(quantity + 1)}
                                 disabled={addingToCart}
-                                className="px-4 py-3 hover:bg-gray-50 disabled:opacity-50"
+                                className="px-3 py-2.5 hover:bg-gray-50 disabled:opacity-50"
                             >
-                                <Plus size={16} strokeWidth={2.5} />
+                                <Plus size={15} strokeWidth={2.5} />
                             </button>
                         </div>
                         <button
                             onClick={handleAddToCart}
                             disabled={addingToCart}
-                            className="flex-1 text-white font-black text-sm tracking-[0.1em] py-4 px-8 rounded-full transition-all shadow-lg hover:shadow-xl disabled:opacity-70 flex items-center justify-center gap-2"
+                            className="flex-1 text-white font-black text-sm tracking-[0.1em] py-3.5 px-6 rounded-full transition-all shadow-lg hover:shadow-xl disabled:opacity-70 flex items-center justify-center gap-2"
                             style={{ backgroundColor: theme.colors.primary }}
                         >
                             {addingToCart ? (
-                                <>
-                                    <Loader2 size={16} className="animate-spin" />
-                                    Adding...
-                                </>
+                                <><Loader2 size={16} className="animate-spin" />Adding...</>
                             ) : (
-                                <>
-                                    <ShoppingBag size={16} />
-                                    ADD TO CART
-                                </>
+                                <><ShoppingBag size={16} />ADD TO CART</>
                             )}
                         </button>
                     </div>
 
-                    {/* Wishlist Button */}
+                    {/* Wishlist */}
                     <button
                         onClick={handleWishlistToggle}
                         disabled={wishlistLoading}
@@ -408,32 +381,24 @@ export default function ProductDetails() {
                             color: wishlisted ? theme.colors.primary : theme.colors.dark,
                         }}
                     >
-                        <Heart
-                            size={18}
-                            strokeWidth={2}
-                            fill={wishlisted ? theme.colors.primary : "none"}
-                        />
+                        <Heart size={17} strokeWidth={2} fill={wishlisted ? theme.colors.primary : "none"} />
                         {wishlisted ? "In Wishlist" : "Add to Wishlist"}
-                        {wishlistLoading && <Loader2 size={14} className="animate-spin ml-auto" />}
+                        {wishlistLoading && <Loader2 size={13} className="animate-spin ml-auto" />}
                     </button>
 
                     {/* Trust Badges */}
                     <div className="grid grid-cols-3 gap-3 pt-4 border-t" style={{ borderColor: `${theme.colors.dark}10` }}>
-                        <div className="text-center">
-                            <Truck />
-                            <p className="text-[10px] font-bold uppercase">Free Shipping</p>
-                            <p className="text-[10px] opacity-50">Orders over $70</p>
-                        </div>
-                        <div className="text-center">
-                            <RefreshCw />
-                            <p className="text-[10px] font-bold uppercase">Easy Returns</p>
-                            <p className="text-[10px] opacity-50">30 days guaranteed</p>
-                        </div>
-                        <div className="text-center">
-                            <TrendingUp />
-                            <p className="text-[10px] font-bold uppercase">Cruelty Free</p>
-                            <p className="text-[10px] opacity-50">100% Vegan</p>
-                        </div>
+                        {[
+                            { icon: <Truck size={18} />, label: "Free Shipping", sub: "Orders over $70" },
+                            { icon: <RefreshCw size={18} />, label: "Easy Returns", sub: "30 days guaranteed" },
+                            { icon: <TrendingUp size={18} />, label: "Cruelty Free", sub: "100% Vegan" },
+                        ].map(({ icon, label, sub }) => (
+                            <div key={label} className="text-center flex flex-col items-center gap-1">
+                                <span className="opacity-60">{icon}</span>
+                                <p className="text-[10px] font-bold uppercase">{label}</p>
+                                <p className="text-[10px] opacity-50">{sub}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

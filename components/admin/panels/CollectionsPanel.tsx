@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Pencil, Trash2, Layers, GripVertical } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { ImageUpload } from "@/components/ImageUpload";
 
 const schema = z.object({
   name: z.string().min(2, "Name required"),
@@ -150,7 +151,18 @@ export default function CollectionsPanel() {
           <Input label="Name" required placeholder="e.g. LNY Limited" {...register("name")} error={errors.name?.message} />
           <Input label="Slug" placeholder="auto-generated if empty" {...register("slug")} hint="Used in URL: /collections/slug" />
           <Textarea label="Description" rows={3} placeholder="Short description of this collection…" {...register("description")} />
-          <Input label="Cover Image URL" placeholder="https://… or /col-1.jpg" {...register("image")} />
+          <Controller
+            name="image"
+            control={control}
+            render={({ field }) => (
+              <ImageUpload
+                label="Cover Image"
+                value={field.value}
+                onChange={field.onChange}
+                hint="Upload from device or capture with camera"
+              />
+            )}
+          />
           <Input label="Sort Order" type="number" placeholder="999" {...register("sortOrder")} hint="Lower number appears first" />
           <div className="flex items-center justify-between py-2 border-t border-[--border]">
             <div>

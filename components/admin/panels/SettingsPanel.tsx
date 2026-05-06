@@ -72,9 +72,9 @@ export default function SettingsPanel() {
         </div>
         <div className="grid sm:grid-cols-2 gap-3">
           {[
-            { label: "Email",        value: user?.email ?? "—" },
-            { label: "Role",         value: "Super Admin" },
-            { label: "User ID",      value: (user?.uid ?? "").slice(0, 16) + "…" },
+            { label: "Email", value: user?.email ?? "—" },
+            { label: "Role", value: "Super Admin" },
+            { label: "User ID", value: (user?.uid ?? "").slice(0, 16) + "…" },
             { label: "Account Type", value: "Firebase Auth" },
           ].map(({ label, value }) => (
             <div key={label} className="border border-[--border] rounded-xl p-3">
@@ -100,34 +100,7 @@ export default function SettingsPanel() {
         </form>
       </Card>
 
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <AlertTriangle size={18} className="text-amber-500" />
-          <h3 className="font-semibold text-slate-900">Setup Required</h3>
-        </div>
-        <p className="text-sm text-slate-600 mb-4">To use this admin panel, make sure you have:</p>
-        <ol className="space-y-2.5 text-sm text-slate-600">
-          {[
-            "Copied .env.local.example to .env.local and filled in your Firebase credentials",
-            'Created an "admins" collection in Firestore with a document matching your admin user UID',
-            "Set Firebase Admin SDK credentials (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY)",
-            "Updated Firestore Security Rules to allow admin operations server-side",
-          ].map((step, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <span className="w-5 h-5 rounded-full bg-[--accent-light] text-[--accent] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-              {step}
-            </li>
-          ))}
-        </ol>
-        <a
-          href="https://firebase.google.com/docs/admin/setup"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 mt-4 text-sm text-[--accent] hover:underline"
-        >
-          Firebase Admin Setup Guide <ExternalLink size={13} />
-        </a>
-      </Card>
+
     </div>
   );
 }

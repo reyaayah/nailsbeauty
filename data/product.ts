@@ -113,6 +113,17 @@ export const products: Product[] = [
         reviews: 34,
         rating: 4.8,
         description: "The Pro Touch Kit is your all-in-one solution for flawless nail application and maintenance. Whether you're a beginner or a seasoned pro, our carefully curated kits include everything you need to achieve salon-quality results at home. From essential tools for prepping and applying press-on nails to advanced accessories for shaping and finishing, the Pro Touch Kit is designed to elevate your nail game and keep your hands looking their best."
+    },
+    {
+        id: 8,
+        name: "Nail Art plus Brush Set",
+        category: "Bundles",
+        image: "/product1.png",
+        isBundle: true,
+        price: 29.00,
+        reviews: 22,
+        rating: 4.7,
+        description: "The Nail Art Plus Brush Set is the ultimate bundle for nail enthusiasts looking to unleash their creativity. This set includes a variety of high-quality brushes designed for precision and versatility, allowing you to create intricate designs, gradients, and freehand art with ease. Whether you're a beginner or a seasoned nail artist, the Nail Art Plus Brush Set provides the tools you need to elevate your nail game and express your unique style."
     }
 
 ];

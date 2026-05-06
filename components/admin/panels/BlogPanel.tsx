@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Pencil, Trash2, BookOpen, Clock, Eye } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
+import { ImageUpload } from "@/components/ImageUpload";
 
 const schema = z.object({
   title: z.string().min(5, "Title required"),
@@ -169,7 +170,18 @@ export default function BlogPanel() {
           <Textarea label="Excerpt" required rows={2} placeholder="A short summary…" {...register("excerpt")} error={errors.excerpt?.message} />
           <Textarea label="Content" required rows={8} placeholder="Write your post content here…" {...register("content")} error={errors.content?.message} />
           <div className="grid sm:grid-cols-2 gap-4">
-            <Input label="Cover Image URL" placeholder="https://…" {...register("coverImage")} />
+            <Controller
+              name="coverImage"
+              control={control}
+              render={({ field }) => (
+                <ImageUpload
+                  label="Cover Image"
+                  value={field.value}
+                  onChange={field.onChange}
+                  hint="Upload from device or capture with camera"
+                />
+              )}
+            />
             <Input label="Tags" placeholder="nails, tips, beauty" {...register("tags")} hint="Comma-separated" />
           </div>
           <div className="flex items-center justify-between py-2 border-t border-[--border]">

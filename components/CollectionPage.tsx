@@ -30,6 +30,10 @@ const COLLECTION_CONFIG: Record<string, CollectionConfig> = {
         collectionName: "Tools & Accessories",
         filter: (p) => p.category === "Tools & Accessories",
     },
+    "bundles": {
+        collectionName: "Bundles",
+        filter: (p) => p.category === "Bundles",
+    },
 };
 
 export default function CollectionPage({ collection, filters, showFilters = true }: {

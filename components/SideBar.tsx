@@ -147,8 +147,8 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                                 </span>
                                 <span className="h-1 w-1 rounded-full bg-primary" />
                             </div>
-                            <div className="text-[14px] font-semibold tracking-wide cursor-pointer text-[#DBA1A2]">
-                                MOTHER'S DAY BUNDLES
+                            <div onClick={() => { router.push("/collections/bundles") }} className="text-[14px] font-semibold tracking-wide cursor-pointer text-[#DBA1A2]">
+                                BUNDLES - Get 10% off when you buy 2 or more sets!
                             </div>
                             <div onClick={() => { router.push("/aboutus") }} className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>About Gloss & Grace</div>
                             <div className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>Shipping & FAQ</div>

@@ -15,6 +15,7 @@ export interface Product {
     sizes?: string[];
     isNew?: boolean;
     isBestSeller?: boolean;
+    isBundle?: boolean;
     onSale?: boolean;
     shape?: string;
     length?: string;

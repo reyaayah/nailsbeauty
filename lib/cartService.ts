@@ -11,7 +11,7 @@ import {
     updateDoc,
     writeBatch,
 } from "firebase/firestore";
-import { getDbInstance } from "@/lib/firebase/FirebaseConfig";
+import { getClientDb } from "@/lib/firebase/client";
 import { Product } from "@/types/product";
 
 export interface CartItemData {
@@ -31,7 +31,7 @@ export async function addCartItem(
     size: string,
     shape: string
 ): Promise<void> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const cartRef = doc(db, "users", uid, "cart", `${product.id}_${size}_${shape}`);
 
     const snap = await getDoc(cartRef);
@@ -56,7 +56,7 @@ export async function addCartItem(
 }
 
 export async function fetchCart(uid: string): Promise<CartItemData[]> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const cartQuery = query(collection(db, "users", uid, "cart"));
     const snap = await getDocs(cartQuery);
     return snap.docs.map((doc) => doc.data() as CartItemData);
@@ -69,7 +69,7 @@ export async function updateCartItem(
     size: string,
     shape: string
 ): Promise<void> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const cartRef = doc(db, "users", uid, "cart", `${productId}_${size}_${shape}`);
 
     if (quantity < 1) {
@@ -85,13 +85,13 @@ export async function removeCartItem(
     size: string,
     shape: string
 ): Promise<void> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const cartRef = doc(db, "users", uid, "cart", `${productId}_${size}_${shape}`);
     await deleteDoc(cartRef);
 }
 
 export async function clearCart(uid: string): Promise<void> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const cartQuery = query(collection(db, "users", uid, "cart"));
     const snap = await getDocs(cartQuery);
 

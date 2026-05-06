@@ -10,7 +10,7 @@ import {
     writeBatch,
     arrayUnion,
 } from "firebase/firestore";
-import { getDbInstance } from "@/lib/firebase/FirebaseConfig";
+import { getClientDb } from "@/lib/firebase/client";
 import { CartItem } from "@/context/CartContext";
 
 export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
@@ -60,7 +60,7 @@ export async function placeOrder(
     shippingAddress: ShippingAddress,
     paymentMethod: string
 ): Promise<string> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const batch = writeBatch(db);
 
     // Generate unique order ID
@@ -120,7 +120,7 @@ export async function placeOrder(
  * Fetch all orders for a user
  */
 export async function fetchOrders(userId: string): Promise<Order[]> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const ordersQuery = query(
         collection(db, "users", userId, "orders"),
         orderBy("createdAt", "desc")
@@ -133,7 +133,7 @@ export async function fetchOrders(userId: string): Promise<Order[]> {
  * Fetch a single order by ID
  */
 export async function fetchOrder(userId: string, orderId: string): Promise<Order | null> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const orderRef = doc(db, "users", userId, "orders", orderId);
     const snap = await getDocs(query(collection(db, "users", userId, "orders")));
     const orderDoc = snap.docs.find((d) => d.id === orderId);
@@ -147,7 +147,7 @@ export async function updateOrderStatus(
     orderId: string,
     status: OrderStatus
 ): Promise<void> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const globalOrderRef = doc(db, "orders", orderId);
 
     await getDocs(query(collection(db, "orders"))).then((snap) => {
@@ -166,7 +166,7 @@ export async function updateOrderStatus(
  * Fetch all orders (admin only)
  */
 export async function fetchAllOrders(): Promise<Order[]> {
-    const db = getDbInstance();
+    const db = getClientDb();
     const ordersQuery = query(
         collection(db, "orders"),
         orderBy("createdAt", "desc")

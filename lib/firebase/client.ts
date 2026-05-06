@@ -1,3 +1,5 @@
+// lib/firebase/client.ts
+// CLIENT-SIDE ONLY — uses NEXT_PUBLIC_* env vars (safe to expose to browser)
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
@@ -9,15 +11,11 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-let _app: FirebaseApp | null = null;
-
 function getFirebaseApp(): FirebaseApp {
-  if (!_app) {
-    _app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  }
-  return _app;
+  return getApps().length ? getApp() : initializeApp(firebaseConfig);
 }
 
 export function getClientAuth(): Auth {

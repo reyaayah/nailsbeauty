@@ -1,17 +1,31 @@
 import type { NextConfig } from "next";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Firebase — CLIENT-SIDE (browser-safe, NEXT_PUBLIC_* prefix)
+// ─────────────────────────────────────────────────────────────────────────────
+const clientFirebase = {
+  NEXT_PUBLIC_FIREBASE_API_KEY: "AIzaSyCG-eZuOecjQYs5dNAUv5QOl5Bmvjv0sP0",
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "nailsbeauty-978c5.firebaseapp.com",
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: "nailsbeauty-978c5",
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: "nailsbeauty-978c5.firebasestorage.app",
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "402268561511",
+  NEXT_PUBLIC_FIREBASE_APP_ID: "1:402268561511:web:df3bd2d1ae70875ccef4c2",
+  NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: "G-1EJKR5GZ03",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Firebase — SERVER-SIDE Admin SDK (never exposed to browser)
+// ─────────────────────────────────────────────────────────────────────────────
+const adminFirebase = {
+  FIREBASE_PROJECT_ID: "nailsbeauty-978c5",
+  FIREBASE_CLIENT_EMAIL: "firebase-adminsdk-fbsvc@nailsbeauty-978c5.iam.gserviceaccount.com",
+  FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDyW8/AAE2WmjXQ\nmSoaf9x5kJhj9Jv1ptZgQFKUETl9iE2HWHQcC3NO6DnT73DSoPDvc0QkWAqijtMC\nKJp9GeRxwqozdwt4YSLNo6aMoxRwH/46Id0kq218Eg+e712OzGFobC9xVWt/KFp+\nDsq7rxI2vTFMg8YfyOZEMPQY61Y9Bnxsrgj3Yj5CJv5Vvs9ThA5D24Ydfl0G6REa\nNyz9R4BnKc6boCM7vSMXtIMgcoS7Qol4HcG/oROGwMbm2IGz7aJX5HGDTiOe5xye\napBCxG1MuU4TOeeBKv5fN+2gK8zDi2g7QKP8DfrbQj7kAiURzGYcihBZboKoQI0A\nuBEuj3VfAgMBAAECggEADW6x2ebj/5WMp2lg/R00ESRgX3EQI2Vu561fX+e0FrVZ\njEeGdYPbwE/vqiodrmOo87FUSAPKYLSz+wa/SHEi1hYSpkD4iK0wwOv+kAUXEP9w\nJDTg4Fm3lJ/qb+xW9GvdRDlzlOXFzCmzTKqxaTiS5/TEop4berYar3hB6lwOW6bN\ndzTVg/V5z92Y9gfnVbCQd6aonpP+Hv7zVD+ReswbLn6arRtlU9fYhm/EfbuXwwaY\nJ0IDnUzufg+9fIkcOYz3wbOf8QEEKh1ZAIE5vxeGoKNA3JqTAueMdKbko/FvJTox\nHMWMwLz0c29yz+SChZ07OUhBYRUED6h088XGoriuTQKBgQD5jG+OU8lx9PX5b4fb\nSqaEr1iWqQoNKT+T94OgworXAFZsYd8is3EtbJpvlfI0oMp3dyWzlTdP/bvhHo6B\n8udmsT0O+ERNMLQej+EkH9/lvak28nnjNbedtrWYBMUkYjmJ/T2/WYjCf+BIFA2F\nHFdMnKxxnf4IURh2ofEudKz3FQKBgQD4n8qPpGhx0zTH5A980f2dhker/0Edw2kl\noRO2zRDipPtgGnhp38/kHQRm8947uDmHaSG+1z61dgtAWzkxUUJ4f1liD9SX19iS\n9BzEzB8GiTNLZeMfBZLmAtTNWQ+nCzTK+AdPddm0LLuaSr37TC9Q36lyhKnjCAzK\nTOiWiB5XowKBgQCywzJKr6S3uHXX+FhG8+PzWrTIQFFN+kVsFru5FoNk3v4J59Zz\nQj4J/ylmU/DMWH6RM83TJkoYSDglXMFTP5EaVE7cAWbUMNZmqkTqntbB+apVDT/Z\nTmq5VOAjBQ/AL4juW3W3NEkuo3Ij0BGbUCENZZJ2VWpbxNQUb4+Y6sXYvQKBgBZd\nETRgfoCWle3RBs+cd+qedH31JN9Pf3rCBWrxAS7R1karut8TIbkMHyQ/lWLbzFjw\nzPdEl0BtUM/GJNvZylfaZKjccawC31lAmgHdtoC5AKMslARrVO5ZnNinxS+qY2JK\ncyXjnOSHDYzwYixjivIEXFKPulRQmg3sYxN/RPNvAoGAOzUrOeAvkYaRfUWaZUNj\nSpI+3/T23hKUmpV76pTJI06fFM3vKNnArucT8X7T8y/WeOwvDP1eksC8cS5sAE9X\nQzRmd1rD39xEXNlRZa3OxITq8pHbo0YyULehZ7PWZ60qkkBhvnmq1ybEaaOt194e\nM6Jvf3s6HWngtxa7PjundX8=\n-----END PRIVATE KEY-----\n",
+};
+
 const nextConfig: NextConfig = {
   env: {
-    NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
-    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-    NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
-    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
-    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
-    NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
-    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID!,
-    FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID!,
-    FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL!,
-    FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY!,
+    ...clientFirebase,
+    ...adminFirebase,
   },
   async headers() {
     return [

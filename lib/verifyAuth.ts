@@ -1,6 +1,6 @@
 // lib/verifyAuth.ts
 import { NextRequest } from "next/server";
-import { auth } from "@/lib/firebaseAdmin"; // import the initialized instance
+import { adminAuth as auth } from "@/lib/firebase/admin"; // import the initialized instance
 
 export async function verifyUser(request: NextRequest): Promise<string | null> {
     try {

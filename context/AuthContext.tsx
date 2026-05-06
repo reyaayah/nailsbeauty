@@ -16,6 +16,7 @@ import {
     signOut,
     sendPasswordResetEmail,
     updateProfile,
+    GoogleAuthProvider,
     AuthError,
 } from "firebase/auth";
 import {
@@ -28,7 +29,7 @@ import {
     getDocs,
     serverTimestamp,
 } from "firebase/firestore";
-import { initializeFirebase, getAuthInstance, getDbInstance, getGoogleProvider } from "@/lib/firebase/FirebaseConfig";
+import { getClientAuth, getClientDb } from "@/lib/firebase/client";
 import { UserProfile } from "@/types/user";
 
 /* ─── Shape ──────────────────────────────────────────────── */
@@ -46,6 +47,10 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+/* ─── Google provider (instantiated once) ────────────────── */
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
 /* ─── Error messages ─────────────────────────────────────── */
 function parseFirebaseError(error: AuthError): string {
@@ -85,7 +90,8 @@ async function withRetry<T>(
 }
 
 /* ─── Firestore helpers ──────────────────────────────────── */
-async function createUserDocument(user: User, provider: "email" | "google", db: any) {
+async function createUserDocument(user: User, provider: "email" | "google") {
+    const db = getClientDb();
     const ref = doc(db, "users", user.uid);
     const snap = await withRetry(() => getDoc(ref));
     if (!snap.exists()) {
@@ -107,15 +113,15 @@ async function createUserDocument(user: User, provider: "email" | "google", db: 
     }
 }
 
-async function fetchUserProfile(uid: string, db: any): Promise<UserProfile | null> {
+async function fetchUserProfile(uid: string): Promise<UserProfile | null> {
+    const db = getClientDb();
     const snap = await withRetry(() => getDoc(doc(db, "users", uid)));
     return snap.exists() ? (snap.data() as UserProfile) : null;
 }
 
-// Look up which provider an email is registered with via our Firestore users collection.
-// This avoids the deprecated fetchSignInMethodsForEmail Firebase SDK method.
-async function getProviderForEmail(email: string, db: any): Promise<"email" | "google" | null> {
+async function getProviderForEmail(email: string): Promise<"email" | "google" | null> {
     try {
+        const db = getClientDb();
         const q = query(collection(db, "users"), where("email", "==", email));
         const snap = await getDocs(q);
         if (snap.empty) return null;
@@ -131,45 +137,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState<string | null>(null);
-    const [firebaseReady, setFirebaseReady] = useState(false);
 
     const clearError = () => setAuthError(null);
 
     useEffect(() => {
-        initializeFirebase().then(() => {
-            const auth = getAuthInstance();
-            const db = getDbInstance();
-
-            const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-                setUser(firebaseUser);
-                if (firebaseUser) {
-                    const profile = await fetchUserProfile(firebaseUser.uid, db);
-                    setUserProfile(profile);
-                } else {
-                    setUserProfile(null);
-                }
-                setLoading(false);
-            });
-            setFirebaseReady(true);
-            return unsub;
+        const auth = getClientAuth();
+        const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+            setUser(firebaseUser);
+            if (firebaseUser) {
+                const profile = await fetchUserProfile(firebaseUser.uid);
+                setUserProfile(profile);
+            } else {
+                setUserProfile(null);
+            }
+            setLoading(false);
         });
+        return unsub;
     }, []);
 
     /* Register */
     const register = async (email: string, password: string, displayName: string) => {
         try {
             clearError();
-            const db = getDbInstance();
-            const existingProvider = await getProviderForEmail(email, db);
+            const existingProvider = await getProviderForEmail(email);
             if (existingProvider === "google") {
                 setAuthError("This email is already registered via Google. Please sign in with Google instead.");
                 throw new Error("provider-conflict");
             }
-            const auth = getAuthInstance();
+            const auth = getClientAuth();
             const cred = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(cred.user, { displayName });
-            await createUserDocument(cred.user, "email", db);
-            const profile = await fetchUserProfile(cred.user.uid, db);
+            await createUserDocument(cred.user, "email");
+            const profile = await fetchUserProfile(cred.user.uid);
             setUserProfile(profile);
         } catch (err) {
             if ((err as Error).message !== "provider-conflict") {
@@ -183,10 +182,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const login = async (email: string, password: string) => {
         try {
             clearError();
-            const auth = getAuthInstance();
-            const db = getDbInstance();
+            const auth = getClientAuth();
             const cred = await signInWithEmailAndPassword(auth, email, password);
-            const profile = await fetchUserProfile(cred.user.uid, db);
+            const profile = await fetchUserProfile(cred.user.uid);
             setUserProfile(profile);
         } catch (err) {
             const error = err as AuthError;
@@ -195,8 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 error.code === "auth/wrong-password" ||
                 error.code === "auth/user-not-found"
             ) {
-                const db = getDbInstance();
-                const existingProvider = await getProviderForEmail(email, db);
+                const existingProvider = await getProviderForEmail(email);
                 if (existingProvider === "google") {
                     setAuthError("This email is registered via Google. Please sign in with Google instead.");
                     throw err;
@@ -211,18 +208,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const loginWithGoogle = async () => {
         try {
             clearError();
-            const auth = getAuthInstance();
-            const db = getDbInstance();
-            const googleProvider = getGoogleProvider();
+            const auth = getClientAuth();
             const cred = await signInWithPopup(auth, googleProvider);
-            const existingProvider = await getProviderForEmail(cred.user.email ?? "", db);
+            const existingProvider = await getProviderForEmail(cred.user.email ?? "");
             if (existingProvider === "email") {
                 await signOut(auth);
                 setAuthError("This email is already registered with a password. Please sign in with your email and password instead.");
                 throw new Error("provider-conflict");
             }
-            await createUserDocument(cred.user, "google", db);
-            const profile = await fetchUserProfile(cred.user.uid, db);
+            await createUserDocument(cred.user, "google");
+            const profile = await fetchUserProfile(cred.user.uid);
             setUserProfile(profile);
         } catch (err) {
             if ((err as Error).message !== "provider-conflict") {
@@ -234,8 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     /* Logout */
     const logout = async () => {
-        const auth = getAuthInstance();
-        await signOut(auth);
+        await signOut(getClientAuth());
         setUserProfile(null);
     };
 
@@ -243,23 +237,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const forgotPassword = async (email: string) => {
         try {
             clearError();
-            const db = getDbInstance();
-            const existingProvider = await getProviderForEmail(email, db);
-
-            // No account found at all
+            const existingProvider = await getProviderForEmail(email);
             if (existingProvider === null) {
                 setAuthError("No account found with this email address.");
                 throw new Error("provider-conflict");
             }
-
-            // Account exists but uses Google — no password to reset
             if (existingProvider === "google") {
                 setAuthError("This email uses Google sign-in and doesn't have a password to reset.");
                 throw new Error("provider-conflict");
             }
-
-            const auth = getAuthInstance();
-            await sendPasswordResetEmail(auth, email);
+            await sendPasswordResetEmail(getClientAuth(), email);
         } catch (err) {
             if ((err as Error).message !== "provider-conflict") {
                 setAuthError(parseFirebaseError(err as AuthError));

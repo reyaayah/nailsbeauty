@@ -64,7 +64,7 @@ export function Sidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <p style={{ color: theme.colors.light }} className="font-semibold text-sm leading-none tracking-tight">
-                Gloss & Grace
+                Nailsa
               </p>
               <p style={{ color: theme.colors.subtitle }} className="text-[10px] mt-1 uppercase tracking-widest opacity-60">
                 Admin

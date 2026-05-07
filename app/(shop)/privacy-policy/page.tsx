@@ -1,9 +1,9 @@
 import React from 'react';
 
 const PrivacyPolicy = () => {
-    const brandName = "Grace & Gloss";
-    const domain = "graceandgloss.com";
-    const contactEmail = "support@graceandgloss.com";
+    const brandName = "Nailsa";
+    const domain = "Nailsa.com";
+    const contactEmail = "support@Nailsa.com";
 
     return (
         <div className="bg-white text-gray-800 min-h-screen pt-20">

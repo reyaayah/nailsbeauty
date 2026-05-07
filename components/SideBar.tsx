@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                             className="text-2xl font-serif font-bold italic"
                             style={{ color: theme.colors.dark }}
                         >
-                            Gloss & Grace
+                            Nailsa
                         </h1>
                         <p className="text-[10px] uppercase tracking-[0.2em] font-semibold mt-1" style={{ color: theme.colors.primary }}>Premium Press-Ons</p>
                     </div>
@@ -150,7 +150,7 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                             <div onClick={() => { router.push("/collections/bundles") }} className="text-[14px] font-semibold tracking-wide cursor-pointer text-[#DBA1A2]">
                                 BUNDLES - Get 10% off when you buy 2 or more sets!
                             </div>
-                            <div onClick={() => { router.push("/aboutus") }} className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>About Gloss & Grace</div>
+                            <div onClick={() => { router.push("/aboutus") }} className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>About Nailsa</div>
                             <div className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>Shipping & FAQ</div>
                         </div>
                     </div>

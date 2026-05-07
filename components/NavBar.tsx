@@ -33,7 +33,7 @@ const allProducts = [
 const navItems = [
   { name: "New Arrivals", href: "#new-arrivals" },
   { name: "Shop All", href: "/products" },
-  { name: "Bundles", href: "#bundles" },
+  { name: "Bundles", href: "/collections/bundles" },
   { name: "Best Sellers", href: "#best-sellers" },
 ];
 
@@ -332,7 +332,7 @@ export default function Navbar() {
               </h3>
               <p className="text-sm text-gray-500 font-light leading-relaxed mb-8">
                 Are you sure you want to sign out of your <br />
-                <strong>Gloss & Grace</strong> account?
+                <strong>Nailsa</strong> account?
               </p>
 
               <div className="flex flex-col w-full gap-3">

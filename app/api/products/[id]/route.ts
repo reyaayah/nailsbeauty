@@ -44,6 +44,11 @@ const products: Product[] = [
         length: "Medium",
         style: "Glossy",
         collection: "LNY Limited",
+        videoReviews: [
+            { id: 1, user: "@valerie_nails", videoUrl: "/videos/review1.mp4", poster: "/thumb1.jpg" },
+            { id: 2, user: "@beauty_by_jade", videoUrl: "/videos/review2.mp4", poster: "/thumb2.jpg" },
+            { id: 3, user: "@minimalist_mani", videoUrl: "/videos/review3.mp4", poster: "/thumb3.jpg" },
+        ],
     },
     {
         id: 2,
@@ -75,6 +80,10 @@ const products: Product[] = [
         length: "Short",
         style: "Metallic",
         collection: "The Love Edit",
+        videoReviews: [
+            { id: 1, user: "@Nailsa_fan_01", videoUrl: "/videos/review4.mp4", poster: "/thumb4.jpg" },
+            { id: 2, user: "@nailsbyrosa", videoUrl: "/videos/review5.mp4", poster: "/thumb5.jpg" },
+        ],
     },
     {
         id: 3,
@@ -104,6 +113,10 @@ const products: Product[] = [
         length: "Long",
         style: "Matte",
         collection: "G & G Essence",
+        videoReviews: [
+            { id: 1, user: "@minimalist_mani", videoUrl: "/videos/review3.mp4", poster: "/thumb3.jpg" },
+            { id: 2, user: "@valerie_nails", videoUrl: "/videos/review1.mp4", poster: "/thumb1.jpg" },
+        ],
     },
     {
         id: 4,
@@ -133,6 +146,9 @@ const products: Product[] = [
         length: "Medium",
         style: "Glitter",
         collection: "Summer '24",
+        videoReviews: [
+            { id: 2, user: "@beauty_by_jade", videoUrl: "/videos/review2.mp4", poster: "/thumb2.jpg" },
+        ],
     },
     {
         id: 5,
@@ -162,6 +178,11 @@ const products: Product[] = [
         length: "Medium",
         style: "Glossy",
         collection: "Summer '24",
+        videoReviews: [
+            { id: 2, user: "@valerie_nails", videoUrl: "/videos/review1.mp4", poster: "/thumb1.jpg" },
+            { id: 3, user: "@Nailsa_fan_01", videoUrl: "/videos/review4.mp4", poster: "/thumb4.jpg" },
+            { id: 4, user: "@nailsbyrosa", videoUrl: "/videos/review5.mp4", poster: "/thumb5.jpg" },
+        ],
     },
 ];
 

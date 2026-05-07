@@ -70,7 +70,7 @@ const Footer = () => {
                             NEWSLETTER
                         </h3>
                         <p className="text-sm mb-6 leading-relaxed">
-                            Join the Gloss & Grace family. Subscribe for exclusive offers, beauty tips, and trend updates.
+                            Join the Nailsa family. Subscribe for exclusive offers, beauty tips, and trend updates.
                         </p>
                         <form className="relative group" onSubmit={(e) => e.preventDefault()}>
                             <input
@@ -90,7 +90,7 @@ const Footer = () => {
                 <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-8" style={{ borderColor: 'rgba(247, 243, 237, 0.1)' }}>
                     <div className="text-center md:text-left">
                         <p className="text-xs tracking-widest uppercase mb-2">
-                            © {new Date().getFullYear()} Gloss & Grace Salon
+                            © {new Date().getFullYear()} Nailsa Salon
                         </p>
                         <div className="flex space-x-4 text-[10px] uppercase opacity-60">
                             <Link href="/privacy-policy" className="hover:underline">Privacy Policy</Link>

@@ -163,9 +163,9 @@ export default function ProductDetails() {
                 <span className="font-bold">{product.name}</span>
             </nav>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-14 gap-18">
                 {/* ── Product Images ── */}
-                <div className="lg:col-span-6 flex gap-3">
+                <div className="lg:col-span-7 flex gap-3">
                     {/* Thumbnail strip — max 2 images */}
                     <div className="flex flex-col gap-2.5 flex-shrink-0">
                         {thumbnailImages.map((img, idx) => (
@@ -190,7 +190,7 @@ export default function ProductDetails() {
                     </div>
 
                     {/* Main image — fixed height so it never overflows */}
-                    <div className="relative flex-1 rounded-2xl overflow-hidden bg-white shadow-sm" style={{ maxHeight: "480px" }}>
+                    <div className="relative flex-1 rounded-2xl overflow-hidden bg-white shadow-sm h-[340px] sm:h-[460px] lg:h-[560px] xl:h-[640px]">
                         {product.isNew && (
                             <span
                                 className="absolute top-4 right-4 text-white text-[10px] font-black px-4 py-1.5 rounded-full z-10 tracking-widest"
@@ -210,7 +210,7 @@ export default function ProductDetails() {
                 </div>
 
                 {/* ── Product Details ── */}
-                <div className="lg:col-span-6 flex flex-col gap-5">
+                <div className="lg:col-span-7 flex flex-col gap-3">
                     <div>
                         <h1 className="text-4xl font-serif tracking-tight mb-2" style={{ color: theme.colors.dark }}>
                             {product.name}
@@ -231,16 +231,12 @@ export default function ProductDetails() {
                         <span style={{ color: theme.colors.primary }}>${product.price.toFixed(2)}</span>
                         <span className="text-xs font-normal italic opacity-50">inc. VAT</span>
                     </div>
-
-                    {/* Description — 2-line preview */}
-                    <div className="space-y-1">
-                        <p className="leading-relaxed opacity-80 text-sm">
-                            {descExpanded ? fullDesc : descPreview}
-                        </p>
+                    <p className="leading-relaxed opacity-80 text-sm">
+                        {descExpanded ? fullDesc : descPreview}
                         {hasMoreDesc && (
                             <button
                                 onClick={() => setDescExpanded((v) => !v)}
-                                className="flex items-center gap-1 text-xs font-bold transition-opacity hover:opacity-70"
+                                className="inline-flex items-center gap-0.5 text-xs font-bold transition-opacity hover:opacity-70 ml-1 align-middle"
                                 style={{ color: theme.colors.primary }}
                             >
                                 {descExpanded ? (
@@ -250,7 +246,7 @@ export default function ProductDetails() {
                                 )}
                             </button>
                         )}
-                    </div>
+                    </p>
 
                     {/* Features — 3 visible, rest behind toggle */}
                     {allFeatures.length > 0 && (
@@ -405,7 +401,7 @@ export default function ProductDetails() {
 
             {/* Additional Sections */}
             <ApplicationGuide />
-            <VideoReviews />
+            <VideoReviews reviews={product.videoReviews ?? []} />
             <Faqs />
         </main>
     );

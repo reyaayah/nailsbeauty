@@ -1,8 +1,8 @@
 import React from 'react';
 
 const TermsOfService = () => {
-    const brandName = "Grace & Gloss";
-    const contactEmail = "support@graceandgloss.com";
+    const brandName = "Nailsa";
+    const contactEmail = "support@Nailsa.com";
 
     return (
         <div className="bg-white text-gray-800 min-h-screen pt-20">

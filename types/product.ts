@@ -1,3 +1,10 @@
+export interface VideoReview {
+    id: number;
+    user: string;
+    videoUrl: string;
+    poster: string;
+}
+
 export interface Product {
     id: number;
     name: string;
@@ -24,4 +31,5 @@ export interface Product {
     isKit?: boolean;
     kitOptions?: string[];
     isSimple?: boolean;
+    videoReviews?: VideoReview[];
 }

@@ -10,9 +10,12 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || "";
     const search = searchParams.get("search") || "";
+    const isGift = searchParams.get("isGift") === "true";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "15");
 
+    // Only filter by status at the Firestore level — it has a single-field index already.
+    // isGift is filtered in-memory below to avoid needing a composite index.
     let q: FirebaseFirestore.Query = adminDb.collection("orders").orderBy("createdAt", "desc");
     if (status) q = q.where("status", "==", status);
 
@@ -27,6 +30,11 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    // In-memory filters (no index required)
+    if (isGift) {
+      orders = orders.filter((o: any) => o.isGift === true);
+    }
+
     if (search) {
       const s = search.toLowerCase();
       orders = orders.filter(
@@ -34,7 +42,8 @@ export async function GET(req: NextRequest) {
           o.id?.toLowerCase().includes(s) ||
           o.userId?.toLowerCase().includes(s) ||
           o.userEmail?.toLowerCase().includes(s) ||
-          o.shippingAddress?.fullName?.toLowerCase().includes(s)
+          o.shippingAddress?.fullName?.toLowerCase().includes(s) ||
+          o.discountCode?.toLowerCase().includes(s)
       );
     }
 

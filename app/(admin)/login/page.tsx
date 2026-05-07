@@ -60,7 +60,7 @@ export default function LoginPage() {
           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.colors.primary }}>
             <Sparkles className="text-white" size={20} />
           </div>
-          <h1 className="text-xl font-serif tracking-widest text-white uppercase">Gloss & Grace</h1>
+          <h1 className="text-xl font-serif tracking-widest text-white uppercase">Nailsa</h1>
         </div>
 
         <div className="relative z-20">

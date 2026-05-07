@@ -67,7 +67,7 @@ export default function LoginPage() {
                     </h1>
                     {/* Changed from opacity-60 to text-slate-600 for better readability */}
                     <p className="text-sm font-medium text-slate-600">
-                        Sign in to your Gloss & Grace account
+                        Sign in to your Nailsa account
                     </p>
                 </div>
 

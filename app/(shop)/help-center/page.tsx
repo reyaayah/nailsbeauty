@@ -17,27 +17,27 @@ const faqs: Record<string, { q: string; a: string }[]> = {
     product: [
         { q: "How to find my size?", a: "We offer a comprehensive sizing guide using a millimeter ruler or our Sizing Kit. Most nails range from 8mm to 17mm to ensure a perfect fit for every nail bed." },
         { q: "How are the different shapes and lengths looks like?", a: "We offer Coffin, Almond, Stiletto, Square, and Oval shapes in Short, Medium, and Long lengths. Check our 'Shapes Guide' page for visual comparisons." },
-        { q: "Are we vegan and cruelty-free?", a: "Yes! Grace & Gloss Nails is committed to ethical beauty. All our gels and materials are 100% vegan and never tested on animals." },
+        { q: "Are we vegan and cruelty-free?", a: "Yes! Nailsa Nails is committed to ethical beauty. All our gels and materials are 100% vegan and never tested on animals." },
         { q: "Are our press-on nails reusable?", a: "Absolutely. Because they are handcrafted with high-quality gel, they are reusable for life with proper care and gentle removal." },
-        { q: "How are Grace & Gloss Nails different from the other press-on nails?", a: "Unlike mass-produced plastic nails, ours are handcrafted by professional nail techs using real gel. They offer salon quality, zero damage, and last up to 4 weeks per wear." },
+        { q: "How are Nailsa Nails different from the other press-on nails?", a: "Unlike mass-produced plastic nails, ours are handcrafted by professional nail techs using real gel. They offer salon quality, zero damage, and last up to 4 weeks per wear." },
     ],
     application: [
-        { q: "How do I apply Grace & Gloss Press-Ons?", a: "Prep is key! Clean your natural nails, push back cuticles, and use the included adhesive. Application takes under 10 minutes for a salon-quality look." },
+        { q: "How do I apply Nailsa Press-Ons?", a: "Prep is key! Clean your natural nails, push back cuticles, and use the included adhesive. Application takes under 10 minutes for a salon-quality look." },
         { q: "How do I remove them safely?", a: "Soak your nails in warm water with soap and oil for 10-15 minutes. Gently lift from the sides. This ensures zero damage to your natural nails." },
     ],
     customization: [
-        { q: "Do we offer any customization?", a: "Yes! You can personalize the shape, length, and design of existing sets, or email us at hello@Grace & Glossnails.com for a fully bespoke, one-of-a-kind creation." },
+        { q: "Do we offer any customization?", a: "Yes! You can personalize the shape, length, and design of existing sets, or email us at hello@Nailsanails.com for a fully bespoke, one-of-a-kind creation." },
         { q: "How do I submit a custom design?", a: "Send us inspiration photos, your outfit ideas, or specific motifs like 3D flowers or chrome effects. Our techs will confirm feasibility within 24 hours." },
     ],
     shipping: [
-        { q: "Where do you ship to?", a: "We ship worldwide! Whether you're local or international, Grace & Gloss Nails can reach your doorstep." },
+        { q: "Where do you ship to?", a: "We ship worldwide! Whether you're local or international, Nailsa Nails can reach your doorstep." },
         { q: "How much and how long does it cost?", a: "Shipping costs and times vary by location. Typically, domestic orders arrive in 3-5 business days, while international can take 7-14 days." },
         { q: "Is there free shipping?", a: "We often offer free shipping on orders over a certain value. Check our header banner for the most current promotion." },
         { q: "Why is my tracking not updating?", a: "Tracking can take 24-48 hours to update once the courier scans the package. If it hasn't moved in 5 days, please contact us." },
     ],
     returns: [
         { q: "Do we offer refunds or exchanges?", a: "Due to the hygienic nature of our handcrafted products, we generally do not accept returns. However, your satisfaction is our priority—contact us if you have issues with your order." },
-        { q: "I've received a damaged item, how can I get assistance?", a: "Please email hello@Grace & Glossnails.com with your order number and a photo of the damage within 48 hours of delivery. We will make it right." },
+        { q: "I've received a damaged item, how can I get assistance?", a: "Please email hello@Nailsanails.com with your order number and a photo of the damage within 48 hours of delivery. We will make it right." },
         { q: "What forms of payment do you accept?", a: "We accept all major credit cards, PayPal, and modern digital wallets to ensure your checkout is safe and seamless." },
     ],
 };
@@ -87,7 +87,7 @@ export default function HelpCenterPage() {
                     className="text-5xl md:text-7xl font-bold leading-none mb-6"
                     style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                    Grace & Gloss <em className="italic" style={{ color: theme.colors.primary }}>Help Center</em>
+                    Nailsa <em className="italic" style={{ color: theme.colors.primary }}>Help Center</em>
                 </h1>
                 <p className="text-sm opacity-50 mb-12 uppercase tracking-widest">How can we assist your journey?</p>
 
@@ -159,8 +159,8 @@ export default function HelpCenterPage() {
                         <Mail className="mb-6" style={{ color: theme.colors.primary }} />
                         <h3 className="text-2xl font-bold mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>Email Support</h3>
                         <p className="text-sm opacity-60 mb-6 leading-relaxed">Prefer the traditional way? Send us an email and we'll get back to you within 24 hours.</p>
-                        <a href="mailto:hello@Grace & Glossnails.com" className="text-xs font-bold uppercase tracking-widest border-b-2 pb-1" style={{ borderBottomColor: theme.colors.primary }}>
-                            hello@Grace & Glossnails.com
+                        <a href="mailto:hello@Nailsanails.com" className="text-xs font-bold uppercase tracking-widest border-b-2 pb-1" style={{ borderBottomColor: theme.colors.primary }}>
+                            hello@Nailsanails.com
                         </a>
                     </div>
                 </div>

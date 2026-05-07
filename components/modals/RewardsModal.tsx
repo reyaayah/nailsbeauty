@@ -146,7 +146,7 @@ export default function RewardsModal() {
                         fontSize: 16,
                     }}>✦</div>
                     <span style={{ fontSize: 10, letterSpacing: "0.25em", color: "#C9956C", textTransform: "uppercase", fontWeight: 700 }}>
-                        Gloss &amp; Grace
+                        Nailsa
                     </span>
                 </div>
 
@@ -158,7 +158,7 @@ export default function RewardsModal() {
                     fontSize: 22, fontWeight: 700,
                     color: "#E8D5C4", lineHeight: 1.2, marginBottom: 8,
                 }}>
-                    Gloss &amp; Grace<br />
+                    Nailsa<br />
                     <em style={{ color: "#C9956C", fontStyle: "italic" }}>Rewards</em>
                 </h2>
                 <p style={{ fontSize: 12, color: "rgba(232,213,196,0.6)", lineHeight: 1.6, marginBottom: 16 }}>

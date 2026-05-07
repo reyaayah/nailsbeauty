@@ -26,7 +26,7 @@ const tiers = [
 
 const howItWorks = [
     { step: "01", title: "Create an Account", desc: "Sign up for free and your rewards journey begins immediately." },
-    { step: "02", title: "Shop & Earn", desc: "Earn 1 point for every $1 spent on any Gloss & Grace product." },
+    { step: "02", title: "Shop & Earn", desc: "Earn 1 point for every $1 spent on any Nailsa product." },
     { step: "03", title: "Unlock Rewards", desc: "Redeem points for discounts, free products, and exclusive perks." },
     { step: "04", title: "Rise Through Tiers", desc: "The more you shop, the more exclusive your benefits become." },
 ];
@@ -54,7 +54,7 @@ export default function RewardsPage() {
                 {/* Wrap content in a relative div with higher z-index */}
                 <div className="relative z-10">
                     <p className="text-[11px] font-medium uppercase tracking-[0.3em] mb-4" style={{ color: theme.colors.primary }}>
-                        Gloss & Grace
+                        Nailsa
                     </p>
                     <h1
                         className="text-5xl md:text-7xl font-bold leading-none mb-6"

@@ -6,16 +6,16 @@ import {
   Button, Card, PageHeader, StatusBadge, Select, Input, Spinner,
 } from "@/components/ui";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/utils";
-import { ArrowLeft, MapPin, CreditCard, Package2, CheckCircle2, Save } from "lucide-react";
+import { ArrowLeft, MapPin, CreditCard, Package2, CheckCircle2, Save, Tag, Gift, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useAdminTab } from "@/context/AdminTabContext";
 
 const STEPS: OrderStatus[] = ["pending", "confirmed", "shipped", "delivered"];
 const STATUS_OPTIONS = [
-  { value: "pending",   label: "Pending" },
+  { value: "pending", label: "Pending" },
   { value: "confirmed", label: "Confirmed" },
-  { value: "shipped",   label: "Shipped" },
+  { value: "shipped", label: "Shipped" },
   { value: "delivered", label: "Delivered" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -49,7 +49,9 @@ export default function OrderDetailPanel({ id }: { id: string }) {
         method: "PATCH",
         body: JSON.stringify({ status: newStatus, trackingNumber: tracking, notes }),
       });
-      setOrder((prev) => prev ? { ...prev, status: newStatus, trackingNumber: tracking, notes } : prev);
+      setOrder((prev) =>
+        prev ? { ...prev, status: newStatus, trackingNumber: tracking, notes } : prev
+      );
       toast.success("Order updated!");
     } catch {
       toast.error("Failed to update order");
@@ -59,10 +61,15 @@ export default function OrderDetailPanel({ id }: { id: string }) {
   };
 
   if (loading) return <div className="flex items-center justify-center h-64"><Spinner size={28} /></div>;
-  if (!order)  return <div className="text-center py-20 text-slate-500">Order not found.</div>;
+  if (!order) return <div className="text-center py-20 text-slate-500">Order not found.</div>;
 
   const currentStepIdx = STEPS.indexOf(order.status as OrderStatus);
   const isCancelled = order.status === "cancelled";
+
+  const hasDiscount = !!(order as any).discountCode;
+  const hasOrderNote = !!(order as any).orderNote;
+  const isGift = !!(order as any).isGift;
+  const hasGiftNote = !!(order as any).giftNote;
 
   return (
     <div className="max-w-[1100px] space-y-5">
@@ -77,11 +84,12 @@ export default function OrderDetailPanel({ id }: { id: string }) {
         }
       />
 
+      {/* Status stepper */}
       {!isCancelled && (
         <Card className="p-5">
           <div className="flex items-center gap-0">
             {STEPS.map((step, i) => {
-              const done   = i <= currentStepIdx;
+              const done = i <= currentStepIdx;
               const active = i === currentStepIdx;
               return (
                 <div key={step} className="flex items-center flex-1 last:flex-none">
@@ -111,6 +119,8 @@ export default function OrderDetailPanel({ id }: { id: string }) {
 
       <div className="grid lg:grid-cols-3 gap-5">
         <div className="lg:col-span-2 space-y-5">
+
+          {/* Order Items */}
           <Card>
             <div className="flex items-center gap-2 px-5 py-4 border-b border-[--border]">
               <Package2 size={16} className="text-slate-500" />
@@ -120,7 +130,12 @@ export default function OrderDetailPanel({ id }: { id: string }) {
               {(order.items ?? []).map((item, i) => (
                 <div key={i} className="flex items-center gap-4 px-5 py-4">
                   {item.image && (
-                    <img src={item.image} alt={item.name} className="w-12 h-12 rounded-xl object-cover border border-[--border] flex-shrink-0" onError={(e) => (e.currentTarget.style.display = "none")} />
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-12 h-12 rounded-xl object-cover border border-[--border] flex-shrink-0"
+                      onError={(e) => (e.currentTarget.style.display = "none")}
+                    />
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-slate-900 truncate">{item.name}</p>
@@ -135,13 +150,79 @@ export default function OrderDetailPanel({ id }: { id: string }) {
                 </div>
               ))}
             </div>
+
+            {/* Pricing breakdown */}
             <div className="px-5 py-4 border-t border-[--border] space-y-2">
-              <div className="flex justify-between text-sm text-slate-600"><span>Subtotal</span><span>{formatCurrency(order.subtotal)}</span></div>
-              <div className="flex justify-between text-sm text-slate-600"><span>Shipping</span><span>{order.shipping === 0 ? "Free" : formatCurrency(order.shipping)}</span></div>
-              <div className="flex justify-between font-semibold text-slate-900 pt-2 border-t border-[--border]"><span>Total</span><span>{formatCurrency(order.total)}</span></div>
+              <div className="flex justify-between text-sm text-slate-600">
+                <span>Subtotal</span>
+                <span>{formatCurrency(order.subtotal)}</span>
+              </div>
+
+              {/* Discount row */}
+              {hasDiscount && (
+                <div className="flex justify-between text-sm">
+                  <span className="flex items-center gap-1.5 text-emerald-600">
+                    <Tag size={12} />
+                    Discount
+                    <span className="font-mono text-xs bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md">
+                      {(order as any).discountCode}
+                    </span>
+                    {(order as any).discountLabel && (
+                      <span className="text-slate-400 text-xs">· {(order as any).discountLabel}</span>
+                    )}
+                  </span>
+                  <span className="text-emerald-600 font-medium">
+                    −{formatCurrency((order as any).discountAmount ?? 0)}
+                  </span>
+                </div>
+              )}
+
+              <div className="flex justify-between text-sm text-slate-600">
+                <span>Shipping</span>
+                <span>{order.shipping === 0 ? "Free" : formatCurrency(order.shipping)}</span>
+              </div>
+              <div className="flex justify-between font-semibold text-slate-900 pt-2 border-t border-[--border]">
+                <span>Total</span>
+                <span>{formatCurrency(order.total)}</span>
+              </div>
             </div>
           </Card>
 
+          {/* Order Note & Gift */}
+          {(hasOrderNote || isGift) && (
+            <Card className="p-5 space-y-4">
+              {hasOrderNote && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText size={15} className="text-slate-500" />
+                    <h3 className="font-semibold text-slate-900 text-sm">Order Note</h3>
+                  </div>
+                  <p className="text-sm text-slate-600 bg-slate-50 rounded-xl px-4 py-3 border border-[--border] whitespace-pre-wrap">
+                    {(order as any).orderNote}
+                  </p>
+                </div>
+              )}
+
+              {isGift && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Gift size={15} className="text-pink-500" />
+                    <h3 className="font-semibold text-slate-900 text-sm">Gift Order</h3>
+                    <span className="text-[10px] font-bold bg-pink-50 text-pink-600 border border-pink-200 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                      Gift
+                    </span>
+                  </div>
+                  {hasGiftNote && (
+                    <p className="text-sm text-slate-600 bg-pink-50 rounded-xl px-4 py-3 border border-pink-100 whitespace-pre-wrap">
+                      {(order as any).giftNote}
+                    </p>
+                  )}
+                </div>
+              )}
+            </Card>
+          )}
+
+          {/* Shipping Address */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
               <MapPin size={16} className="text-slate-500" />
@@ -161,6 +242,7 @@ export default function OrderDetailPanel({ id }: { id: string }) {
           </Card>
         </div>
 
+        {/* Right column */}
         <div className="space-y-5">
           <Card className="p-5 space-y-4">
             <h3 className="font-semibold text-slate-900">Update Order</h3>
@@ -181,6 +263,7 @@ export default function OrderDetailPanel({ id }: { id: string }) {
             </Button>
           </Card>
 
+          {/* Payment & Customer */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-3">
               <CreditCard size={16} className="text-slate-500" />
@@ -188,11 +271,11 @@ export default function OrderDetailPanel({ id }: { id: string }) {
             </div>
             <div className="space-y-2 text-sm">
               {[
-                { label: "Payment",  value: order.paymentMethod || "—" },
-                { label: "Status",   value: <StatusBadge status={order.status} /> },
+                { label: "Payment", value: order.paymentMethod || "—" },
+                { label: "Status", value: <StatusBadge status={order.status} /> },
                 { label: "Customer", value: (order as any).userEmail || "—" },
-                { label: "Name",     value: (order as any).userName || order.shippingAddress?.fullName || "—" },
-                { label: "User ID",  value: <span className="font-mono text-xs break-all">{order.userId}</span> },
+                { label: "Name", value: (order as any).userName || order.shippingAddress?.fullName || "—" },
+                { label: "User ID", value: <span className="font-mono text-xs break-all">{order.userId}</span> },
               ].map(({ label, value }) => (
                 <div key={label} className="flex items-start justify-between gap-3">
                   <span className="text-slate-400 flex-shrink-0">{label}</span>
@@ -202,6 +285,30 @@ export default function OrderDetailPanel({ id }: { id: string }) {
             </div>
           </Card>
 
+          {/* Discount summary (read-only) */}
+          {hasDiscount && (
+            <Card className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Tag size={15} className="text-emerald-600" />
+                <h3 className="font-semibold text-slate-900">Discount Applied</h3>
+              </div>
+              <div className="space-y-2 text-sm">
+                {[
+                  { label: "Code", value: <span className="font-mono font-bold text-emerald-700">{(order as any).discountCode}</span> },
+                  { label: "Type", value: <span className="capitalize">{(order as any).discountType}</span> },
+                  { label: "Saving", value: <span className="text-emerald-600 font-semibold">{(order as any).discountLabel}</span> },
+                  { label: "Amount", value: <span className="text-emerald-600 font-semibold">−{formatCurrency((order as any).discountAmount ?? 0)}</span> },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between gap-3">
+                    <span className="text-slate-400">{label}</span>
+                    <span className="text-slate-700">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Timeline */}
           <Card className="p-5">
             <h3 className="font-semibold text-slate-900 mb-3">Timeline</h3>
             <div className="space-y-2 text-sm">

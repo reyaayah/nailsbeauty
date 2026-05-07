@@ -218,8 +218,8 @@ export default function CustomizationPage() {
                         <Link href="/contact" className="px-12 py-4 bg-black text-white text-xs font-bold uppercase tracking-widest hover:opacity-80 transition-all">
                             Contact Customer Service
                         </Link>
-                        <a href="mailto:hello@graceandgloss.com" className="px-12 py-4 border border-black text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all">
-                            hello@graceandgloss.com
+                        <a href="mailto:hello@Nailsa.com" className="px-12 py-4 border border-black text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all">
+                            hello@Nailsa.com
                         </a>
                     </div>
                 </motion.div>

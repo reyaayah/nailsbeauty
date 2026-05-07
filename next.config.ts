@@ -33,11 +33,24 @@ const cloudflareR2 = {
   NEXT_PUBLIC_R2_PUBLIC_URL: "https://pub-1f5f31cf3f764b058ee30785bec47206.r2.dev",
 };
 
+const smtp = {
+  SMTP_HOST: "smtp.gmail.com",           // e.g. smtp.gmail.com / smtp.resend.com
+  SMTP_PORT: "587",
+  SMTP_SECURE: "false",                  // "true" for port 465
+  SMTP_USER: "riyaawal7@gmail.com",           // sending account / API key username
+  SMTP_PASS: "vlpl brnz njxs ptpp",        // app password or API key
+  SMTP_FROM: 'riyaawal7@gmail.com',
+};
+const brand = {
+  NEXT_PUBLIC_BRAND_NAME: "Nailsa",
+};
 const nextConfig: NextConfig = {
   env: {
     ...clientFirebase,
     ...adminFirebase,
     ...cloudflareR2,
+    ...smtp,
+    ...brand,
   },
   async headers() {
     return [

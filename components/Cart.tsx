@@ -66,7 +66,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         if (window.innerWidth < 1024) onClose();
     };
 
-    const handleRemoveItem = async (productId: number, size: string, shape: string) => {
+    const handleRemoveItem = async (productId: string, size: string, shape: string) => {
         const itemKey = `${productId}-${size}-${shape}`;
         setIsRemoving(itemKey);
         try {
@@ -80,7 +80,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     };
 
     const handleQuantityUpdate = async (
-        productId: number,
+        productId: string,
         newQuantity: number,
         size: string,
         shape: string
@@ -573,8 +573,8 @@ interface CartItemsProps {
     items: any[];
     isRemoving: string | null;
     isUpdating: string | null;
-    onRemove: (productId: number, size: string, shape: string) => void;
-    onUpdateQuantity: (productId: number, quantity: number, size: string, shape: string) => void;
+    onRemove: (productId: string, size: string, shape: string) => void;
+    onUpdateQuantity: (productId: string, quantity: number, size: string, shape: string) => void;
     user: any;
 }
 

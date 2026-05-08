@@ -36,8 +36,8 @@ export interface AppliedDiscount {
 interface CartContextValue {
     items: CartItem[];
     addToCart: (product: Product, size: string, shape: string, quantity?: number) => Promise<void>;
-    removeFromCart: (productId: number, size?: string, shape?: string) => Promise<void>;
-    updateQuantity: (productId: number, quantity: number, size?: string, shape?: string) => Promise<void>;
+    removeFromCart: (productId: string, size?: string, shape?: string) => Promise<void>;
+    updateQuantity: (productId: string, quantity: number, size?: string, shape?: string) => Promise<void>;
     clearCart: () => Promise<void>;
     totalItems: number;
     subtotal: number;
@@ -180,7 +180,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                             image: i.image,
                             price: i.price,
                             category: "",
-                        } as Product,
+                        } as unknown as Product,
                         quantity: i.quantity,
                         size: i.size,
                         shape: i.shape,
@@ -224,7 +224,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
 
     const removeFromCart = useCallback(
-        async (productId: number, size = "", shape = "") => {
+        async (productId: string, size = "", shape = "") => {
             setItems((prev) =>
                 prev.filter(
                     (i) => !(i.product.id === productId && i.size === size && i.shape === shape)
@@ -242,7 +242,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
 
     const updateQuantity = useCallback(
-        async (productId: number, quantity: number, size = "", shape = "") => {
+        async (productId: string, quantity: number, size = "", shape = "") => {
             if (quantity < 1) {
                 return removeFromCart(productId, size, shape);
             }

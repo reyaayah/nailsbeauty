@@ -15,7 +15,7 @@ import { getClientDb } from "@/lib/firebase/client";
 import { Product } from "@/types/product";
 
 export interface CartItemData {
-    productId: number;
+    productId: string;
     name: string;
     image: string;
     price: number;
@@ -64,7 +64,7 @@ export async function fetchCart(uid: string): Promise<CartItemData[]> {
 
 export async function updateCartItem(
     uid: string,
-    productId: number,
+    productId: string,
     quantity: number,
     size: string,
     shape: string
@@ -81,7 +81,7 @@ export async function updateCartItem(
 
 export async function removeCartItem(
     uid: string,
-    productId: number,
+    productId: string,
     size: string,
     shape: string
 ): Promise<void> {

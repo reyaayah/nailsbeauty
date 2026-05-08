@@ -1,4 +1,3 @@
-// app/products/[id]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -46,8 +45,6 @@ function useProduct(id: string) {
 }
 
 const SHAPE_OPTIONS = ["Almond", "Square", "Coffin", "Oval"];
-
-// Max features visible before "View more"
 const FEATURES_PREVIEW = 3;
 
 export default function ProductDetails() {
@@ -56,13 +53,13 @@ export default function ProductDetails() {
     const { user } = useAuth();
     const { isInWishlist, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist();
     const params = useParams();
-    const productId = parseInt(params.id as string);
-    const { product } = useProduct(params.id as string);
+    const productId = params.id as string; // keep as string — Firestore IDs are strings
+
+    const { product, loading, error } = useProduct(productId);
 
     const [quantity, setQuantity] = useState(1);
-    // Only show first 2 images in the thumbnail strip
     const [activeImage, setActiveImage] = useState(0);
-    const [selectedSize, setSelectedSize] = useState(product?.sizes?.[2] || "M");
+    const [selectedSize, setSelectedSize] = useState<string>("");
     const [selectedShape, setSelectedShape] = useState(SHAPE_OPTIONS[0]);
     const [addingToCart, setAddingToCart] = useState(false);
     const [wishlisted, setWishlisted] = useState(false);
@@ -70,13 +67,34 @@ export default function ProductDetails() {
     const [descExpanded, setDescExpanded] = useState(false);
     const [featuresExpanded, setFeaturesExpanded] = useState(false);
 
+    // Set default size once product loads
+    useEffect(() => {
+        if (product?.sizes?.length) {
+            setSelectedSize(product.sizes[2] ?? product.sizes[0]);
+        }
+    }, [product]);
+
+    // Sync wishlist state once both user and product are ready
     useEffect(() => {
         if (user && product) {
             setWishlisted(isInWishlist(product.id));
         }
     }, [user, product, isInWishlist]);
 
-    if (!product) {
+    // ── Loading state ──────────────────────────────────────────────────────────
+    if (loading) {
+        return (
+            <main
+                className="w-full min-h-screen flex items-center justify-center"
+                style={{ backgroundColor: theme.colors.light }}
+            >
+                <Loader2 size={32} className="animate-spin" style={{ color: theme.colors.primary }} />
+            </main>
+        );
+    }
+
+    // ── Error / not found state ────────────────────────────────────────────────
+    if (error || !product) {
         return (
             <main
                 className="w-full min-h-screen flex items-center justify-center"
@@ -113,7 +131,7 @@ export default function ProductDetails() {
             await addToCart(product, selectedSize, selectedShape);
             toast.success(`Added ${quantity} to cart`, { icon: <ShoppingBag size={16} /> });
             setQuantity(1);
-        } catch (error) {
+        } catch {
             toast.error("Failed to add to cart. Please try again.");
         } finally {
             setAddingToCart(false);
@@ -139,14 +157,14 @@ export default function ProductDetails() {
             setWishlistLoading(false);
         }
     };
-
-    // Only use first 2 images for the thumbnail strip
-    const thumbnailImages = (product.images ?? [product.image]).slice(0, 2);
+    const thumbnailImages =
+        product.images && product.images.length > 0
+            ? product.images
+            : [product.image];
     const allFeatures = product.features ?? [];
     const visibleFeatures = featuresExpanded ? allFeatures : allFeatures.slice(0, FEATURES_PREVIEW);
     const hasMoreFeatures = allFeatures.length > FEATURES_PREVIEW;
 
-    // Description: clamp to 2 lines via JS word-split (≈120 chars)
     const fullDesc = product.description ?? "";
     const descPreview = fullDesc.length > 120 ? fullDesc.slice(0, 120).trimEnd() + "…" : fullDesc;
     const hasMoreDesc = fullDesc.length > 120;
@@ -166,7 +184,6 @@ export default function ProductDetails() {
             <div className="grid grid-cols-1 lg:grid-cols-14 gap-18">
                 {/* ── Product Images ── */}
                 <div className="lg:col-span-7 flex gap-3">
-                    {/* Thumbnail strip — max 2 images */}
                     <div className="flex flex-col gap-2.5 flex-shrink-0">
                         {thumbnailImages.map((img, idx) => (
                             <button
@@ -184,12 +201,12 @@ export default function ProductDetails() {
                                     width={64}
                                     height={80}
                                     className="w-full h-full object-cover"
+
                                 />
                             </button>
                         ))}
                     </div>
 
-                    {/* Main image — fixed height so it never overflows */}
                     <div className="relative flex-1 rounded-2xl overflow-hidden bg-white shadow-sm h-[340px] sm:h-[460px] lg:h-[560px] xl:h-[640px]">
                         {product.isNew && (
                             <span
@@ -203,6 +220,7 @@ export default function ProductDetails() {
                             src={thumbnailImages[activeImage] ?? product.image}
                             alt={product.name}
                             fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
                             className="object-cover object-top"
                             priority
                         />
@@ -231,6 +249,7 @@ export default function ProductDetails() {
                         <span style={{ color: theme.colors.primary }}>${product.price.toFixed(2)}</span>
                         <span className="text-xs font-normal italic opacity-50">inc. VAT</span>
                     </div>
+
                     <p className="leading-relaxed opacity-80 text-sm">
                         {descExpanded ? fullDesc : descPreview}
                         {hasMoreDesc && (
@@ -248,7 +267,6 @@ export default function ProductDetails() {
                         )}
                     </p>
 
-                    {/* Features — 3 visible, rest behind toggle */}
                     {allFeatures.length > 0 && (
                         <div className="space-y-2">
                             <ul className="space-y-2">
@@ -290,7 +308,7 @@ export default function ProductDetails() {
                             </button>
                         </div>
                         <div className="flex gap-2.5 flex-wrap">
-                            {product?.sizes?.map((size) => (
+                            {product.sizes?.map((size) => (
                                 <button
                                     key={size}
                                     onClick={() => setSelectedSize(size)}
@@ -399,7 +417,6 @@ export default function ProductDetails() {
                 </div>
             </div>
 
-            {/* Additional Sections */}
             <ApplicationGuide />
             <VideoReviews reviews={product.videoReviews ?? []} />
             <Faqs />

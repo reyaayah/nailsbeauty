@@ -15,10 +15,9 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "12");
 
-    let q: FirebaseFirestore.Query = adminDb.collection("products").orderBy("createdAt", "desc");
-    if (category) q = q.where("category", "==", category);
+    // Fetch all — filter/sort in JS to avoid composite index requirement
+    const snap = await adminDb.collection("products").get();
 
-    const snap = await q.get();
     let products = snap.docs.map((d) => {
       const data = d.data();
       return {
@@ -29,6 +28,19 @@ export async function GET(req: NextRequest) {
       };
     });
 
+    // Sort by createdAt desc
+    products.sort((a: any, b: any) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    // Filter by category
+    if (category) {
+      products = products.filter((p: any) => p.category === category);
+    }
+
+    // Filter by search
     if (search) {
       const s = search.toLowerCase();
       products = products.filter(

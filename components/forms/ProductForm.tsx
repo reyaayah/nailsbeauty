@@ -1,13 +1,14 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Textarea, Select, Toggle, Button, Card } from "@/components/ui";
 import { Save, ArrowLeft, Plus, Trash2, Package } from "lucide-react";
-import { useRouter } from "next/navigation";
 import type { Product } from "@/types";
 import { ImageUpload } from "@/components/ImageUpload";
 import { useAdminTab } from "@/context/AdminTabContext";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const schema = z.object({
   name: z.string().min(2, "Name required"),
@@ -29,10 +30,8 @@ const schema = z.object({
   isBestSeller: z.boolean(),
   onSale: z.boolean(),
   isActive: z.boolean(),
-  // product type — mutually exclusive
   isKit: z.boolean(),
   isSimple: z.boolean(),
-  // kit options — max 5
   kitOptions: z
     .array(z.object({ value: z.string().min(1, "Option cannot be empty") }))
     .max(5, "Maximum 5 kit options")
@@ -69,8 +68,49 @@ const STYLE_OPTIONS = [
 ];
 
 export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps) {
-
   const { goBack } = useAdminTab();
+
+  // ── Collections dropdown ──────────────────────────────────────────────────
+  const [collectionOptions, setCollectionOptions] = useState<{ value: string; label: string }[]>([
+    { value: "", label: "None" },
+  ]);
+  const [collectionsLoading, setCollectionsLoading] = useState(true);
+
+  useEffect(() => {
+    const auth = getAuth();
+
+    // Wait for Firebase to resolve the current user before fetching
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setCollectionsLoading(false);
+        return;
+      }
+
+      try {
+        const token = await user.getIdToken();
+        const res = await fetch("/api/admin/collections", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
+        const data = await res.json();
+        setCollectionOptions([
+          { value: "", label: "None" },
+          ...data.collections.map((c: { name: string }) => ({
+            value: c.name,
+            label: c.name,
+          })),
+        ]);
+      } catch (err) {
+        console.error("Failed to load collections:", err);
+      } finally {
+        setCollectionsLoading(false);
+        unsubscribe(); // only need the first resolved state
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const {
     register,
@@ -112,7 +152,6 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
 
   const { fields, append, remove } = useFieldArray({ control, name: "kitOptions" });
 
-  // Mutually exclusive handlers
   const handleIsKitChange = (checked: boolean) => {
     setValue("isKit", checked);
     if (checked) {
@@ -199,10 +238,28 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
                 name="category"
                 control={control}
                 render={({ field }) => (
-                  <Select label="Category" required options={CATEGORY_OPTIONS} {...field} error={errors.category?.message} />
+                  <Select
+                    label="Category"
+                    required
+                    options={CATEGORY_OPTIONS}
+                    {...field}
+                    error={errors.category?.message}
+                  />
                 )}
               />
-              <Input label="Collection" placeholder="e.g. LNY Limited" {...register("collection")} />
+              {/* ── Collection dropdown — from Firestore ── */}
+              <Controller
+                name="collection"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    label={collectionsLoading ? "Collection (loading…)" : "Collection"}
+                    options={collectionOptions}
+                    disabled={collectionsLoading}
+                    {...field}
+                  />
+                )}
+              />
             </div>
             <div className="grid sm:grid-cols-3 gap-4">
               <Controller name="shape" control={control} render={({ field }) => <Select label="Shape" options={SHAPE_OPTIONS} {...field} />} />
@@ -231,7 +288,7 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
             </div>
           </Card>
 
-          {/* Kit Options — conditionally rendered */}
+          {/* Kit Options */}
           {isKit && (
             <Card className="p-5 space-y-4">
               <div className="flex items-center justify-between">
@@ -330,13 +387,11 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
             </div>
           </Card>
 
-          {/* Product Type — mutually exclusive selection */}
           <Card className="p-5 space-y-4">
             <h3 className="font-semibold text-slate-900">Product Type</h3>
             <p className="text-xs text-slate-400 -mt-2">Only one type can be active at a time.</p>
 
             <div className="space-y-2">
-              {/* Simple */}
               <div
                 role="button"
                 tabIndex={0}
@@ -354,7 +409,6 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
                 <Toggle checked={isSimple} onChange={handleIsSimpleChange} size="sm" />
               </div>
 
-              {/* Kit */}
               <div
                 role="button"
                 tabIndex={0}

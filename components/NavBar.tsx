@@ -149,9 +149,9 @@ export default function Navbar() {
 
               <div onClick={() => router.push("/")} className="flex flex-col leading-none cursor-pointer">
                 <h1 className="text-lg md:text-xl text-[#c28c8d] font-black tracking-tighter uppercase whitespace-nowrap">
-                  Gloss <span className="font-light italic text-gray-400">&</span> Grace
+                  Nailsa
                 </h1>
-                <span className="text-[7px] tracking-[0.4em] text-gray-400 ml-0.5 uppercase">Aesthetics Studio</span>
+                <span className="text-[7px] tracking-[0.4em] text-gray-400 ml-0.5 uppercase">Beauty at your fingertips </span>
               </div>
             </div>
 

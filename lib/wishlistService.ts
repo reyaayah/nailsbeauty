@@ -1,7 +1,6 @@
-
 import { db } from "./firebaseAdmin";
 
-export async function addToWishlist(userId: string, productId: number) {
+export async function addToWishlist(userId: string, productId: string) {
     try {
         const ref = db
             .collection("wishlists")
@@ -25,8 +24,7 @@ export async function addToWishlist(userId: string, productId: number) {
     }
 }
 
-
-export async function removeFromWishlist(userId: string, productId: number) {
+export async function removeFromWishlist(userId: string, productId: string) {
     try {
         const ref = db
             .collection("wishlists")
@@ -49,26 +47,22 @@ export async function removeFromWishlist(userId: string, productId: number) {
     }
 }
 
-export async function fetchWishlist(userId: string) {
+export async function fetchWishlist(userId: string): Promise<string[]> {
     try {
-        console.log("Fetching wishlist for:", userId);
-
         const snapshot = await db
             .collection("wishlists")
             .doc(userId)
             .collection("items")
             .get();
 
-        console.log("Docs:", snapshot.docs.length);
-
-        return snapshot.docs.map((doc) => Number(doc.data().productId));
+        return snapshot.docs.map((doc) => String(doc.data().productId));
     } catch (error) {
         console.error("fetchWishlist error:", error);
         throw error;
     }
 }
 
-export async function isInWishlist(uid: string, productId: number): Promise<boolean> {
+export async function isInWishlist(uid: string, productId: string): Promise<boolean> {
     const wishlist = await fetchWishlist(uid);
     return wishlist.includes(productId);
 }

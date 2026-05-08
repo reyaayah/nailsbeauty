@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
 // POST
 export async function POST(request: NextRequest) {
     try {
-        const userId = await verifyUser(request); // ← was getUserId(), now verifyUser()
+        const userId = await verifyUser(request);
 
         if (!userId) {
             return NextResponse.json(
@@ -52,16 +52,17 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const productId = Number(body?.productId);
+        // Firestore IDs are strings — accept any non-empty string
+        const productId = body?.productId;
 
-        if (isNaN(productId) || productId <= 0) {
+        if (!productId || typeof productId !== "string" || productId.trim() === "") {
             return NextResponse.json(
                 { success: false, error: "Invalid productId" },
                 { status: 400 }
             );
         }
 
-        await addToWishlist(userId, productId);
+        await addToWishlist(userId, productId.trim());
 
         return NextResponse.json(
             { success: true },

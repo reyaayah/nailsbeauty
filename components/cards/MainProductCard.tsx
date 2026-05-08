@@ -111,6 +111,7 @@ export default function ProductCard({ product }: { product: Product }) {
                         width={300}
                         className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${hovered ? "opacity-0 scale-110" : "opacity-100 scale-100"
                             }`}
+                        unoptimized
                     />
 
                     {/* Hover Image */}
@@ -121,6 +122,7 @@ export default function ProductCard({ product }: { product: Product }) {
                         width={300}
                         className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out ${hovered ? "opacity-100 scale-100" : "opacity-0 scale-95"
                             }`}
+                        unoptimized
                     />
 
                     <button

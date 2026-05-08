@@ -5,7 +5,7 @@ import { db } from "@/lib/firebaseAdmin";
 export async function GET() {
     const snap = await db
         .collection("products")
-        .where("isBestSeller", "==", true)
+        .where("onSale", "==", true)
         .get();
 
     const products = snap.docs.map((doc) => ({
@@ -13,8 +13,5 @@ export async function GET() {
         ...doc.data(),
     })) as unknown as Product[];
 
-    return NextResponse.json({
-        products,
-        total: products.length,
-    });
+    return NextResponse.json({ products, total: products.length });
 }

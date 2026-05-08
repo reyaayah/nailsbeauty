@@ -304,7 +304,7 @@ export function Card({ children, className }: CardProps) {
 
 // ─── Spinner ──────────────────────────────────────────────────────────────
 export function Spinner({ size = 20 }: { size?: number }) {
-  return <Loader2 size={size} style={{ color: theme.colors.primary }} className="animate-spin" />;
+  return <Loader2 size={size} style={{ color: theme.colors.muted }} className="animate-spin" />;
 }
 // ─── Empty State ──────────────────────────────────────────────────────────
 interface EmptyStateProps {

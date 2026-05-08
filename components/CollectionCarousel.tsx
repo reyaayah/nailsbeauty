@@ -2,50 +2,76 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import theme from "@/theme";
 import { CollectionCard } from "./cards/CollectionCard";
-import { products } from "@/data/product";
 import ProductCard from "./cards/MainProductCard";
+import { CollectionItem } from "./CollectionSection";
+import type { Product } from "@/types/product";
 
 interface CollectionsCarouselProps {
+    collections: CollectionItem[];
     activeCollection?: string | null;
 }
-
-const COLLECTIONS = [
-    { name: "Summer '24", slug: "summer-24", image: "/deal1.png", bg: "#F2DED3", filter: "Summer '24" },
-    { name: "G & G Essence", slug: "g-g-essence", image: "/deal2.png", bg: "#EDD9E9", filter: "G & G Essence" },
-    { name: "The Love Edit", slug: "the-love-edit", image: "https://images.unsplash.com/photo-1777287852750-53eb2ca506e9?q=80&w=1114&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", bg: "#D9E9E0", filter: "The Love Edit" },
-    { name: "LNY Limited", slug: "lny-limited", image: "/deal1.png", bg: "#F5EAD0", filter: "LNY Limited" },
-];
 
 const CARD_W = 170;
 const GAP = 16;
 const STEP = CARD_W + GAP;
 
-export function CollectionsCarousel({ activeCollection }: CollectionsCarouselProps) {
+export function CollectionsCarousel({ collections, activeCollection }: CollectionsCarouselProps) {
     const wrapRef = useRef<HTMLDivElement>(null);
 
     const [index, setIndex] = useState(0);
     const [maxIdx, setMaxIdx] = useState(0);
 
     const [selectedCollection, setSelectedCollection] = useState<string | null>(() => {
-        if (!activeCollection) return COLLECTIONS[0]?.filter ?? null;
-        return COLLECTIONS.find((c) => c.slug === activeCollection)?.filter ?? null;
+        if (!activeCollection) return collections[0]?.filter ?? null;
+        return collections.find((c) => c.slug === activeCollection)?.filter ?? null;
     });
 
+    // ── Products state ────────────────────────────────────────────────────────
+    const [collectionProducts, setCollectionProducts] = useState<Product[]>([]);
+    const [productsLoading, setProductsLoading] = useState(false);
+
+    // Sync when activeCollection or collections change
     useEffect(() => {
+        if (collections.length === 0) return;
         if (!activeCollection) {
-            // No collection in URL — default to the first collection
-            setSelectedCollection(COLLECTIONS[0]?.filter ?? null);
+            setSelectedCollection(collections[0]?.filter ?? null);
             return;
         }
-        // activeCollection is a slug like "summer-24" — resolve to filter name like "Summer '24"
-        const matched = COLLECTIONS.find((c) => c.slug === activeCollection);
+        const matched = collections.find((c) => c.slug === activeCollection);
         setSelectedCollection(matched?.filter ?? null);
-    }, [activeCollection]);
+    }, [activeCollection, collections]);
+
+    // Fetch products whenever selectedCollection changes
+    useEffect(() => {
+        if (!selectedCollection) {
+            setCollectionProducts([]);
+            return;
+        }
+        const fetchProducts = async () => {
+            setProductsLoading(true);
+            try {
+                const res = await fetch(
+                    `/api/products?collection=${encodeURIComponent(selectedCollection)}`
+                );
+                if (!res.ok) throw new Error("Failed to fetch");
+                const data = await res.json();
+                setCollectionProducts(data.products ?? []);
+            } catch (err) {
+                console.error("Failed to load collection products:", err);
+                setCollectionProducts([]);
+            } finally {
+                setProductsLoading(false);
+            }
+        };
+        fetchProducts();
+    }, [selectedCollection]);
+
+    // Carousel sizing
     const recalc = useCallback(() => {
         if (!wrapRef.current) return;
         const visible = Math.floor((wrapRef.current.offsetWidth + GAP) / STEP);
-        setMaxIdx(Math.max(0, COLLECTIONS.length - visible));
-    }, []);
+        setMaxIdx(Math.max(0, collections.length - visible));
+    }, [collections.length]);
 
     useEffect(() => {
         recalc();
@@ -55,9 +81,15 @@ export function CollectionsCarousel({ activeCollection }: CollectionsCarouselPro
 
     const goTo = (i: number) => setIndex(Math.max(0, Math.min(i, maxIdx)));
 
-    const collectionProducts = selectedCollection
-        ? products.filter((p) => p.collection === selectedCollection)
-        : [];
+    if (collections.length === 0) {
+        return (
+            <div className="mb-[52px] flex items-center justify-center py-12">
+                <p className="text-[13px]" style={{ color: theme.colors.muted }}>
+                    No collections available.
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="mb-[52px]">
@@ -90,11 +122,10 @@ export function CollectionsCarousel({ activeCollection }: CollectionsCarouselPro
                         transition: "transform 0.45s cubic-bezier(.25,.8,.25,1)",
                     }}
                 >
-                    {COLLECTIONS.map((c) => (
+                    {collections.map((c) => (
                         <div
-                            key={c.name}
+                            key={c.id}
                             onClick={() =>
-                                // ✅ Toggle off if clicking the already-selected collection
                                 setSelectedCollection((prev) => (prev === c.filter ? null : c.filter))
                             }
                             className="cursor-pointer flex-shrink-0"
@@ -113,20 +144,22 @@ export function CollectionsCarousel({ activeCollection }: CollectionsCarouselPro
             </div>
 
             {/* Dot indicators */}
-            <div className="flex justify-center gap-1.5 mt-5">
-                {Array.from({ length: maxIdx + 1 }).map((_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => goTo(i)}
-                        className="h-1.5 rounded-full border-0 cursor-pointer transition-all duration-200"
-                        style={{
-                            width: i === index ? 20 : 6,
-                            background: theme.colors.primary,
-                            opacity: i === index ? 1 : 0.35,
-                        }}
-                    />
-                ))}
-            </div>
+            {maxIdx > 0 && (
+                <div className="flex justify-center gap-1.5 mt-5">
+                    {Array.from({ length: maxIdx + 1 }).map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => goTo(i)}
+                            className="h-1.5 rounded-full border-0 cursor-pointer transition-all duration-200"
+                            style={{
+                                width: i === index ? 20 : 6,
+                                background: theme.colors.primary,
+                                opacity: i === index ? 1 : 0.35,
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
 
             {/* Collection product grid */}
             {selectedCollection && (
@@ -136,7 +169,7 @@ export function CollectionsCarousel({ activeCollection }: CollectionsCarouselPro
                             className="text-[22px] font-serif tracking-tight"
                             style={{ color: theme.colors.dark }}
                         >
-                            {COLLECTIONS.find((c) => c.filter === selectedCollection)?.name}
+                            {collections.find((c) => c.filter === selectedCollection)?.name}
                         </h2>
                         <button
                             onClick={() => setSelectedCollection(null)}
@@ -147,7 +180,18 @@ export function CollectionsCarousel({ activeCollection }: CollectionsCarouselPro
                         </button>
                     </div>
 
-                    {collectionProducts.length === 0 ? (
+                    {/* Loading skeleton */}
+                    {productsLoading ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-16">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="animate-pulse">
+                                    <div className="rounded-2xl bg-[#f0ebe8] aspect-[3/4] mb-3" />
+                                    <div className="h-3 bg-[#f0ebe8] rounded w-3/4 mb-2" />
+                                    <div className="h-3 bg-[#f0ebe8] rounded w-1/2" />
+                                </div>
+                            ))}
+                        </div>
+                    ) : collectionProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-3">
                             <p className="text-[18px] font-serif tracking-tight" style={{ color: theme.colors.dark }}>
                                 No products found

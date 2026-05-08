@@ -1,4 +1,5 @@
 import { CollectionsCarousel } from "@/components/CollectionCarousel";
+import { CollectionsSection } from "@/components/CollectionSection";
 import theme from "@/theme";
 
 export default async function ShopCollection({
@@ -72,7 +73,7 @@ export default async function ShopCollection({
                     )}
                 </div>
 
-                <CollectionsCarousel activeCollection={activeCollection} />
+                <CollectionsSection activeCollection={activeCollection} />
             </div>
         </section>
     );

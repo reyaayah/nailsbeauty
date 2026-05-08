@@ -2,7 +2,7 @@ import { Product } from "@/types/product";
 
 export const products: Product[] = [
     {
-        id: 1,
+        id: "1",
 
         name: "Midnight Silk",
         image: "/product1.png",
@@ -21,7 +21,7 @@ export const products: Product[] = [
         collection: "LNY Limited",
     },
     {
-        id: 2,
+        id: "2",
         name: "Vintage Rose Gold",
         image: "/product2.png",
         hoverImage: "/backimg2.png",
@@ -39,7 +39,7 @@ export const products: Product[] = [
         collection: "The Love Edit",
     },
     {
-        id: 3,
+        id: "3",
         name: "Frosted Peony",
         image: "/product3.png",
         hoverImage: "/backimg3.png",
@@ -55,7 +55,7 @@ export const products: Product[] = [
         collection: "G & G Essence",
     },
     {
-        id: 4,
+        id: "4",
         name: "Champagne Toast",
         image: "/product1.png",
         hoverImage: "/backimg1.png",
@@ -71,7 +71,7 @@ export const products: Product[] = [
         collection: "Summer '24",
     },
     {
-        id: 5,
+        id: "5",
         name: "Obsidian Glaze",
         image: "/product2.png",
         hoverImage: "/backimg2.png",
@@ -87,7 +87,7 @@ export const products: Product[] = [
         collection: "Summer '24",
     },
     {
-        id: 6,
+        id: "6",
         name: "Crystal Clear Nail Glue",
         image: "/glue.png",
         price: 12.00,
@@ -99,7 +99,7 @@ export const products: Product[] = [
 
     },
     {
-        id: 7,
+        id: "7",
         name: "Pro Touch Kit",
         category: "Tools & Accessories",
         image: "/kit.png",
@@ -115,7 +115,7 @@ export const products: Product[] = [
         description: "The Pro Touch Kit is your all-in-one solution for flawless nail application and maintenance. Whether you're a beginner or a seasoned pro, our carefully curated kits include everything you need to achieve salon-quality results at home. From essential tools for prepping and applying press-on nails to advanced accessories for shaping and finishing, the Pro Touch Kit is designed to elevate your nail game and keep your hands looking their best."
     },
     {
-        id: 8,
+        id: "8",
         name: "Nail Art plus Brush Set",
         category: "Bundles",
         image: "/product1.png",

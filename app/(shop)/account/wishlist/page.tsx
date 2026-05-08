@@ -13,19 +13,22 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { products } from "@/data/product";
 import MainProductCard from "@/components/cards/MainProductCard";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function WishlistPage() {
     const router = useRouter();
     const { user } = useAuth();
-    const { wishlist, loading, removeItem } = useWishlist();
     const { addToCart } = useCart();
 
-    // ── Map wishlist IDs → full Product objects ───────────────────────────────
+    const { products, loading: productsLoading } = useProducts();  // ← add
+    const { wishlist, loading: wishlistLoading, removeItem } = useWishlist();
+
+    const loading = productsLoading || wishlistLoading;  // ← combine loading states
+
     const wishlistProducts = useMemo(
         () => products.filter((p) => wishlist.includes(p.id)),
-        [wishlist]
+        [wishlist, products]   // ← add products as dependency
     );
-
     // ── Move all to cart ──────────────────────────────────────────────────────
     const handleMoveAllToCart = async () => {
         if (!user) {

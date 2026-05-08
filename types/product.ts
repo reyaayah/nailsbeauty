@@ -1,12 +1,12 @@
 export interface VideoReview {
-    id: number;
+    id: string;
     user: string;
     videoUrl: string;
     poster: string;
 }
 
 export interface Product {
-    id: number;
+    id: string;
     name: string;
     image: string;
     hoverImage?: string;

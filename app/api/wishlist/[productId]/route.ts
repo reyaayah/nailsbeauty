@@ -1,15 +1,15 @@
+// app/api/wishlist/[productId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { removeFromWishlist } from "@/lib/wishlistService";
 import { verifyUser } from "@/lib/verifyAuth";
 
-
-
+// app/api/wishlist/[productId]/route.ts
 export async function DELETE(
     request: NextRequest,
-    context: { params: Promise<{ productId: string }> }
+    { params }: { params: Promise<{ productId: string }> }  // ← Promise type
 ) {
     try {
-       const userId = await verifyUser(request);
+        const userId = await verifyUser(request);
 
         if (!userId) {
             return NextResponse.json(
@@ -18,25 +18,22 @@ export async function DELETE(
             );
         }
 
-        const { productId } = await context.params;
+        const { productId } = await params;  // ← await it
 
-        const id = Number(productId);
-
-        if (isNaN(id)) {
+        if (!productId || productId.trim() === "") {
             return NextResponse.json(
                 { success: false, error: "Invalid productId" },
                 { status: 400 }
             );
         }
 
-        await removeFromWishlist(userId, id);
+        await removeFromWishlist(userId, productId.trim());
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {
-        console.error("[DELETE /api/wishlist]", error);
-
+        console.error("[DELETE /api/wishlist/:productId]", error);
         return NextResponse.json(
-            { success: false, error: "Failed to remove item" },
+            { success: false, error: "Failed to remove from wishlist" },
             { status: 500 }
         );
     }

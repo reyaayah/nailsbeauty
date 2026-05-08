@@ -13,10 +13,10 @@ import { useAuth } from "@/context/AuthContext";
 import { User } from "firebase/auth";
 
 interface WishlistContextValue {
-    wishlist: number[];
-    addItem: (productId: number) => Promise<void>;
-    removeItem: (productId: number) => Promise<void>;
-    isInWishlist: (productId: number) => boolean;
+    wishlist: string[];
+    addItem: (productId: string) => Promise<void>;
+    removeItem: (productId: string) => Promise<void>;
+    isInWishlist: (productId: string) => boolean;
     loading: boolean;
 }
 
@@ -32,7 +32,7 @@ async function getAuthHeaders(user: User): Promise<HeadersInit> {
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
-    const [wishlist, setWishlist] = useState<number[]>([]);
+    const [wishlist, setWishlist] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -51,9 +51,9 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
                 if (!res.ok) throw new Error("Failed to fetch wishlist");
                 const json = await res.json();
 
-                // ✅ Coerce to number[] — JSON serialisation can silently
+                // ✅ Coerce to string[] — JSON serialisation can silently
                 //    turn numbers to strings, which breaks wishlist.includes(p.id)
-                const ids: number[] = (json.data ?? []).map(Number);
+                const ids: string[] = (json.data ?? []).map(String);
 
                 if (!cancelled) setWishlist(ids);
             } catch (err) {
@@ -67,7 +67,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     }, [user?.uid]);
 
     const addItem = useCallback(
-        async (productId: number) => {
+        async (productId: string) => {
             if (!user) throw new Error("You must be logged in to add to wishlist");
 
             // Optimistic update
@@ -78,8 +78,8 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
                 const res = await fetch("/api/wishlist", {
                     method: "POST",
                     headers,
-                    // ✅ Explicitly send as number — route does Number(body.productId)
-                    body: JSON.stringify({ productId: Number(productId) }),
+                    // ✅ Explicitly send as string — route does String(body.productId)
+                    body: JSON.stringify({ productId: String(productId) }),
                 });
 
                 if (!res.ok) {
@@ -96,7 +96,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     );
 
     const removeItem = useCallback(
-        async (productId: number) => {
+        async (productId: string) => {
             if (!user) throw new Error("You must be logged in to remove from wishlist");
 
             // Optimistic update
@@ -124,7 +124,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
     // ✅ Coerce here too so MainProductCard comparisons always work
     const isInWishlist = useCallback(
-        (productId: number) => wishlist.includes(Number(productId)),
+        (productId: string) => wishlist.includes(String(productId)),
         [wishlist]
     );
 

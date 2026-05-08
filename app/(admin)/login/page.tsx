@@ -1,11 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Mail, Lock, AlertTriangle, Sparkles, LayoutDashboard, ArrowRight, ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, Sparkles, ArrowRight, ShieldCheck, AlertTriangle } from "lucide-react";
 
 const theme = {
   colors: {
@@ -15,162 +15,329 @@ const theme = {
     muted: "#C2C6B9",
     subtitle: "#EFD8D6",
     pink: "#EF7575",
+    cream: "#FAF7F2",
   },
 };
 
 const schema = z.object({
-  email: z.string().email("Invalid administrator email"),
-  password: z.string().min(6, "Security requirement: 6+ characters"),
+  password: z.string().min(6, "Minimum 6 characters required"),
 });
 type FormValues = z.infer<typeof schema>;
+
+// Decorative dot grid
+function DotGrid() {
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full opacity-[0.04] pointer-events-none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle cx="2" cy="2" r="1.5" fill={theme.colors.dark} />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#dots)" />
+    </svg>
+  );
+}
 
 export default function LoginPage() {
   const { login } = useAdminAuth();
   const router = useRouter();
   const [showPwd, setShowPwd] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setFocus,
+  } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
-  const onSubmit = async ({ email, password }: FormValues) => {
+  useEffect(() => {
+    setFocus("password");
+  }, [setFocus]);
+
+  const onSubmit = async ({ password }: FormValues) => {
     setAuthError("");
     try {
-      await login(email, password);
+      await login(password);
       router.replace("/admin");
     } catch (err: any) {
-      setAuthError(err.message || "Credential verification failed.");
+      setAttempts((a) => a + 1);
+      setAuthError("Incorrect password. Please try again.");
     }
   };
 
+  const { ref: rhfRef, ...restRegister } = register("password");
+
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: theme.colors.light }}>
-
-      {/* LEFT PANEL */}
-      <div className="hidden lg:flex flex-col justify-between w-[40%] p-16 relative overflow-hidden shadow-[20px_0_60px_-15px_rgba(0,0,0,0.3)] z-10"
-        style={{ backgroundColor: theme.colors.dark }}>
+    <div
+      className="min-h-screen flex items-stretch"
+      style={{ backgroundColor: theme.colors.light }}
+    >
+      {/* ── LEFT PANEL ─────────────────────────────────────── */}
+      <div
+        className="hidden lg:flex flex-col justify-between w-[42%] p-16 relative overflow-hidden"
+        style={{ backgroundColor: theme.colors.dark }}
+      >
+        {/* Background photo */}
         <div
-          className="absolute inset-0 z-0 opacity-80 bg-cover bg-center mix-blend-overlay"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1588359953494-0c215e3cedc6?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}
+          className="absolute inset-0 opacity-30 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1588359953494-0c215e3cedc6?q=80&w=688&auto=format&fit=crop')",
+          }}
         />
-        <div className="absolute inset-0 z-10" style={{ background: `linear-gradient(to bottom, ${theme.colors.dark}CC 0%, ${theme.colors.dark}44 50%, ${theme.colors.dark}EE 100%)` }} />
+        {/* gradient overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(160deg, ${theme.colors.dark}F5 0%, ${theme.colors.dark}88 55%, ${theme.colors.dark}F5 100%)`,
+          }}
+        />
 
-        <div className="relative z-20 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.colors.primary }}>
-            <Sparkles className="text-white" size={20} />
+        {/* thin vertical accent line */}
+        <div
+          className="absolute right-0 top-0 bottom-0 w-[3px]"
+          style={{
+            background: `linear-gradient(to bottom, transparent, ${theme.colors.primary}, transparent)`,
+          }}
+        />
+
+        {/* Logo */}
+        <div className="relative z-10 flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: theme.colors.primary }}
+          >
+            <Sparkles className="text-white" size={16} />
           </div>
-          <h1 className="text-xl font-serif tracking-widest text-white uppercase">Nailsa</h1>
+          <span
+            className="text-sm font-bold uppercase tracking-[0.35em] text-white"
+            style={{ fontFamily: "serif" }}
+          >
+            Nailsa
+          </span>
         </div>
 
-        <div className="relative z-20">
-          <h2 className="text-5xl font-serif leading-tight mb-6" style={{ color: theme.colors.light }}>
+        {/* Hero text */}
+        <div className="relative z-10">
+          {/* Decorative small label */}
+          <div
+            className="mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.3em] border"
+            style={{ borderColor: `${theme.colors.primary}55`, color: theme.colors.primary }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: theme.colors.primary }} />
+            Admin Portal
+          </div>
+
+          <h2
+            className="text-[2.8rem] leading-[1.1] mb-6"
+            style={{ color: theme.colors.light, fontFamily: "Georgia, serif" }}
+          >
             Precision in<br />
             <span style={{ color: theme.colors.primary }}>Every Detail.</span>
           </h2>
-          <p className="text-base font-light max-w-xs leading-relaxed opacity-80" style={{ color: theme.colors.subtitle }}>
-            The administrative suite for high-performance beauty management.
+          <p
+            className="text-sm font-light max-w-[260px] leading-relaxed opacity-60"
+            style={{ color: theme.colors.subtitle }}
+          >
+            High-performance beauty management, secured with a single private key.
           </p>
         </div>
 
-        <div className="relative z-20 text-[10px] uppercase tracking-[0.4em] font-bold opacity-40" style={{ color: theme.colors.subtitle }}>
-          Est. 2026 Admin Control
+        <div
+          className="relative z-10 text-[9px] uppercase tracking-[0.5em] font-bold opacity-30"
+          style={{ color: theme.colors.subtitle }}
+        >
+          Est. 2026 · Admin Control
         </div>
       </div>
 
-      {/* NEWLY DESIGNED RIGHT PANEL */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-24 relative overflow-hidden">
-        {/* Decorative subtle background shape */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10" style={{ backgroundColor: theme.colors.primary }} />
+      {/* ── RIGHT PANEL ────────────────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-20 relative overflow-hidden">
+        <DotGrid />
 
-        <div className="w-full max-w-md z-10">
-          <div className="mb-12">
-            <span className="text-[11px] font-bold uppercase tracking-[0.3em] mb-3 block" style={{ color: theme.colors.primary }}>Secure Portal</span>
-            <h3 className="text-4xl font-serif leading-none mb-3" style={{ color: theme.colors.dark }}>Administrator Login</h3>
-            <div className="w-12 h-[2px]" style={{ backgroundColor: theme.colors.primary }} />
+        {/* Soft radial glow behind the card */}
+        <div
+          className="absolute w-[500px] h-[500px] rounded-full pointer-events-none"
+          style={{
+            background: `radial-gradient(circle, ${theme.colors.primary}18 0%, transparent 70%)`,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+
+        <div className="w-full max-w-[380px] z-10">
+          {/* Mobile logo */}
+          <div className="flex lg:hidden items-center gap-2 mb-10">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: theme.colors.dark }}
+            >
+              <Sparkles className="text-white" size={14} />
+            </div>
+            <span
+              className="text-sm font-bold uppercase tracking-widest"
+              style={{ color: theme.colors.dark, fontFamily: "serif" }}
+            >
+              Nailsa
+            </span>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
-            {authError && (
-              <div className="flex items-center gap-3 rounded-lg px-4 py-3 text-xs font-bold border-l-4 animate-in slide-in-from-top-2"
-                style={{ backgroundColor: "white", borderColor: theme.colors.pink, color: theme.colors.pink, boxShadow: "0 4px 15px rgba(0,0,0,0.05)" }}>
-                <AlertTriangle size={16} />
-                {authError}
-              </div>
-            )}
+          {/* Header */}
+          <div className="mb-10">
+            <p
+              className="text-[10px] font-bold uppercase tracking-[0.35em] mb-2"
+              style={{ color: theme.colors.primary }}
+            >
+              Restricted Access
+            </p>
+            <h3
+              className="text-3xl leading-tight mb-3"
+              style={{ color: theme.colors.dark, fontFamily: "Georgia, serif" }}
+            >
+              Enter your<br />admin password
+            </h3>
+            <div className="flex items-center gap-2 mt-4">
+              <div className="h-[2px] w-10" style={{ backgroundColor: theme.colors.primary }} />
+              <div className="h-[2px] w-3 rounded-full opacity-30" style={{ backgroundColor: theme.colors.primary }} />
+            </div>
+          </div>
 
-            <div className="space-y-8">
-              {/* Refined Email Input */}
-              <div className="relative group">
-                <input
-                  {...register("email")}
-                  type="email"
-                  required
-                  className="w-full py-3 bg-transparent border-b-2 outline-none transition-all peer placeholder-transparent"
-                  style={{ borderColor: theme.colors.muted, color: theme.colors.dark }}
-                />
-                <label className="absolute left-0 -top-3.5 text-xs font-bold uppercase tracking-widest transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs pointer-events-none"
-                  style={{ color: theme.colors.muted }}>
-                  Email Address
-                </label>
-                <div className="absolute bottom-0 left-0 h-[2px] w-0 group-focus-within:w-full transition-all duration-500" style={{ backgroundColor: theme.colors.primary }} />
-                {errors.email && <p className="text-[10px] font-bold mt-2" style={{ color: theme.colors.pink }}>{errors.email.message}</p>}
-              </div>
+          {/* Error */}
+          {authError && (
+            <div
+              className="mb-6 flex items-start gap-3 rounded-xl px-4 py-3 text-xs font-semibold border-l-4"
+              style={{
+                backgroundColor: "white",
+                borderColor: theme.colors.pink,
+                color: theme.colors.pink,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+              }}
+            >
+              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+              <span>{authError}{attempts >= 3 ? " Too many attempts." : ""}</span>
+            </div>
+          )}
 
-              {/* Refined Password Input */}
-              <div className="relative group">
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+            {/* Password field */}
+            <div>
+              <label
+                className="block text-[10px] font-bold uppercase tracking-[0.3em] mb-3"
+                style={{ color: theme.colors.muted }}
+              >
+                Password
+              </label>
+
+              <div
+                className="flex items-center rounded-2xl px-5 py-4 transition-all duration-200 focus-within:shadow-[0_0_0_2px]"
+                style={{
+                  backgroundColor: "white",
+                  boxShadow: `0 2px 16px rgba(0,0,0,0.06)`,
+                  // focus-within ring via CSS var trick below
+                }}
+                onFocus={() => { }}
+              >
+                {/* Lock icon */}
+                <div className="mr-3 opacity-30" style={{ color: theme.colors.dark }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+
                 <input
-                  {...register("password")}
+                  {...restRegister}
+                  ref={(el) => {
+                    rhfRef(el);
+                    (inputRef as any).current = el;
+                  }}
                   type={showPwd ? "text" : "password"}
-                  required
-                  className="w-full py-3 bg-transparent border-b-2 outline-none transition-all peer placeholder-transparent"
-                  style={{ borderColor: theme.colors.muted, color: theme.colors.dark }}
+                  placeholder="••••••••••"
+                  autoComplete="current-password"
+                  className="flex-1 bg-transparent outline-none text-sm font-medium placeholder-opacity-20"
+                  style={{ color: theme.colors.dark, letterSpacing: showPwd ? "0" : "0.15em" }}
                 />
-                <label className="absolute left-0 -top-3.5 text-xs font-bold uppercase tracking-widest transition-all peer-placeholder-shown:text-base peer-placeholder-shown:top-3 peer-focus:-top-3.5 peer-focus:text-xs pointer-events-none"
-                  style={{ color: theme.colors.muted }}>
-                  Password
-                </label>
+
                 <button
                   type="button"
-                  onClick={() => setShowPwd(!showPwd)}
-                  className="absolute right-0 top-3 opacity-40 hover:opacity-100 transition-opacity"
+                  onClick={() => setShowPwd((v) => !v)}
+                  className="ml-2 opacity-30 hover:opacity-70 transition-opacity"
                   style={{ color: theme.colors.dark }}
+                  tabIndex={-1}
                 >
-                  {showPwd ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-                <div className="absolute bottom-0 left-0 h-[2px] w-0 group-focus-within:w-full transition-all duration-500" style={{ backgroundColor: theme.colors.primary }} />
-                {errors.password && <p className="text-[10px] font-bold mt-2" style={{ color: theme.colors.pink }}>{errors.password.message}</p>}
               </div>
+
+              {errors.password && (
+                <p
+                  className="mt-2 text-[10px] font-bold"
+                  style={{ color: theme.colors.pink }}
+                >
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
-            {/* Premium Action Button */}
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="group relative w-full h-14 rounded-full overflow-hidden transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-[#DBA1A2]/20"
-                style={{ backgroundColor: theme.colors.dark }}
-              >
-                <div className="absolute inset-0 w-0 group-hover:w-full transition-all duration-500 ease-out z-0" style={{ backgroundColor: theme.colors.primary }} />
-                <span className="relative z-10 flex items-center justify-center gap-3 text-sm font-bold uppercase tracking-widest text-white group-hover:text-white">
-                  {isSubmitting ? "Verifying..." : (
-                    <>
-                      Sign In to Dashboard
-                      <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
-                    </>
-                  )}
-                </span>
-              </button>
-            </div>
+            {/* Submit button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="group relative w-full h-[56px] rounded-2xl overflow-hidden transition-all duration-200 active:scale-[0.98] disabled:opacity-60"
+              style={{
+                backgroundColor: theme.colors.dark,
+                boxShadow: `0 8px 30px ${theme.colors.dark}30`,
+              }}
+            >
+              {/* hover fill */}
+              <div
+                className="absolute inset-0 w-0 group-hover:w-full transition-all duration-500 ease-out"
+                style={{ backgroundColor: theme.colors.primary }}
+              />
+              <span className="relative z-10 flex items-center justify-center gap-3 text-xs font-bold uppercase tracking-[0.25em] text-white">
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Verifying…
+                  </span>
+                ) : (
+                  <>
+                    Unlock Dashboard
+                    <ArrowRight
+                      size={16}
+                      className="group-hover:translate-x-1.5 transition-transform duration-300"
+                    />
+                  </>
+                )}
+              </span>
+            </button>
           </form>
 
-          <div className="mt-12 flex items-center justify-between opacity-40">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={14} style={{ color: theme.colors.dark }} />
-              <span className="text-[10px] font-bold uppercase tracking-tighter" style={{ color: theme.colors.dark }}>Encrypted</span>
+          {/* Footer */}
+          <div className="mt-10 flex items-center justify-between">
+            <div className="flex items-center gap-2 opacity-35">
+              <ShieldCheck size={13} style={{ color: theme.colors.dark }} />
+              <span
+                className="text-[9px] font-bold uppercase tracking-widest"
+                style={{ color: theme.colors.dark }}
+              >
+                256-bit Encrypted
+              </span>
             </div>
-            <a href="#" className="text-[10px] font-bold uppercase tracking-tighter hover:underline" style={{ color: theme.colors.dark }}>
-              Forgot Credentials?
+            <a
+              href="/forgot-password"
+              className="text-[9px] font-bold uppercase tracking-widest opacity-35 hover:opacity-70 transition-opacity"
+              style={{ color: theme.colors.dark }}
+            >
+              Forgot password?
             </a>
           </div>
         </div>

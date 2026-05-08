@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search") || "";
     const isGift = searchParams.get("isGift") === "true";
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "15");
+    const limit = parseInt(searchParams.get("limit") || "10");
 
     // Only filter by status at the Firestore level — it has a single-field index already.
     // isGift is filtered in-memory below to avoid needing a composite index.

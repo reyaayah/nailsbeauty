@@ -8,11 +8,16 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { getClientAuth, getClientDb } from "@/lib/firebase/client";
 
+// ─── Set the fixed admin email here ───────────────────────────────────────────
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "riyaawal7@gmail.com";
+// ──────────────────────────────────────────────────────────────────────────────
+
 interface AdminAuthCtx {
   user: User | null;
   isAdmin: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  /** Password-only login — email is fixed server-side */
+  login: (password: string) => Promise<void>;
   logout: () => Promise<void>;
   getToken: () => Promise<string>;
 }
@@ -45,10 +50,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return unsub;
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (password: string) => {
     const auth = getClientAuth();
     const db = getClientDb();
-    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const cred = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
     const snap = await getDoc(doc(db, "admins", cred.user.uid));
     if (!snap.exists()) {
       await signOut(auth);
@@ -62,13 +67,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     setIsAdmin(false);
   }, []);
 
-
   const getToken = useCallback(async (): Promise<string> => {
     const auth = getClientAuth();
-    const user = auth.currentUser; // ← always fresh, no stale closure
-    if (!user) throw new Error("Not authenticated");
-    return user.getIdToken(true); // true = force refresh if near expiry
-  }, []); // no deps needed
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error("Not authenticated");
+    return currentUser.getIdToken(true);
+  }, []);
 
   return (
     <Ctx.Provider value={{ user, isAdmin, loading, login, logout, getToken }}>

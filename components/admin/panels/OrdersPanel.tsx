@@ -37,7 +37,7 @@ export default function OrdersPanel() {
     async (p: number, s: string, q: string, gifts: boolean) => {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ page: String(p), limit: "15" });
+        const params = new URLSearchParams({ page: String(p), limit: "10" });
         if (s) params.set("status", s);
         if (q) params.set("search", q);
         // Pass isGift as an explicit boolean param so the API can filter on the field,
@@ -188,8 +188,8 @@ export default function OrdersPanel() {
               key={tab.value}
               onClick={() => handleStatusChange(tab.value)}
               className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${status === tab.value
-                  ? `${tab.color} border-current`
-                  : "text-slate-400 border-transparent hover:text-slate-600"
+                ? `${tab.color} border-current`
+                : "text-slate-400 border-transparent hover:text-slate-600"
                 }`}
             >
               {tab.label}
@@ -217,8 +217,8 @@ export default function OrdersPanel() {
           <button
             onClick={handleGiftsToggle}
             className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-medium border transition-all ${giftsOnly
-                ? "bg-pink-50 border-pink-300 text-pink-600"
-                : "bg-white border-[--border] text-slate-500 hover:text-pink-500 hover:border-pink-200"
+              ? "bg-pink-50 border-pink-300 text-pink-600"
+              : "bg-white border-[--border] text-slate-500 hover:text-pink-500 hover:border-pink-200"
               }`}
           >
             <Gift size={13} />
@@ -253,7 +253,7 @@ export default function OrdersPanel() {
           page={page}
           totalPages={totalPages}
           total={total}
-          limit={15}
+          limit={10}
           onPage={handlePageChange}
         />
       </Card>

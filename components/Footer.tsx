@@ -34,7 +34,7 @@ const Footer = () => {
                 { name: "SALES", href: "/collections/flashsale" },
                 { name: "SHOP BY COLLECTIONS", href: "/collections" },
                 { name: "SHOP BY SHAPE", href: "/products?shape=Almond" },
-                { name: "SHOP BY LENGTH", href: "/products" },
+                // { name: "SHOP BY LENGTH", href: "/products" },
                 { name: "TOOLS & ACCESSORIES", href: "/collections/toolsandaccessories" }
             ]
         }
@@ -101,7 +101,7 @@ const Footer = () => {
             </div>
             {/* Contact Info */}
             <div
-                className="py-8 border-t  mb-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm"
+                className="py-8 border-t  grid grid-cols-1 md:grid-cols-2 gap-6 text-sm"
                 style={{ borderColor: 'rgba(247, 243, 237, 0.1)' }}
             >
                 <div>

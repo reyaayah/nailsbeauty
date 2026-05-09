@@ -6,24 +6,23 @@ import { useEffect, useState, Suspense, useCallback } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface BlogPost {
-    id: number;
+    id: string;
     slug: string;
     title: string;
-    subtitle: string;
     excerpt: string;
     content: string;
     author: string;
-    authorRole: string;
-    date: string;
     readTime: number;
-    category: string;
     tags: string[];
     coverImage: string;
-    featured: boolean;
+    isPublished: boolean;
+    createdAt: string | null;
+    updatedAt: string | null;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function formatDate(iso: string) {
+function formatDate(iso: string | null) {
+    if (!iso) return "";
     return new Date(iso).toLocaleDateString("en-GB", {
         day: "numeric",
         month: "long",
@@ -39,28 +38,24 @@ function initials(name: string) {
 }
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
-function useBlogList(category: string | null) {
+function useBlogList(tag: string | null) {
     const [posts, setPosts] = useState<BlogPost[]>([]);
-    const [featured, setFeatured] = useState<BlogPost[]>([]);
-    const [categories, setCategories] = useState<string[]>([]);
+    const [tags, setTags] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setLoading(true);
-        const url = category
-            ? `/api/blog?category=${encodeURIComponent(category)}`
-            : `/api/blog`;
+        const url = tag ? `/api/blog?tag=${encodeURIComponent(tag)}` : `/api/blog`;
         fetch(url)
             .then((r) => r.json())
             .then((d) => {
                 setPosts(d.posts ?? []);
-                setFeatured(d.featured ?? []);
-                setCategories(d.categories ?? []);
+                setTags(d.tags ?? []);
             })
             .finally(() => setLoading(false));
-    }, [category]);
+    }, [tag]);
 
-    return { posts, featured, categories, loading };
+    return { posts, tags, loading };
 }
 
 function useBlogPost(slug: string | null) {
@@ -86,16 +81,8 @@ function useBlogPost(slug: string | null) {
     return { post, related, loading, error };
 }
 
-// ─── Category pill ────────────────────────────────────────────────────────────
-function CategoryPill({
-    label,
-    active,
-    onClick,
-}: {
-    label: string;
-    active: boolean;
-    onClick: () => void;
-}) {
+// ─── Tag pill ─────────────────────────────────────────────────────────────────
+function TagPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
     return (
         <button
             onClick={onClick}
@@ -123,7 +110,6 @@ function FeaturedCard({ post, onClick }: { post: BlogPost; onClick: () => void }
             className="relative cursor-pointer rounded-3xl overflow-hidden group"
             style={{ minHeight: 480 }}
         >
-            {/* Image */}
             <div className="absolute inset-0">
                 <img
                     src={post.coverImage}
@@ -140,14 +126,15 @@ function FeaturedCard({ post, onClick }: { post: BlogPost; onClick: () => void }
                 />
             </div>
 
-            {/* Content */}
             <div className="relative z-10 flex flex-col justify-end h-full p-8 lg:p-10" style={{ minHeight: 480 }}>
-                <span
-                    className="text-[9px] uppercase tracking-[0.3em] font-bold mb-3 inline-block px-3 py-1 rounded-full w-fit"
-                    style={{ backgroundColor: theme.colors.pink, color: "#fff" }}
-                >
-                    {post.category}
-                </span>
+                {post.tags[0] && (
+                    <span
+                        className="text-[9px] uppercase tracking-[0.3em] font-bold mb-3 inline-block px-3 py-1 rounded-full w-fit"
+                        style={{ backgroundColor: theme.colors.pink, color: "#fff" }}
+                    >
+                        {post.tags[0]}
+                    </span>
+                )}
                 <h2
                     className="font-serif text-3xl lg:text-4xl text-white leading-tight mb-3 transition-all duration-300"
                     style={{ textShadow: "0 2px 20px rgba(0,0,0,0.3)" }}
@@ -167,7 +154,7 @@ function FeaturedCard({ post, onClick }: { post: BlogPost; onClick: () => void }
                     <div>
                         <p className="text-[12px] font-semibold text-white">{post.author}</p>
                         <p className="text-[10px] text-white/60">
-                            {formatDate(post.date)} · {post.readTime} min read
+                            {formatDate(post.createdAt)} · {post.readTime} min read
                         </p>
                     </div>
                     <div
@@ -197,7 +184,6 @@ function BlogCard({ post, onClick }: { post: BlogPost; onClick: () => void }) {
             className="cursor-pointer group flex flex-col"
             style={{ borderTop: `1px solid ${theme.colors.muted}25` }}
         >
-            {/* Image */}
             <div className="rounded-2xl overflow-hidden aspect-[4/3] mb-5 mt-6">
                 <img
                     src={post.coverImage}
@@ -207,20 +193,20 @@ function BlogCard({ post, onClick }: { post: BlogPost; onClick: () => void }) {
                 />
             </div>
 
-            {/* Meta */}
             <div className="flex items-center gap-3 mb-3">
-                <span
-                    className="text-[9px] uppercase tracking-[0.25em] font-semibold px-2.5 py-1 rounded-full"
-                    style={{ backgroundColor: `${theme.colors.pink}10`, color: theme.colors.pink }}
-                >
-                    {post.category}
-                </span>
+                {post.tags[0] && (
+                    <span
+                        className="text-[9px] uppercase tracking-[0.25em] font-semibold px-2.5 py-1 rounded-full"
+                        style={{ backgroundColor: `${theme.colors.pink}10`, color: theme.colors.pink }}
+                    >
+                        {post.tags[0]}
+                    </span>
+                )}
                 <span className="text-[11px]" style={{ color: theme.colors.muted }}>
                     {post.readTime} min
                 </span>
             </div>
 
-            {/* Title */}
             <h3
                 className="font-serif text-xl leading-snug mb-2 transition-all duration-200"
                 style={{
@@ -239,7 +225,6 @@ function BlogCard({ post, onClick }: { post: BlogPost; onClick: () => void }) {
                 {post.excerpt}
             </p>
 
-            {/* Author */}
             <div className="flex items-center gap-2.5 mt-auto">
                 <div
                     className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold"
@@ -252,7 +237,7 @@ function BlogCard({ post, onClick }: { post: BlogPost; onClick: () => void }) {
                         {post.author}
                     </p>
                     <p className="text-[10px]" style={{ color: theme.colors.muted }}>
-                        {formatDate(post.date)}
+                        {formatDate(post.createdAt)}
                     </p>
                 </div>
             </div>
@@ -284,29 +269,25 @@ function ListSkeleton() {
 function BlogList({ onSelectPost }: { onSelectPost: (slug: string) => void }) {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const categoryParam = searchParams.get("category");
-    const [activeCategory, setActiveCategory] = useState<string | null>(categoryParam);
-    const { posts, featured, categories, loading } = useBlogList(activeCategory);
+    const tagParam = searchParams.get("tag");
+    const [activeTag, setActiveTag] = useState<string | null>(tagParam);
+    const { posts, tags, loading } = useBlogList(activeTag);
 
-    const handleCategory = (cat: string | null) => {
-        setActiveCategory(cat);
+    const handleTag = (tag: string | null) => {
+        setActiveTag(tag);
         const params = new URLSearchParams(searchParams.toString());
-        if (cat) params.set("category", cat);
-        else params.delete("category");
+        if (tag) params.set("tag", tag);
+        else params.delete("tag");
         router.replace(`/blog?${params.toString()}`, { scroll: false });
     };
 
-    const featuredPost = featured[0];
-    const gridPosts = activeCategory
-        ? posts
-        : posts.filter((p) => !p.featured || p !== featuredPost);
+    // First post acts as the hero when not filtering
+    const heroPost = !activeTag ? posts[0] : null;
+    const gridPosts = !activeTag ? posts.slice(1) : posts;
 
     return (
         <main className="min-h-screen font-sans" style={{ backgroundColor: theme.colors.light }}>
-            {/* Header */}
             <div className="max-w-[1400px] mx-auto px-6 pt-24 pb-10">
-
-
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10">
                     <div>
                         <h1
@@ -320,20 +301,11 @@ function BlogList({ onSelectPost }: { onSelectPost: (slug: string) => void }) {
                         </p>
                     </div>
 
-                    {/* Category filter */}
+                    {/* Tag filter */}
                     <div className="flex flex-wrap gap-2">
-                        <CategoryPill
-                            label="All"
-                            active={activeCategory === null}
-                            onClick={() => handleCategory(null)}
-                        />
-                        {categories.map((cat) => (
-                            <CategoryPill
-                                key={cat}
-                                label={cat}
-                                active={activeCategory === cat}
-                                onClick={() => handleCategory(cat)}
-                            />
+                        <TagPill label="All" active={activeTag === null} onClick={() => handleTag(null)} />
+                        {tags.map((t) => (
+                            <TagPill key={t} label={t} active={activeTag === t} onClick={() => handleTag(t)} />
                         ))}
                     </div>
                 </div>
@@ -344,57 +316,37 @@ function BlogList({ onSelectPost }: { onSelectPost: (slug: string) => void }) {
                     <ListSkeleton />
                 ) : (
                     <>
-                        {/* Featured hero — only on All view */}
-                        {!activeCategory && featuredPost && (
+                        {/* Hero — first post when on All view */}
+                        {heroPost && (
                             <div className="mb-14">
-                                <FeaturedCard
-                                    post={featuredPost}
-                                    onClick={() => onSelectPost(featuredPost.slug)}
-                                />
+                                <FeaturedCard post={heroPost} onClick={() => onSelectPost(heroPost.slug)} />
                             </div>
                         )}
 
-                        {/* Two-column featured row (second featured if exists) */}
-                        {!activeCategory && featured.length > 1 && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                {featured.slice(1).map((p) => (
-                                    <FeaturedCard
-                                        key={p.slug}
-                                        post={p}
-                                        onClick={() => onSelectPost(p.slug)}
-                                    />
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Divider label */}
-                        {!activeCategory && gridPosts.length > 0 && (
+                        {/* Divider */}
+                        {gridPosts.length > 0 && (
                             <div className="flex items-center gap-4 mb-2">
                                 <span
                                     className="text-[10px] uppercase tracking-[0.3em] font-semibold"
                                     style={{ color: theme.colors.muted }}
                                 >
-                                    All Posts
+                                    {activeTag ? `#${activeTag}` : "All Posts"}
                                 </span>
                                 <div className="flex-1 h-px" style={{ backgroundColor: `${theme.colors.muted}25` }} />
                             </div>
                         )}
 
-                        {/* Grid */}
                         {gridPosts.length === 0 && !loading && (
                             <div className="py-32 text-center">
                                 <p className="text-[22px] font-serif" style={{ color: theme.colors.dark }}>
-                                    No posts in this category yet.
+                                    No posts yet.
                                 </p>
                             </div>
                         )}
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
                             {gridPosts.map((post) => (
-                                <BlogCard
-                                    key={post.slug}
-                                    post={post}
-                                    onClick={() => onSelectPost(post.slug)}
-                                />
+                                <BlogCard key={post.slug} post={post} onClick={() => onSelectPost(post.slug)} />
                             ))}
                         </div>
                     </>
@@ -407,11 +359,10 @@ function BlogList({ onSelectPost }: { onSelectPost: (slug: string) => void }) {
 // ─── Blog detail view ─────────────────────────────────────────────────────────
 function BlogDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
     const { post, related, loading, error } = useBlogPost(slug);
-    const [onSelectPost, setOnSelectPost] = useState<string | null>(null);
+    const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
-    // Navigate to another post
-    if (onSelectPost) {
-        return <BlogDetail slug={onSelectPost} onBack={() => setOnSelectPost(null)} />;
+    if (selectedSlug) {
+        return <BlogDetail slug={selectedSlug} onBack={() => setSelectedSlug(null)} />;
     }
 
     if (loading) {
@@ -447,22 +398,15 @@ function BlogDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
 
     return (
         <main className="min-h-screen font-sans" style={{ backgroundColor: theme.colors.light }}>
-
-            {/* Cover image — full-width cinematic */}
+            {/* Cover image */}
             <div className="relative w-full" style={{ height: "55vh", minHeight: 360 }}>
-                <img
-                    src={post.coverImage}
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                />
+                <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
                 <div
                     className="absolute inset-0"
                     style={{
-                        background:
-                            "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%)",
+                        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%)",
                     }}
                 />
-                {/* Back button over image */}
                 <button
                     onClick={onBack}
                     className="absolute top-8 left-6 lg:left-10 flex items-center gap-2 text-white/90 text-[11px] uppercase tracking-[0.25em] font-semibold transition-all duration-200 hover:gap-3"
@@ -473,33 +417,28 @@ function BlogDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
                     Journal
                 </button>
 
-                {/* Category over image */}
-                <div className="absolute bottom-8 left-6 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-[760px] lg:w-full px-0 lg:px-6">
-                    <span
-                        className="text-[9px] uppercase tracking-[0.3em] font-bold px-3 py-1 rounded-full"
-                        style={{ backgroundColor: "rgba(255,255,255,0.18)", color: "#fff" }}
-                    >
-                        {post.category}
-                    </span>
-                </div>
+                {post.tags[0] && (
+                    <div className="absolute bottom-8 left-6 lg:left-1/2 lg:-translate-x-1/2 lg:max-w-[760px] lg:w-full px-0 lg:px-6">
+                        <span
+                            className="text-[9px] uppercase tracking-[0.3em] font-bold px-3 py-1 rounded-full"
+                            style={{ backgroundColor: "rgba(255,255,255,0.18)", color: "#fff" }}
+                        >
+                            {post.tags[0]}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Article content */}
             <div className="max-w-[760px] mx-auto px-6 lg:px-0 pb-24">
-
-                {/* Title block */}
                 <div className="pt-10 pb-8 border-b" style={{ borderColor: `${theme.colors.muted}25` }}>
                     <h1
-                        className="font-serif text-4xl md:text-5xl tracking-tight leading-tight mb-4"
+                        className="font-serif text-4xl md:text-5xl tracking-tight leading-tight mb-6"
                         style={{ color: theme.colors.dark }}
                     >
                         {post.title}
                     </h1>
-                    <p className="text-[16px] leading-relaxed mb-6" style={{ color: theme.colors.muted }}>
-                        {post.subtitle}
-                    </p>
 
-                    {/* Author + meta row */}
                     <div className="flex items-center gap-4">
                         <div
                             className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] font-bold"
@@ -511,65 +450,50 @@ function BlogDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
                             <p className="text-[13px] font-semibold" style={{ color: theme.colors.dark }}>
                                 {post.author}
                             </p>
-                            <p className="text-[11px]" style={{ color: theme.colors.muted }}>
-                                {post.authorRole}
-                            </p>
                         </div>
-                        <div
-                            className="ml-auto text-right"
-                            style={{ color: theme.colors.muted }}
-                        >
-                            <p className="text-[12px]">{formatDate(post.date)}</p>
+                        <div className="ml-auto text-right" style={{ color: theme.colors.muted }}>
+                            <p className="text-[12px]">{formatDate(post.createdAt)}</p>
                             <p className="text-[11px]">{post.readTime} min read</p>
                         </div>
                     </div>
                 </div>
 
-                {/* Body */}
                 <div
                     className="pt-10 prose-blog"
                     style={{ color: theme.colors.dark }}
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mt-12 pt-8 border-t" style={{ borderColor: `${theme.colors.muted}25` }}>
-                    {post.tags.map((tag) => (
-                        <span
-                            key={tag}
-                            className="text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full border"
-                            style={{ borderColor: `${theme.colors.muted}40`, color: theme.colors.muted }}
-                        >
-                            {tag}
-                        </span>
-                    ))}
-                </div>
+                {post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-12 pt-8 border-t" style={{ borderColor: `${theme.colors.muted}25` }}>
+                        {post.tags.map((tag) => (
+                            <span
+                                key={tag}
+                                className="text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full border"
+                                style={{ borderColor: `${theme.colors.muted}40`, color: theme.colors.muted }}
+                            >
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Related posts */}
             {related.length > 0 && (
                 <div className="border-t" style={{ borderColor: `${theme.colors.muted}20` }}>
                     <div className="max-w-[1400px] mx-auto px-6 py-16">
-                        <h2
-                            className="font-serif text-3xl tracking-tight mb-10"
-                            style={{ color: theme.colors.dark }}
-                        >
+                        <h2 className="font-serif text-3xl tracking-tight mb-10" style={{ color: theme.colors.dark }}>
                             Continue Reading
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
                             {related.map((p) => (
-                                <BlogCard
-                                    key={p.slug}
-                                    post={p}
-                                    onClick={() => setOnSelectPost(p.slug)}
-                                />
+                                <BlogCard key={p.slug} post={p} onClick={() => setSelectedSlug(p.slug)} />
                             ))}
                         </div>
                     </div>
                 </div>
             )}
-
-
         </main>
     );
 }
@@ -578,9 +502,7 @@ function BlogDetail({ slug, onBack }: { slug: string; onBack: () => void }) {
 function BlogPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeSlug, setActiveSlug] = useState<string | null>(
-        searchParams.get("post")
-    );
+    const [activeSlug, setActiveSlug] = useState<string | null>(searchParams.get("post"));
 
     const handleSelectPost = useCallback((slug: string) => {
         setActiveSlug(slug);

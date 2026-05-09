@@ -19,6 +19,8 @@ export default function ProductNewPanel() {
         features: values.features ? values.features.split(",").map((f) => f.trim()).filter(Boolean) : [],
         sizes: values.sizes ? values.sizes.split(",").map((s) => s.trim()).filter(Boolean) : [],
         originalPrice: values.originalPrice || undefined,
+        kitOptions: values.kitOptions?.map((o) => o.value).filter(Boolean) ?? [], // ← add this
+
       };
       await apiFetch("/api/admin/products", { method: "POST", body: JSON.stringify(payload) });
       toast.success("Product created!");

@@ -1,7 +1,7 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "@/hooks/useApi";
-import { Order, OrderStatus } from "@/types";
+import { Order } from "@/types";
 import {
   Button, Card, PageHeader, StatusBadge, Table, EmptyState, Pagination,
 } from "@/components/ui";
@@ -30,56 +30,70 @@ export default function OrdersPanel() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
-  // Dedicated gift filter — sent as isGift=true param, NOT mixed into search text
   const [giftsOnly, setGiftsOnly] = useState(false);
+  // Incrementing this forces a re-fetch even when other deps haven't changed
+  // (e.g. user hits Search while already on page 1 with the same query).
+  const [searchTrigger, setSearchTrigger] = useState(0);
 
-  const load = useCallback(
-    async (p: number, s: string, q: string, gifts: boolean) => {
+  // ✅ Single fetch site — reacts to every filter/page change automatically.
+  //    No stale closures: the effect always reads the latest state values.
+  useEffect(() => {
+    let cancelled = false; // guard against out-of-order responses
+
+    const fetchOrders = async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ page: String(p), limit: "10" });
-        if (s) params.set("status", s);
-        if (q) params.set("search", q);
-        // Pass isGift as an explicit boolean param so the API can filter on the field,
-        // not as a text search string
-        if (gifts) params.set("isGift", "true");
+        const params = new URLSearchParams({ page: String(page), limit: "10" });
+        if (status) params.set("status", status);
+        if (search) params.set("search", search);
+        if (giftsOnly) params.set("isGift", "true");
+
         const data = await apiFetch(`/api/admin/orders?${params}`);
-        setOrders(data.orders ?? []);
-        setTotal(data.total ?? 0);
-        setTotalPages(data.totalPages ?? 1);
+
+        if (!cancelled) {
+          setOrders(data.orders ?? []);
+          setTotal(data.total ?? 0);
+          setTotalPages(data.totalPages ?? 1);
+        }
       } catch {
-        toast.error("Failed to load orders");
+        if (!cancelled) toast.error("Failed to load orders");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
-    },
-    [apiFetch]
-  );
+    };
 
-  useEffect(() => { load(1, "", "", false); }, []);
+    fetchOrders();
+    return () => { cancelled = true; };
+  }, [page, status, search, giftsOnly, searchTrigger, apiFetch]);
 
-  const handleGiftsToggle = () => {
-    const next = !giftsOnly;
-    setGiftsOnly(next);
-    setPage(1);
-    load(1, status, search, next);
-  };
+  // ── Handlers only update state; the effect above does the fetching ────────
 
   const handleStatusChange = (s: string) => {
     setStatus(s);
     setPage(1);
-    load(1, s, search, giftsOnly);
   };
 
+  const handleGiftsToggle = () => {
+    setGiftsOnly((prev) => !prev);
+    setPage(1);
+  };
+
+  // setPage(1) alone won't re-trigger the effect if page is already 1,
+  // so we also bump searchTrigger to guarantee a fresh fetch.
   const handleSearch = () => {
     setPage(1);
-    load(1, status, search, giftsOnly);
+    setSearchTrigger((n) => n + 1);
   };
 
   const handlePageChange = (p: number) => {
     setPage(p);
-    load(p, status, search, giftsOnly);
   };
+
+  const handleRefresh = () => {
+    setSearchTrigger((n) => n + 1);
+  };
+
+  // ── Table columns ─────────────────────────────────────────────────────────
 
   const columns = [
     {
@@ -118,7 +132,9 @@ export default function OrdersPanel() {
       key: "items",
       label: "Items",
       render: (o: Order) => (
-        <span>{o.items?.length ?? 0} item{(o.items?.length ?? 0) !== 1 ? "s" : ""}</span>
+        <span>
+          {o.items?.length ?? 0} item{(o.items?.length ?? 0) !== 1 ? "s" : ""}
+        </span>
       ),
     },
     {
@@ -134,7 +150,9 @@ export default function OrdersPanel() {
                 {(o as any).discountCode}
               </span>
               {(o as any).discountLabel && (
-                <span className="text-[10px] text-slate-400">· {(o as any).discountLabel}</span>
+                <span className="text-[10px] text-slate-400">
+                  · {(o as any).discountLabel}
+                </span>
               )}
             </div>
           )}
@@ -150,7 +168,9 @@ export default function OrdersPanel() {
       key: "paymentMethod",
       label: "Payment",
       render: (o: Order) => (
-        <span className="text-xs capitalize text-slate-500">{o.paymentMethod || "—"}</span>
+        <span className="text-xs capitalize text-slate-500">
+          {o.paymentMethod || "—"}
+        </span>
       ),
     },
     {
@@ -161,6 +181,8 @@ export default function OrdersPanel() {
       ),
     },
   ];
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <div className="max-w-[1200px] space-y-5">
@@ -173,7 +195,7 @@ export default function OrdersPanel() {
             variant="ghost"
             size="sm"
             leftIcon={<RefreshCw size={13} />}
-            onClick={() => load(page, status, search, giftsOnly)}
+            onClick={handleRefresh}
           >
             Refresh
           </Button>
@@ -188,8 +210,8 @@ export default function OrdersPanel() {
               key={tab.value}
               onClick={() => handleStatusChange(tab.value)}
               className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${status === tab.value
-                ? `${tab.color} border-current`
-                : "text-slate-400 border-transparent hover:text-slate-600"
+                  ? `${tab.color} border-current`
+                  : "text-slate-400 border-transparent hover:text-slate-600"
                 }`}
             >
               {tab.label}
@@ -200,7 +222,10 @@ export default function OrdersPanel() {
         {/* Search + Gift filter bar */}
         <div className="flex items-center gap-3 p-4 border-b border-[--border]">
           <div className="relative flex-1 max-w-sm">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search
+              size={14}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -209,16 +234,17 @@ export default function OrdersPanel() {
               className="w-full h-9 pl-9 pr-3 text-sm border border-[--border] rounded-xl outline-none focus:border-[--accent] focus:ring-2 focus:ring-[--accent]/20"
             />
           </div>
+
           <Button variant="secondary" size="sm" onClick={handleSearch}>
             Search
           </Button>
 
-          {/* Gift toggle — active state shown with pink highlight */}
+          {/* Gift toggle */}
           <button
             onClick={handleGiftsToggle}
             className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-xl text-sm font-medium border transition-all ${giftsOnly
-              ? "bg-pink-50 border-pink-300 text-pink-600"
-              : "bg-white border-[--border] text-slate-500 hover:text-pink-500 hover:border-pink-200"
+                ? "bg-pink-50 border-pink-300 text-pink-600"
+                : "bg-white border-[--border] text-slate-500 hover:text-pink-500 hover:border-pink-200"
               }`}
           >
             <Gift size={13} />

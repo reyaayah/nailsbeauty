@@ -7,7 +7,7 @@ import theme from "@/theme";
 
 // FilterBar.tsx
 export const filterOptions: Record<string, string[]> = {
-    length: ["Extra-long", "Long", "Medium", "Short"],  // "Med" → "Medium"
+    length: ["XL", "Long", "Medium", "Short", "XS"],  // "Med" → "Medium"
     shape: ["Almond", "Coffin", "Oval", "Square", "Squoval"],
     style: ["Glossy", "Metallic", "Matte", "French Tip", "Glitter", "Cat Eye", "Chrome"],
 

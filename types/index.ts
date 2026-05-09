@@ -1,4 +1,11 @@
 // ─── Product (matches existing store) ────────────────────────────────
+export interface VideoReview {
+  id: string;
+  user: string;
+  videoUrl: string;
+  poster: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -28,6 +35,8 @@ export interface Product {
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
+
+  videoReviews?: VideoReview[];
 }
 
 // ─── Order (matches existing orderService) ───────────────────────────

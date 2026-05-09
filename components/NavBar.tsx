@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import { useProducts } from "@/hooks/useProducts";
 
 const announcements = [
   "FREE SHIPPING ON ORDERS OVER $75",
@@ -16,19 +17,7 @@ const announcements = [
   "BUY 3 GET 1 FREE BUNDLES",
 ];
 
-const allSuggestions = [
-  "nails short almond", "almond", "medium almond", "almond blue",
-  "All", "coffin long", "oval pink", "square french",
-];
-
-const allProducts = [
-  { id: 1, name: "Bloomwave - medium almond", image: "/product1.png" },
-  { id: 2, name: "Dark Blood", image: "/product2.png" },
-  { id: 3, name: "Lush Green", image: "/product3.png" },
-  { id: 4, name: "Spiced Bloom", image: "/product2.png" },
-  { id: 5, name: "Rich Girl", image: "/product1.png" },
-  { id: 6, name: "Candy Blossom", image: "/product3.png" },
-];
+const SUGGESTIONS = ["Almond", "Coffin", "Square", "Short", "Stiletto", "Oval", "French", "Glitter"];
 
 const navItems = [
   { name: "New Arrivals", href: "#new-arrivals" },
@@ -44,48 +33,61 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-  // 1. Add 'useState' for the modal
   const [showSignOutModal, setShowSignOutModal] = useState(false);
 
-  // 2. Add the actual logout handler
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const { totalItems } = useCart();
+  const { user, userProfile, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Fetch all products once; filter client-side
+  const { products, loading } = useProducts();
+
   const handleConfirmLogout = async () => {
     setShowSignOutModal(false);
     setUserMenuOpen(false);
     await logout();
     router.push("/");
   };
-  const { totalItems } = useCart();
-  const { user, userProfile, logout } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
 
   const handleNav = (href: string) => {
     if (href.startsWith("#")) {
-      if (pathname !== "/") {
-        router.push(`/${href}`);
-      } else {
-        document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-      }
+      if (pathname !== "/") router.push(`/${href}`);
+      else document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
     } else {
       router.push(href);
     }
   };
 
-  const filteredSuggestions = searchQuery.trim()
-    ? allSuggestions.filter((s) => s.toLowerCase().includes(searchQuery.toLowerCase()))
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  };
+
+  // ── Derived search state ──────────────────────────────────────────────────
+  const q = searchQuery.trim().toLowerCase();
+
+  const filteredProducts = q
+    ? products.filter(
+      (p) =>
+        p.name?.toLowerCase().includes(q) ||
+        (p as any).style?.toLowerCase().includes(q) ||
+        (p as any).shape?.toLowerCase().includes(q) ||
+        (p as any).length?.toLowerCase().includes(q)
+    )
     : [];
 
-  const filteredProducts = searchQuery.trim()
-    ? allProducts.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    : [];
+  const filteredSuggestions = q
+    ? SUGGESTIONS.filter((s) => s.toLowerCase().includes(q))
+    : SUGGESTIONS;
 
-  const showDropdown =
-    searchOpen &&
-    searchQuery.trim().length > 0 &&
-    (filteredSuggestions.length > 0 || filteredProducts.length > 0);
+  const showDropdown = searchOpen && q.length > 0;
 
+  // ── Timers & listeners ────────────────────────────────────────────────────
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % announcements.length);
@@ -95,54 +97,57 @@ export default function Navbar() {
 
   useEffect(() => {
     if (searchOpen) setTimeout(() => searchInputRef.current?.focus(), 100);
+    else setSearchQuery("");
   }, [searchOpen]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setSearchOpen(false); setSearchQuery(""); setUserMenuOpen(false); }
+      if (e.key === "Escape") {
+        closeSearch();
+        setUserMenuOpen(false);
+      }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
-  // Close user menu on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false);
+      }
+      // Close search if clicking outside the search bar area
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        closeSearch();
       }
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const closeSearch = () => { setSearchOpen(false); setSearchQuery(""); };
-
   const initials = userProfile?.displayName
-    ? userProfile.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    ? userProfile.displayName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "GG";
 
   return (
     <>
       <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-      <Sidebar isOpen={isOpen} onClose={() => setIsOpen(false)} onFilterSelect={(category, value) => {
-        router.push(`/products?${category}=${value}`);
-      }} />
+      <Sidebar
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onFilterSelect={(category, value) => router.push(`/products?${category}=${value}`)}
+      />
 
-      <header className="fixed top-0 left-0 w-full z-40 transition-all duration-300">
-        <nav
-          className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out
-            ${searchOpen ? "bg-white py-3 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)]" : "bg-white/60 backdrop-blur-md py-6"}
-          `}
-        >
-          <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex items-center justify-between">
+      <header className="fixed top-0 left-0 w-full z-40">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-md py-6 shadow-sm transition-all duration-500">
+          <div className="max-w-[1440px] mx-auto px-6 md:px-12 grid grid-cols-3 items-center">
 
             {/* Left */}
-            <div className="flex flex-1 items-center gap-4">
-              <button onClick={() => setIsOpen(true)} className="group flex items-center gap-2 overflow-hidden">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setIsOpen(true)} className="group flex items-center gap-2">
                 <div className="relative w-6 h-6 flex flex-col justify-center gap-1">
-                  <span className="h-[1px] w-6 transition-all duration-300 bg-black group-hover:w-4" />
-                  <span className="h-[1px] w-4 transition-all duration-300 bg-black group-hover:w-6" />
+                  <span className="h-[1px] w-6 bg-black transition-all duration-300 group-hover:w-4" />
+                  <span className="h-[1px] w-4 bg-black transition-all duration-300 group-hover:w-6" />
                 </div>
                 <span className="hidden md:block text-[10px] tracking-[0.3em] uppercase text-black">Menu</span>
               </button>
@@ -151,28 +156,144 @@ export default function Navbar() {
                 <h1 className="text-lg md:text-xl text-[#c28c8d] font-black tracking-tighter uppercase whitespace-nowrap">
                   Nailsa
                 </h1>
-                <span className="text-[7px] tracking-[0.4em] text-gray-400 ml-0.5 uppercase">Beauty at your fingertips </span>
+                <span className="text-[7px] tracking-[0.4em] text-gray-400 ml-0.5 uppercase">
+                  Beauty at your fingertips
+                </span>
               </div>
             </div>
 
-            {/* Center nav */}
-            <div className="hidden lg:flex flex-1 justify-center items-center gap-4">
-              {navItems.map((item) => (
-                <a key={item.name} onClick={() => handleNav(item.href)} href={item.href}
-                  className="group relative text-[11px] font-bold uppercase tracking-[0.15em] text-gray-600 hover:text-black transition-colors">
-                  {item.name}
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-black rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
-                </a>
-              ))}
-            </div>
+            {/* Center — nav links OR search bar */}
+            {!searchOpen ? (
+              <div className="hidden lg:flex justify-center items-center gap-4">
+                {navItems.map((item) => (
+                  <a
+                    key={item.name}
+                    onClick={() => handleNav(item.href)}
+                    href={item.href}
+                    className="group relative text-[11px] font-bold uppercase tracking-[0.15em] text-gray-600 hover:text-black transition-colors"
+                  >
+                    {item.name}
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-black rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div ref={searchRef} className="relative">
+                {/* Input row */}
+                <div className="flex items-center border-b border-black/15 pb-2">
+                  <Search size={14} className="text-gray-400 mr-3 shrink-0" strokeWidth={1.5} />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="SEARCH OUR COLLECTION..."
+                    className="w-full bg-transparent text-sm text-gray-700 font-light tracking-[0.15em] outline-none placeholder:text-gray-400 uppercase"
+                  />
+                  <button
+                    onClick={closeSearch}
+                    className="ml-3 hover:rotate-90 transition-transform duration-300 shrink-0"
+                  >
+                    <X size={16} strokeWidth={1.5} />
+                  </button>
+                </div>
 
-            {/* Right actions */}
-            <div className="flex flex-1 items-center justify-end gap-4 md:gap-8">
-              <button onClick={() => setSearchOpen(true)} className="transition-transform duration-300 hover:scale-110 text-black">
-                <Search size={20} strokeWidth={1.5} />
-              </button>
+                {/* Dropdown — sits below the navbar, full width of the search bar */}
+                {showDropdown && (
+                  <div className="absolute left-0 right-0 top-full mt-3 bg-white rounded-2xl shadow-xl border border-black/5 z-50 overflow-hidden">
+                    <div className="grid grid-cols-2 gap-0 divide-x divide-black/5">
 
-              {/* ── Auth-aware user button ── */}
+                      {/* Suggestions */}
+                      <div className="p-5">
+                        <h4 className="text-[9px] tracking-[0.25em] text-gray-400 mb-4 uppercase">
+                          Suggestions
+                        </h4>
+                        {filteredSuggestions.length > 0 ? (
+                          <ul className="space-y-2.5">
+                            {filteredSuggestions.slice(0, 5).map((s, i) => (
+                              <li
+                                key={i}
+                                onClick={() => setSearchQuery(s)}
+                                className="flex items-center gap-2 text-xs text-gray-700 font-light hover:translate-x-1 transition-transform cursor-pointer"
+                              >
+                                <Search size={10} className="text-gray-300" strokeWidth={1.5} />
+                                {s}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-[10px] text-gray-300 tracking-widest">No suggestions</p>
+                        )}
+                      </div>
+
+                      {/* Top matches */}
+                      <div className="p-5">
+                        <h4 className="text-[9px] tracking-[0.25em] text-gray-400 mb-4 uppercase">
+                          {loading
+                            ? "Searching…"
+                            : `Top Matches${filteredProducts.length > 0 ? ` (${filteredProducts.length})` : ""}`}
+                        </h4>
+
+                        {loading ? (
+                          <div className="space-y-3">
+                            {[1, 2].map((i) => (
+                              <div key={i} className="flex gap-3 animate-pulse">
+                                <div className="w-10 h-12 bg-gray-100 rounded-lg shrink-0" />
+                                <div className="flex flex-col justify-center gap-1.5">
+                                  <div className="h-1.5 w-24 bg-gray-100 rounded" />
+                                  <div className="h-1.5 w-14 bg-gray-100 rounded" />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : filteredProducts.length > 0 ? (
+                          <div className="space-y-3">
+                            {filteredProducts.slice(0, 3).map((p) => (
+                              <div
+                                key={p.id}
+                                onClick={() => { router.push(`/products/${p.id}`); closeSearch(); }}
+                                className="flex gap-3 group cursor-pointer"
+                              >
+                                <div className="w-10 h-12 bg-gray-50 rounded-lg overflow-hidden shrink-0">
+                                  <img
+                                    src={(p as any).image || (p as any).images?.[0]}
+                                    alt={p.name}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                  />
+                                </div>
+                                <div className="flex flex-col justify-center">
+                                  <p className="text-[10px] text-gray-700 tracking-wider uppercase leading-tight mb-0.5">
+                                    {p.name}
+                                  </p>
+                                  <p className="text-[9px] text-gray-400">View Product →</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[10px] text-gray-300 tracking-widest">
+                            No results for "{searchQuery}"
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Right — actions */}
+            <div className="flex items-center justify-end gap-4 md:gap-6">
+              {!searchOpen && (
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="transition-transform duration-300 hover:scale-110 text-black"
+                >
+                  <Search size={20} strokeWidth={1.5} />
+                </button>
+              )}
+
+              {/* Auth-aware user button */}
               <div className="relative" ref={userMenuRef}>
                 {user ? (
                   <button
@@ -180,12 +301,7 @@ export default function Navbar() {
                     className="transition-transform duration-300 hover:scale-105"
                   >
                     {userProfile?.photoURL ? (
-                      <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-offset-1"
-                      // style={{
-                      // ringColor: theme.colors.primary
-
-                      //  }}
-                      >
+                      <div className="w-8 h-8 rounded-full overflow-hidden ring-2 ring-offset-1">
                         <Image src={userProfile.photoURL} alt="avatar" width={32} height={32} className="object-cover" />
                       </div>
                     ) : (
@@ -198,7 +314,10 @@ export default function Navbar() {
                     )}
                   </button>
                 ) : (
-                  <button onClick={() => router.push("/auth/login")} className="transition-transform duration-300 hover:scale-110 text-black">
+                  <button
+                    onClick={() => router.push("/auth/login")}
+                    className="transition-transform duration-300 hover:scale-110 text-black"
+                  >
                     <User size={20} strokeWidth={1.5} />
                   </button>
                 )}
@@ -212,30 +331,20 @@ export default function Navbar() {
                       </p>
                       <p className="text-[10px] opacity-40 truncate">{user.email}</p>
                     </div>
-                    <button
-                      onClick={() => { setUserMenuOpen(false); router.push("/account"); }}
-                      className="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-gray-50 transition-colors text-gray-600"
-                    >
+                    <button onClick={() => { setUserMenuOpen(false); router.push("/account"); }}
+                      className="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-gray-50 transition-colors text-gray-600">
                       My Account
                     </button>
-                    <button
-                      onClick={() => { setUserMenuOpen(false); router.push("/account/orders"); }}
-                      className="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-gray-50 transition-colors text-gray-600"
-                    >
+                    <button onClick={() => { setUserMenuOpen(false); router.push("/account/orders"); }}
+                      className="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-gray-50 transition-colors text-gray-600">
                       Orders
                     </button>
-                    <button
-                      onClick={() => { setUserMenuOpen(false); router.push("/account/wishlist"); }}
-                      className="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-gray-50 transition-colors text-gray-600"
-                    >
+                    <button onClick={() => { setUserMenuOpen(false); router.push("/account/wishlist"); }}
+                      className="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-gray-50 transition-colors text-gray-600">
                       Wishlist
                     </button>
-                    {/* User dropdown - Sign Out Button Section */}
                     <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        setShowSignOutModal(true); // Open modal instead of logging out
-                      }}
+                      onClick={() => { setUserMenuOpen(false); setShowSignOutModal(true); }}
                       className="w-full text-left px-4 py-3 text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-gray-50"
                     >
                       <LogOut size={12} /> Sign Out
@@ -257,67 +366,16 @@ export default function Navbar() {
               </button>
             </div>
           </div>
-
-          {/* Search overlay */}
-          <div className={`absolute inset-x-0 top-0 bg-white transform transition-transform duration-500 ease-out ${searchOpen ? "translate-y-0" : "-translate-y-full"} z-10 shadow-xl`}>
-            <div className="max-w-4xl mx-auto px-6 py-12">
-              <div className="flex items-center border-b border-black/10 pb-4">
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="SEARCH OUR COLLECTION..."
-                  className="w-full bg-transparent text-xl text-gray-500 font-light tracking-[0.2em] outline-none placeholder:text-gray-800 uppercase"
-                />
-                <button onClick={closeSearch} className="ml-4 hover:rotate-90 transition-transform duration-300">
-                  <X size={24} strokeWidth={1} />
-                </button>
-              </div>
-              {showDropdown && (
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div>
-                    <h4 className="text-[10px] tracking-[0.2em] text-gray-800 mb-6 uppercase">Suggestions</h4>
-                    <ul className="space-y-4">
-                      {filteredSuggestions.map((s, i) => (
-                        <li key={i} className="text-sm text-gray-800 font-light hover:translate-x-2 transition-transform cursor-pointer" onClick={() => setSearchQuery(s)}>
-                          {s}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] tracking-[0.2em] text-gray-800 mb-6 uppercase">Top Matches</h4>
-                    <div className="space-y-6">
-                      {filteredProducts.slice(0, 3).map((p) => (
-                        <div key={p.id} className="flex gap-4 group cursor-pointer">
-                          <div className="w-16 h-20 bg-gray-50 overflow-hidden">
-                            <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                          </div>
-                          <div className="flex flex-col justify-center">
-                            <p className="text-xs text-gray-600 tracking-widest uppercase mb-1">{p.name}</p>
-                            <p className="text-[10px] text-gray-900">View Product —</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
         </nav>
       </header>
-      {/* ── SIGN OUT CONFIRMATION MODAL ── */}
+
+      {/* ── Sign out modal ───────────────────────────────────────────────── */}
       {showSignOutModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
             onClick={() => setShowSignOutModal(false)}
           />
-
-          {/* Modal Content */}
           <div className="relative bg-white w-full max-w-sm rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <div className="flex flex-col items-center text-center">
               <div
@@ -326,7 +384,6 @@ export default function Navbar() {
               >
                 <LogOut size={28} style={{ color: theme.colors.pink }} />
               </div>
-
               <h3 className="text-xl font-serif mb-2" style={{ color: theme.colors.dark }}>
                 Sign Out?
               </h3>
@@ -334,7 +391,6 @@ export default function Navbar() {
                 Are you sure you want to sign out of your <br />
                 <strong>Nailsa</strong> account?
               </p>
-
               <div className="flex flex-col w-full gap-3">
                 <button
                   onClick={handleConfirmLogout}
@@ -343,7 +399,6 @@ export default function Navbar() {
                 >
                   Yes, Sign Me Out
                 </button>
-
                 <button
                   onClick={() => setShowSignOutModal(false)}
                   className="w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-widest transition-colors hover:bg-gray-50"
@@ -356,8 +411,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-
-      {searchOpen && <div className="fixed inset-0 z-30" onClick={closeSearch} />}
     </>
   );
 }

@@ -259,7 +259,7 @@ export default function Navbar() {
 
       {/* ── Navbar bar ──────────────────────────────────────────────────────── */}
       <header className="fixed top-0 left-0 w-full z-40">
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/60 backdrop-blur-md shadow-sm transition-all duration-500">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/50 backdrop-blur-md shadow-sm transition-all duration-500">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12">
             {/*
               Flex layout — logo is absolutely centered so it's truly centred

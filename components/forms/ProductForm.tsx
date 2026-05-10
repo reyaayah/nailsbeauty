@@ -207,7 +207,7 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
                 type="number"
                 step="0.01"
                 required
-                inputPrefix="$"
+                inputPrefix="£"
                 placeholder="0.00"
                 {...register("price")}
                 error={errors.price?.message}
@@ -216,7 +216,7 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
                 label="Original Price"
                 type="number"
                 step="0.01"
-                inputPrefix="$"
+                inputPrefix="£"
                 placeholder="0.00"
                 {...register("originalPrice")}
                 hint="Show strikethrough"

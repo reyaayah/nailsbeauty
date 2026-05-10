@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
     Plus, Minus, Heart, Ruler, Loader2, ShoppingBag,
-    Truck, RefreshCw, TrendingUp, ChevronDown, ChevronUp
+    Truck, RefreshCw, TrendingUp, ChevronDown, ChevronUp, Star
 } from "lucide-react";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -11,6 +11,7 @@ import theme from "@/theme";
 import ApplicationGuide from "@/components/ApplicationGuide";
 import VideoReviews from "@/components/VideoReviews";
 import Faqs from "@/components/Faqs";
+import ProductReviews from "@/components/ProductReviews";
 import { useParams, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -47,13 +48,40 @@ function useProduct(id: string) {
 const SHAPE_OPTIONS = ["Almond", "Square", "Coffin", "Oval"];
 const FEATURES_PREVIEW = 3;
 
+// ── Inline star display (read-only, used in product header) ──────────────────
+function StarDisplay({ value, count }: { value: number; count?: number }) {
+    return (
+        <button
+            onClick={() => document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" })}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            aria-label="Jump to reviews"
+        >
+            <div className="flex items-center gap-0.5">
+                {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                        key={s}
+                        size={14}
+                        fill={s <= Math.round(value) ? "#F59E0B" : "none"}
+                        stroke={s <= Math.round(value) ? "#F59E0B" : "#D1D5DB"}
+                        strokeWidth={1.5}
+                    />
+                ))}
+            </div>
+            <span className="text-xs font-semibold opacity-60">
+                {value.toFixed(1)}
+                {count !== undefined && ` (${count})`}
+            </span>
+        </button>
+    );
+}
+
 export default function ProductDetails() {
     const router = useRouter();
     const { addToCart } = useCart();
     const { user } = useAuth();
     const { isInWishlist, addItem: addToWishlist, removeItem: removeFromWishlist } = useWishlist();
     const params = useParams();
-    const productId = params.id as string; // keep as string — Firestore IDs are strings
+    const productId = params.id as string;
 
     const { product, loading, error } = useProduct(productId);
 
@@ -67,14 +95,12 @@ export default function ProductDetails() {
     const [descExpanded, setDescExpanded] = useState(false);
     const [featuresExpanded, setFeaturesExpanded] = useState(false);
 
-    // Set default size once product loads
     useEffect(() => {
         if (product?.sizes?.length) {
             setSelectedSize(product.sizes[2] ?? product.sizes[0]);
         }
     }, [product]);
 
-    // Sync wishlist state once both user and product are ready
     useEffect(() => {
         if (user && product) {
             setWishlisted(isInWishlist(product.id));
@@ -128,7 +154,7 @@ export default function ProductDetails() {
         }
         setAddingToCart(true);
         try {
-            await addToCart(product, selectedSize, selectedShape);
+            await addToCart(product, selectedSize, selectedShape, quantity);
             toast.success(`Added ${quantity} to cart`, { icon: <ShoppingBag size={16} /> });
             setQuantity(1);
         } catch {
@@ -157,10 +183,12 @@ export default function ProductDetails() {
             setWishlistLoading(false);
         }
     };
+
     const thumbnailImages =
         product.images && product.images.length > 0
             ? product.images
             : [product.image];
+
     const allFeatures = product.features ?? [];
     const visibleFeatures = featuresExpanded ? allFeatures : allFeatures.slice(0, FEATURES_PREVIEW);
     const hasMoreFeatures = allFeatures.length > FEATURES_PREVIEW;
@@ -177,7 +205,7 @@ export default function ProductDetails() {
             {/* Breadcrumbs */}
             <nav className="flex items-center gap-2 text-sm mb-8 font-medium opacity-70 mt-20">
                 <span onClick={() => router.push("/")} className="hover:opacity-100 cursor-pointer">Home</span> /
-                <span onClick={() => router.push("/collections/all")} className="hover:opacity-100 cursor-pointer">{product.category}</span> /
+                <span onClick={() => router.push("/collections")} className="hover:opacity-100 cursor-pointer">{product.category}</span> /
                 <span className="font-bold">{product.name}</span>
             </nav>
 
@@ -201,7 +229,6 @@ export default function ProductDetails() {
                                     width={64}
                                     height={80}
                                     className="w-full h-full object-cover"
-
                                 />
                             </button>
                         ))}
@@ -233,20 +260,18 @@ export default function ProductDetails() {
                         <h1 className="text-4xl font-serif tracking-tight mb-2" style={{ color: theme.colors.dark }}>
                             {product.name}
                         </h1>
-                        {product.rating && (
-                            <div className="flex items-center gap-2">
-                                <div className="flex items-center">
-                                    {[...Array(5)].map((_, i) => (
-                                        <span key={i} className="text-yellow-400">★</span>
-                                    ))}
-                                </div>
-                                <span className="text-xs opacity-60">{product.reviews} reviews</span>
-                            </div>
+
+                        {/* ── Rating summary (live from Firestore denormalised field) ── */}
+                        {product.rating != null && product.rating > 0 && (
+                            <StarDisplay
+                                value={product.rating}
+                                count={product.reviews ?? undefined}
+                            />
                         )}
                     </div>
 
                     <div className="text-3xl font-bold flex items-baseline gap-2">
-                        <span style={{ color: theme.colors.primary }}>${product.price.toFixed(2)}</span>
+                        <span style={{ color: theme.colors.primary }}>£{product.price.toFixed(2)}</span>
                         <span className="text-xs font-normal italic opacity-50">inc. VAT</span>
                     </div>
 
@@ -403,7 +428,7 @@ export default function ProductDetails() {
                     {/* Trust Badges */}
                     <div className="grid grid-cols-3 gap-3 pt-4 border-t" style={{ borderColor: `${theme.colors.dark}10` }}>
                         {[
-                            { icon: <Truck size={18} />, label: "Free Shipping", sub: "Orders over $70" },
+                            { icon: <Truck size={18} />, label: "Free Shipping", sub: "Orders over £70" },
                             { icon: <RefreshCw size={18} />, label: "Easy Returns", sub: "30 days guaranteed" },
                             { icon: <TrendingUp size={18} />, label: "Cruelty Free", sub: "100% Vegan" },
                         ].map(({ icon, label, sub }) => (
@@ -419,6 +444,10 @@ export default function ProductDetails() {
 
             <ApplicationGuide />
             <VideoReviews reviews={product.videoReviews ?? []} />
+
+            {/* ── Reviews Section ── */}
+            <ProductReviews productId={productId} />
+
             <Faqs />
         </main>
     );

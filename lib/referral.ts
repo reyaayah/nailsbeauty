@@ -21,18 +21,18 @@ export const POINTS_CONFIG = {
     REFERRER_REWARD: 200,
     /** Points given to the new user who redeemed a referral */
     REFEREE_REWARD: 150,
-    /** Points earned per dollar spent (applied at checkout) */
-    POINTS_PER_DOLLAR: 10,
+    /** Points earned per pound spent (applied at checkout) */
+    POINTS_PER_POUND: 10,
     /** Threshold where a free reward coupon is unlocked */
     REWARD_THRESHOLD: 600,
-    /** Dollar value of the free reward coupon */
+    /** Pound value of the free reward coupon */
     REWARD_VALUE: 5,
 } as const;
 
 export const LEVEL_CONFIG = [
-    { level: 1, label: "Bronze", min: 0,    max: 499  },
-    { level: 2, label: "Silver", min: 500,  max: 999  },
-    { level: 3, label: "Gold",   min: 1000, max: Infinity },
+    { level: 1, label: "Bronze", min: 0, max: 499 },
+    { level: 2, label: "Silver", min: 500, max: 999 },
+    { level: 3, label: "Gold", min: 1000, max: Infinity },
 ] as const;
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -197,7 +197,7 @@ export async function redeemReferralCode(
 
 /**
  * Called from your order completion webhook / checkout handler.
- * Awards POINTS_PER_DOLLAR × orderTotal points.
+ * Awards POINTS_PER_POUND × orderTotal points.
  */
 export async function awardPurchasePoints(
     uid: string,
@@ -205,7 +205,7 @@ export async function awardPurchasePoints(
     orderId: string
 ): Promise<number> {
     const db = getClientDb();
-    const points = Math.floor(orderTotal * POINTS_CONFIG.POINTS_PER_DOLLAR);
+    const points = Math.floor(orderTotal * POINTS_CONFIG.POINTS_PER_POUND);
     if (points <= 0) return 0;
 
     await updateDoc(doc(db, "users", uid), {

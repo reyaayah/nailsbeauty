@@ -104,7 +104,7 @@ export default function HeroWithProducts() {
                                     />
                                 </div>
                                 <p className="mt-3 text-sm font-medium opacity-60">
-                                    ${featured.price.toFixed(2)}
+                                    £{featured.price.toFixed(2)}
                                 </p>
                             </div>
                         )}

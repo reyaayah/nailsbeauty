@@ -25,12 +25,12 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
                     </span>
                 ))}
             </div>
-            <span
-                className="text-[9px] tracking-[0.1em] font-medium opacity-60"
-                style={{ color: theme.colors.dark }}
-            >
-                {count} REVIEWS
-            </span>
+            {/* <span
+            className="text-[9px] tracking-[0.1em] font-medium opacity-60"
+            style={{ color: theme.colors.dark }}
+        >
+            {count} REVIEWS
+        </span> */}
         </div>
     );
 }

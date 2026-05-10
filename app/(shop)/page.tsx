@@ -12,7 +12,7 @@ import ReviewCarousel from "@/components/ReviewSection";
 import ShopByShape from "@/components/ShopByShape";
 
 export const metadata: Metadata = {
-    title: "Luxury Press-On Nails | Nails Beauty",
+    title: "Nailsa | Luxury Press-On Nails for Every Occasion",
     description:
         "Shop luxury reusable press-on nails with salon-quality finishes. Discover trendy nail collections, shapes, and styles for every occasion.",
     keywords: [
@@ -29,11 +29,11 @@ export const metadata: Metadata = {
         canonical: "https://nailsbeauty.vercel.app",
     },
     openGraph: {
-        title: "Luxury Press-On Nails | Nails Beauty",
+        title: "Luxury Press-On Nails | Nailsa Beauty",
         description:
             "Discover premium reusable press-on nails designed for effortless beauty.",
         url: "https://nailsbeauty.vercel.app",
-        siteName: "Nails Beauty",
+        siteName: "Nailsa Beauty",
         images: [
             {
                 url: "/nails1.png",

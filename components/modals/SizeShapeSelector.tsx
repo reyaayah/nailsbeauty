@@ -72,7 +72,7 @@ function SimpleSelector({ product, onClose, onAdded }: Props) {
                             {product.name}
                         </h3>
                         <p className="text-sm font-semibold mt-0.5" style={{ color: theme.colors.primary }}>
-                            ${product.price.toFixed(2)}
+                            £{product.price.toFixed(2)}
                         </p>
                     </div>
                 </div>
@@ -197,7 +197,7 @@ function KitSelector({ product, onClose, onAdded }: Props) {
                             {product.name}
                         </h3>
                         <p className="text-sm font-semibold mt-0.5" style={{ color: theme.colors.primary }}>
-                            ${product.price.toFixed(2)}
+                            £{product.price.toFixed(2)}
                         </p>
                     </div>
                 </div>
@@ -333,7 +333,7 @@ function StandardSelector({ product, onClose, onAdded }: Props) {
                             {product.name}
                         </h3>
                         <p className="text-sm font-semibold mt-0.5" style={{ color: theme.colors.primary }}>
-                            ${product.price.toFixed(2)}
+                            £{product.price.toFixed(2)}
                         </p>
                     </div>
                 </div>

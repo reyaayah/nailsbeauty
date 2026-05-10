@@ -8,7 +8,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Cell,
 } from "recharts";
-import { DollarSign, ShoppingBag, Users, Package, ArrowRight } from "lucide-react";
+import { ShoppingBag, Users, Package, ArrowRight, PoundSterling } from "lucide-react";
 import { useAdminTab } from "@/context/AdminTabContext";
 import theme from "@/theme";
 
@@ -28,7 +28,7 @@ export default function DashboardPanel() {
 
   const STAT_CARDS = analytics
     ? [
-      { label: "Total Revenue", value: formatCurrency(analytics.totalRevenue), change: analytics.revenueGrowth, icon: <DollarSign size={18} />, iconBg: "#D1FAE5", iconColor: "#10B981" },
+      { label: "Total Revenue", value: formatCurrency(analytics.totalRevenue), change: analytics.revenueGrowth, icon: <PoundSterling size={18} />, iconBg: "#D1FAE5", iconColor: "#10B981" },
       { label: "Total Orders", value: analytics.totalOrders.toLocaleString(), change: analytics.ordersGrowth, icon: <ShoppingBag size={18} />, iconBg: "#F0F0F0", iconColor: "#0EA5E9" },
       { label: "Customers", value: analytics.totalCustomers.toLocaleString(), icon: <Users size={18} />, iconBg: "#E0E7FF", iconColor: "#4338CA" },
       { label: "Products Listed", value: analytics.totalProducts.toLocaleString(), icon: <Package size={18} />, iconBg: "#FEF3C7", iconColor: "#B45309" },
@@ -92,7 +92,7 @@ export default function DashboardPanel() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={theme.colors.muted} vertical={false} opacity={0.2} />
               <XAxis dataKey="date" tick={{ fontSize: 10, fill: theme.colors.muted }} tickLine={false} axisLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: theme.colors.muted }} tickFormatter={(v) => `$${v}`} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: theme.colors.muted }} tickFormatter={(v) => `£${v}`} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{ borderRadius: "12px", border: `1px solid ${theme.colors.muted}`, backgroundColor: theme.colors.light }}
                 itemStyle={{ color: theme.colors.primary }}

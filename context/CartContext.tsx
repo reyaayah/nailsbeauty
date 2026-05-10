@@ -29,8 +29,8 @@ export interface CartItem {
 export interface AppliedDiscount {
     code: string;
     type: "percentage" | "fixed";
-    value: number; // percentage (0–100) or fixed $ amount
-    label: string; // e.g. "10% off" or "$5 off"
+    value: number; // percentage (0–100) or fixed £ amount
+    label: string; // e.g. "10% off" or "£5 off"
 }
 
 interface CartContextValue {

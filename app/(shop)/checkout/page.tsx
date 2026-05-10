@@ -329,7 +329,7 @@ export default function CheckoutPage() {
                                                     </p>
                                                 </div>
                                                 <span className="text-sm font-semibold flex-shrink-0" style={{ color: theme.colors.dark }}>
-                                                    ${(product.price * quantity).toFixed(2)}
+                                                    £{(product.price * quantity).toFixed(2)}
                                                 </span>
                                             </div>
                                         ))}
@@ -368,7 +368,7 @@ export default function CheckoutPage() {
                                 )}
 
                                 <PrimaryButton
-                                    label={placing ? "Placing Order…" : `Place Order — $${total.toFixed(2)}`}
+                                    label={placing ? "Placing Order…" : `Place Order — £${total.toFixed(2)}`}
                                     onClick={handlePlaceOrder}
                                     disabled={placing}
                                     icon={placing ? <Loader2 size={14} className="animate-spin" /> : undefined}
@@ -402,7 +402,7 @@ export default function CheckoutPage() {
                                             </p>
                                         </div>
                                         <span className="text-xs font-semibold flex-shrink-0" style={{ color: theme.colors.dark }}>
-                                            ${(product.price * quantity).toFixed(2)}
+                                            £{(product.price * quantity).toFixed(2)}
                                         </span>
                                     </div>
                                 ))}
@@ -411,7 +411,7 @@ export default function CheckoutPage() {
                             <div className="border-t pt-4 space-y-2" style={{ borderColor: `${theme.colors.dark}10` }}>
                                 <div className="flex justify-between text-xs opacity-50" style={{ color: theme.colors.dark }}>
                                     <span>Subtotal</span>
-                                    <span>${subtotal.toFixed(2)}</span>
+                                    <span>£{subtotal.toFixed(2)}</span>
                                 </div>
 
                                 {/* ── Discount row ── */}
@@ -421,13 +421,13 @@ export default function CheckoutPage() {
                                             <Tag size={10} />
                                             {discount.code} · {discount.label}
                                         </span>
-                                        <span>−${discountAmount.toFixed(2)}</span>
+                                        <span>−£{discountAmount.toFixed(2)}</span>
                                     </div>
                                 )}
 
                                 <div className="flex justify-between text-xs opacity-50" style={{ color: theme.colors.dark }}>
                                     <span>Shipping</span>
-                                    <span>{shippingCost === 0 ? "Free" : `$${shippingCost.toFixed(2)}`}</span>
+                                    <span>{shippingCost === 0 ? "Free" : `£${shippingCost.toFixed(2)}`}</span>
                                 </div>
 
                                 {/* ── Gift / note indicators ── */}

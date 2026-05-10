@@ -8,21 +8,21 @@ import { useRef, useState } from "react";
 const deals = [
     {
         image: "/deal1.png",
-        buy: "£99",
-        get: "10",
-        code: "VACAYREADY10",
+        label: "10% off",
+        description: "£20 minimum order",
+        code: "WELCOME10",
     },
     {
         image: "/deal2.png",
-        buy: "£149",
-        get: "20",
-        code: "VACAYREADY20",
+        label: "£5 off",
+        description: "On orders over £30",
+        code: "SAVE5",
     },
     {
         image: "https://media.istockphoto.com/id/1543544136/photo/womans-hand-with-trendy-polka-dot-summer-manicure.jpg?s=612x612&w=0&k=20&c=710sjm-AvbteA8TRkv3zXMYwR_XdOJyBFrQF1K7EtwU=",
-        buy: "£249",
-        get: "25",
-        code: "VACAYREADY25",
+        label: "£9.99 off",
+        description: "Free shipping on orders over £70",
+        code: "FREESHIP",
     },
 ];
 
@@ -34,7 +34,7 @@ function Card({ deal }: { deal: typeof deals[0] }) {
         >
             <img
                 src={deal.image}
-                alt={`Buy ${deal.buy} Get ${deal.get}% off`}
+                alt={deal.label}
                 className="w-full h-full object-cover grayscale-[10%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
             />
 
@@ -48,19 +48,17 @@ function Card({ deal }: { deal: typeof deals[0] }) {
                     >
                         Special Offer
                     </span>
-                    <div className="flex flex-wrap justify-center items-baseline gap-2">
-                        <span className="text-white text-2xl sm:text-3xl lg:text-4xl font-light italic">
-                            Buy {deal.buy}
+                    <div
+                        className="px-3 sm:px-4 py-1 rounded-full"
+                        style={{ backgroundColor: theme.colors.primary }}
+                    >
+                        <span className="text-white text-xl sm:text-2xl lg:text-3xl font-semibold">
+                            {deal.label}
                         </span>
-                        <div
-                            className="px-2 sm:px-3 py-0.5 rounded-full"
-                            style={{ backgroundColor: theme.colors.primary }}
-                        >
-                            <span className="text-white text-lg sm:text-xl lg:text-2xl font-semibold">
-                                -{deal.get}%
-                            </span>
-                        </div>
                     </div>
+                    <p className="text-white/80 text-[10px] sm:text-xs mt-2 tracking-wide">
+                        {deal.description}
+                    </p>
                 </div>
 
                 <div className="h-px w-8 sm:w-12 opacity-50" style={{ backgroundColor: theme.colors.muted }} />

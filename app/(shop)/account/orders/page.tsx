@@ -161,7 +161,7 @@ export default function OrdersPage() {
                                                             </p>
                                                         </div>
                                                         <span className="text-sm font-semibold flex-shrink-0" style={{ color: theme.colors.dark }}>
-                                                            ${(item.price * item.quantity).toFixed(2)}
+                                                            £{(item.price * item.quantity).toFixed(2)}
                                                         </span>
                                                     </div>
                                                 ))}
@@ -207,7 +207,7 @@ export default function OrdersPage() {
                                                         style={{ color: theme.colors.dark }}>
                                                         <span>Shipping</span>
                                                         <span>
-                                                            {order.shipping === 0 ? "Free" : `$${order.shipping.toFixed(2)}`}
+                                                            {order.shipping === 0 ? "Free" : `£${order.shipping.toFixed(2)}`}
                                                         </span>
                                                     </div>
                                                     <div className="flex justify-between text-sm font-bold pt-1 border-t"

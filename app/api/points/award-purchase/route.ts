@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Award points ────────────────────────────────────────────────────────
-    const points = Math.floor(orderTotal * POINTS_CONFIG.POINTS_PER_DOLLAR);
+    const points = Math.floor(orderTotal * POINTS_CONFIG.POINTS_PER_POUND);
     if (points <= 0) {
         return NextResponse.json({ message: "No points to award", points: 0 });
     }

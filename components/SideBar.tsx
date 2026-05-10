@@ -1,7 +1,7 @@
 "use client";
 
 import theme from "@/theme";
-import { X, ChevronRight, Search, User, ShoppingBag } from "lucide-react";
+import { X, ChevronRight, Search, User, ShoppingBag, Contact, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -148,7 +148,7 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                                 <span className="h-1 w-1 rounded-full bg-primary" />
                             </div>
                             <div onClick={() => { router.push("/collections/bundles") }} className="text-[14px] font-semibold tracking-wide cursor-pointer text-[#DBA1A2]">
-                                BUNDLES - Get 10% off when you buy 2 or more sets!
+                                BUNDLES
                             </div>
                             <div onClick={() => { router.push("/aboutus") }} className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>About Nailsa</div>
                             <div className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>Shipping & FAQ</div>
@@ -159,17 +159,17 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                 {/* Bottom Utility Bar */}
                 <div className="p-8 bg-white border-t border-gray-50">
                     <div className="grid grid-cols-3 gap-4 mb-2">
-                        <button className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition" style={{ color: theme.colors.dark }}>
-                            <Search size={18} />
-                            <span className="text-[10px] uppercase">Search</span>
+                        <button onClick={() => router.push("/contact")} className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition" style={{ color: theme.colors.dark }}>
+                            <Contact size={18} />
+                            <span className="text-[10px] uppercase">Contact Us</span>
                         </button>
-                        <button className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition" style={{ color: theme.colors.dark }}>
+                        <button onClick={() => router.push("/account")} className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition" style={{ color: theme.colors.dark }}>
                             <User size={18} />
                             <span className="text-[10px] uppercase">Account</span>
                         </button>
-                        <button className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition" style={{ color: theme.colors.dark }}>
-                            <ShoppingBag size={18} />
-                            <span className="text-[10px] uppercase">Cart</span>
+                        <button onClick={() => router.push("/rewards")} className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition" style={{ color: theme.colors.dark }}>
+                            <Star size={18} />
+                            <span className="text-[10px] uppercase">Rewards</span>
                         </button>
                     </div>
 

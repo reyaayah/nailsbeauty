@@ -19,13 +19,13 @@ const categories = [
     {
         title: "New Arrival",
         image: "/newarrivals.png",
-        href: "/collections/new",
+        href: "/collections/newarrivals",
         label: "THE LATEST",
     },
     {
         title: "Tools & Accessories",
         image: "/tools.png",
-        href: "/collections/tools",
+        href: "/collections/toolsandaccessories",
         label: "ESSENTIALS",
     },
 ];
@@ -186,7 +186,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                                 >
                                     Add{" "}
                                     <span style={{ color: theme.colors.primary }}>
-                                        ${remaining.toFixed(2)}
+                                        £{remaining.toFixed(2)}
                                     </span>{" "}
                                     for free shipping
                                 </p>
@@ -676,7 +676,7 @@ function CartItems({ items, isRemoving, isUpdating, onRemove, onUpdateQuantity }
                                     className="text-xs md:text-sm font-semibold flex-shrink-0"
                                     style={{ color: theme.colors.dark }}
                                 >
-                                    ${(product.price * quantity).toFixed(2)}
+                                    £{(product.price * quantity).toFixed(2)}
                                 </span>
                             </div>
                         </div>
@@ -768,7 +768,7 @@ function CartFooter({
                                 <Tag size={10} />
                                 Discount {discountLabel ? `(${discountLabel})` : ""}
                             </span>
-                            <span>−${discountAmount.toFixed(2)}</span>
+                            <span>−£{discountAmount.toFixed(2)}</span>
                         </div>
                     )}
 
@@ -780,7 +780,7 @@ function CartFooter({
                                     Free
                                 </span>
                             ) : (
-                                `$${shippingCost.toFixed(2)}`
+                                `£${shippingCost.toFixed(2)}`
                             )}
                         </span>
                     </div>
@@ -800,7 +800,7 @@ function CartFooter({
 
             {/* Checkout Button */}
             <Link
-                href={isEmpty ? "/collections/all" : "/checkout"}
+                href={isEmpty ? "/products" : "/checkout"}
                 onClick={onClose}
                 className="flex items-center justify-between w-full px-6 md:px-8 py-4 md:py-5 text-white rounded-xl transition-all hover:shadow-xl"
                 style={{

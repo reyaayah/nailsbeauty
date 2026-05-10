@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
  * In production you'd query these from Firestore / your DB.
  *
  * type: "percentage" → value is % off (0-100)
- * type: "fixed"      → value is $ amount off
+ * type: "fixed"      → value is £ amount off
  * minOrder           → optional minimum subtotal required
  * maxUses            → optional usage cap (tracked in DB in production)
  */
@@ -20,9 +20,9 @@ const DISCOUNT_CODES: Record<
         active: boolean;
     }
 > = {
-    WELCOME10: { type: "percentage", value: 10, label: "10% off", active: true },
-    SAVE5: { type: "fixed", value: 5, label: "$5 off", active: true, minOrder: 30 },
-    FREESHIP: { type: "fixed", value: 9.99, label: "$9.99 off shipping", active: true, minOrder: 0 },
+    WELCOME10: { type: "percentage", value: 10, label: "10% off", active: true, minOrder: 20 },
+    SAVE5: { type: "fixed", value: 5, label: "£5 off", active: true, minOrder: 30 },
+    FREESHIP: { type: "fixed", value: 9.99, label: "£9.99 off shipping", active: true, minOrder: 70 },
     // Add more codes here or fetch from Firestore
 };
 
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 {
                     valid: false,
-                    message: `This code requires a minimum order of $${coupon.minOrder.toFixed(2)}.`,
+                    message: `This code requires a minimum order of £${coupon.minOrder.toFixed(2)}.`,
                 },
                 { status: 200 }
             );

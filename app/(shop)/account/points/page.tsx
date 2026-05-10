@@ -107,7 +107,7 @@ export default function PointsPage() {
                         {[
                             { icon: Sparkles, label: "Create an account", pts: POINTS_CONFIG.SIGNUP_BONUS, color: "#8b5cf6" },
                             { icon: Gift, label: "Refer a friend", pts: POINTS_CONFIG.REFERRER_REWARD, color: "#f59e0b" },
-                            { icon: ShoppingBag, label: "Shop (per $1 spent)", pts: POINTS_CONFIG.POINTS_PER_DOLLAR, color: "#22c55e" },
+                            { icon: ShoppingBag, label: "Shop (per $1 spent)", pts: POINTS_CONFIG.POINTS_PER_POUND, color: "#22c55e" },
                         ].map(({ icon: Icon, label, pts, color }) => (
                             <div key={label} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
                                 <div className="flex items-center gap-3">

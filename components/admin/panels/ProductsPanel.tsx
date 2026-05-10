@@ -183,11 +183,10 @@ export default function ProductsPanel() {
               <button
                 key={c}
                 onClick={() => { const val = c === "All" ? "" : c; setCategory(val); setPage(1); load(1, search, val); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  (c === "All" ? category === "" : category === c)
-                    ? "bg-[--accent] text-white"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-black text-xs font-medium transition-all ${(c === "All" ? category === "" : category === c)
+                  ? "bg-[--accent] text-slate-600"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
               >
                 {c}
               </button>

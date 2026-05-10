@@ -25,8 +25,8 @@ const ReturnPolicy = () => {
                 <section className="text-center space-y-4">
                     <h2 className="text-2xl font-bold italic" style={{ color: theme.colors.primary }}>Our Dedication</h2>
                     <p className="leading-relaxed max-w-xl mx-auto">
-                        At G&G Nails, we're committed to ensuring every customer's experience is as radiant and flawless as our nails.
-                        Need help? 👋🏼 Reach out to us at <span className="font-bold underline">hello@GandGnails.com</span>
+                        At Nailsa Nails, we're committed to ensuring every customer's experience is as radiant and flawless as our nails.
+                        Need help? 👋🏼 Reach out to us at <span className="font-bold underline">Info@nailsaltd.co.uk</span>
                     </p>
                 </section>
 
@@ -78,7 +78,7 @@ const ReturnPolicy = () => {
                     </p>
                     <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
                         <a
-                            href="mailto:hello@GandGnails.com"
+                            href="mailto:Info@nailsaltd.co.uk"
                             className="w-full md:w-auto px-10 py-3 rounded-full font-bold shadow-md transition-all hover:brightness-105"
                             style={{ backgroundColor: theme.colors.dark, color: theme.colors.light }}
                         >
@@ -99,7 +99,7 @@ const ReturnPolicy = () => {
             {/* Footer Tagline */}
             <footer className="py-10 text-center opacity-60">
                 <p className="text-xs tracking-widest uppercase">
-                    G&G Nails — Elevating beauty, one nail at a time. 💅
+                    Nailsa Nails — Elevating beauty, one nail at a time. 💅
                 </p>
             </footer>
         </div>

@@ -166,14 +166,14 @@ export default function ProductCard({ product }: { product: Product }) {
                 </h3>
                 <div className="flex items-center justify-center gap-2">
                     <span className="text-sm font-medium" style={{ color: theme.colors.dark }}>
-                        ${product.price.toFixed(2)}
+                        £{product.price.toFixed(2)}
                     </span>
                     {product.originalPrice && (
                         <span
                             className="text-xs line-through opacity-30"
                             style={{ color: theme.colors.dark }}
                         >
-                            ${product.originalPrice.toFixed(2)}
+                            £{product.originalPrice.toFixed(2)}
                         </span>
                     )}
                 </div>

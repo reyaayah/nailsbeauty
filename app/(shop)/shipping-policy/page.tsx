@@ -11,7 +11,7 @@ const ShippingPolicy = () => {
             <header className="py-16 px-6 text-center" style={{ backgroundColor: theme.colors.subtitle }}>
                 <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Shipping Policy</h1>
                 <p className="text-lg max-w-2xl mx-auto opacity-90">
-                    Everything you need to know about how we deliver your handcrafted G&G magic to your doorstep.
+                    Everything you need to know about how we deliver your handcrafted Nailsa magic to your doorstep.
                 </p>
             </header>
 
@@ -25,7 +25,7 @@ const ShippingPolicy = () => {
                         <h2 className="text-2xl font-bold uppercase tracking-wide">Worldwide Shipping</h2>
                     </div>
                     <p className="leading-relaxed">
-                        At G&G, we're passionate about delivering our handcrafted masterpieces to nail enthusiasts all around the world.
+                        At Nailsa, we're passionate about delivering our handcrafted masterpieces to nail enthusiasts all around the world.
                         Shipping specifics, including charges and estimated delivery times, will be clearly laid out for you during checkout.
                         We're thrilled to offer <span className="font-bold" style={{ color: theme.colors.primary }}>complimentary shipping on all orders exceeding $79 USD.</span>
                     </p>
@@ -38,7 +38,7 @@ const ShippingPolicy = () => {
                             <span style={{ color: theme.colors.primary }}><Star /></span> Crafting Your Magic
                         </h3>
                         <p className="text-sm leading-relaxed">
-                            Every G&G nail set is uniquely tailored just for you. Our made-to-order approach guarantees personalized craftsmanship and champions sustainability by reducing waste.
+                            Every Nailsa nail set is uniquely tailored just for you. Our made-to-order approach guarantees personalized craftsmanship and champions sustainability by reducing waste.
                             <strong> Kindly allow 2-5 business days</strong> for our artists to craft your perfect set.
                         </p>
                     </section>
@@ -65,7 +65,7 @@ const ShippingPolicy = () => {
                     </p>
                     <div className="text-xs grid grid-cols-2 md:grid-cols-3 gap-2 opacity-80">
                         <span>• Solid Nail Glue</span>
-                        <span>• G&G Magic Glue</span>
+                        <span>• Nailsa Magic Glue</span>
                         <span>• Cuticle Oil Pen</span>
                         <span>• Handheld UV Lamp</span>
                         <span>• Removal Pen</span>
@@ -78,7 +78,7 @@ const ShippingPolicy = () => {
                     <div>
                         <h4 className="font-bold mb-2"><Pin /> Address & Cancels</h4>
                         <p className="text-xs">
-                            Contact <span className="underline">hello@GandGnails.com</span> within <strong>12 hours</strong>. After this, orders cannot be intercepted.
+                            Contact <span className="underline">Info@nailsaltd.co.uk</span> within <strong>12 hours</strong>. After this, orders cannot be intercepted.
                         </p>
                     </div>
                     <div>
@@ -101,7 +101,7 @@ const ShippingPolicy = () => {
             <footer className="py-12 text-center border-t" style={{ borderColor: theme.colors.muted }}>
                 <p className="mb-4">Need further assistance?</p>
                 <a
-                    href="mailto:hello@GandGnails.com"
+                    href="mailto:Info@nailsaltd.co.uk"
                     className="inline-block px-8 py-3 rounded-full transition-transform hover:scale-105 font-bold"
                     style={{ backgroundColor: theme.colors.primary, color: 'white' }}
                 >

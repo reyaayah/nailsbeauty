@@ -225,8 +225,14 @@ export function ProductForm({ initial, onSubmit, submitting }: ProductFormProps)
             </div>
             <Input
               label="Discount Label"
-              placeholder="e.g. BEST SELLER, 20% OFF"
-              {...register("discount")}
+              placeholder="e.g. 20% OFF"
+              maxLength={12}
+              {...register("discount", {
+                maxLength: {
+                  value: 12,
+                  message: "Discount label cannot exceed 12 characters",
+                },
+              })}
               hint="Shown as badge on product card"
             />
           </Card>

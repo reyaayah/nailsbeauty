@@ -8,19 +8,19 @@ import { useRef, useState } from "react";
 const deals = [
     {
         image: "/deal1.png",
-        buy: "$99",
+        buy: "£99",
         get: "10",
         code: "VACAYREADY10",
     },
     {
         image: "/deal2.png",
-        buy: "$149",
+        buy: "£149",
         get: "20",
         code: "VACAYREADY20",
     },
     {
         image: "https://media.istockphoto.com/id/1543544136/photo/womans-hand-with-trendy-polka-dot-summer-manicure.jpg?s=612x612&w=0&k=20&c=710sjm-AvbteA8TRkv3zXMYwR_XdOJyBFrQF1K7EtwU=",
-        buy: "$249",
+        buy: "£249",
         get: "25",
         code: "VACAYREADY25",
     },

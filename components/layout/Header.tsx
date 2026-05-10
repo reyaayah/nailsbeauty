@@ -37,17 +37,16 @@ export function Header() {
 
       <div className="flex items-center gap-2">
         {/* Bell Button */}
-        <button
+        {/* <button
           className="relative w-8 h-8 flex items-center justify-center rounded-xl hover:opacity-80 transition-opacity"
           style={{ color: theme.colors.dark }}
         >
           <Bell size={17} />
-          {/* Notification Dot using 'pink' */}
           <span
             style={{ backgroundColor: theme.colors.pink }}
             className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full"
           />
-        </button>
+        </button> */}
 
         <div
           style={{ borderColor: theme.colors.muted }}

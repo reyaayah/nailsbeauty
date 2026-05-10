@@ -1,10 +1,53 @@
 "use client";
 import Link from 'next/link';
-import { ArrowRight, CreditCard } from 'lucide-react';
+import { ArrowRight, CreditCard, Loader2 } from 'lucide-react';
 import theme from '@/theme';
 import Image from 'next/image';
+import { useState } from 'react';
+type NewsletterState = 'idle' | 'loading' | 'success' | 'error';
 
 const Footer = () => {
+    const [email, setEmail] = useState('');
+    const [newsletterState, setNewsletterState] = useState<NewsletterState>('idle');
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const validateEmail = (email: string) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    const handleNewsletterSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateEmail(email)) {
+            setErrorMessage('Please enter a valid email address.');
+            setNewsletterState('error');
+            return;
+        }
+
+        setNewsletterState('loading');
+        setErrorMessage('');
+
+        try {
+            const res = await fetch('/api/newsletter', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            if (res.status === 409) {
+                setErrorMessage('This email is already subscribed.');
+                setNewsletterState('error');
+                return;
+            }
+
+            if (!res.ok) throw new Error('Subscription failed');
+
+            setNewsletterState('success');
+            setEmail('');
+        } catch {
+            setNewsletterState('error');
+            setErrorMessage('Something went wrong. Please try again shortly.');
+        }
+    };
     // 1. Updated data structure with navigation paths
     const footerSections = [
         {
@@ -34,7 +77,6 @@ const Footer = () => {
                 { name: "SALES", href: "/collections/flashsale" },
                 { name: "SHOP BY COLLECTIONS", href: "/collections" },
                 { name: "SHOP BY SHAPE", href: "/products?shape=Almond" },
-                // { name: "SHOP BY LENGTH", href: "/products" },
                 { name: "TOOLS & ACCESSORIES", href: "/collections/toolsandaccessories" }
             ]
         }
@@ -86,17 +128,63 @@ const Footer = () => {
                     <p className="text-sm mb-6 leading-relaxed">
                         Join the Nailsa family. Subscribe for exclusive offers, beauty tips, and trend updates.
                     </p>
-                    <form className="relative group" onSubmit={(e) => e.preventDefault()}>
+                    <form
+                        className="relative group"
+                        onSubmit={handleNewsletterSubmit}
+                        noValidate
+                    >
                         <input
                             type="email"
                             placeholder="Your email"
-                            className="w-full bg-transparent border-b py-2 pr-10 focus:outline-none transition-colors"
+                            value={email}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                if (newsletterState === 'error') {
+                                    setNewsletterState('idle');
+                                    setErrorMessage('');
+                                }
+                            }}
+                            disabled={newsletterState === 'loading'}
+                            className="w-full bg-transparent border-b py-2 pr-10 focus:outline-none transition-colors disabled:opacity-50"
                             style={{ borderColor: theme.colors.muted }}
+                            aria-label="Email address for newsletter"
+                            aria-describedby={
+                                newsletterState === 'error' ? 'newsletter-error' : undefined
+                            }
                         />
-                        <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform">
-                            <ArrowRight size={18} style={{ color: theme.colors.primary }} />
+
+                        <button
+                            type="submit"
+                            disabled={newsletterState === 'loading'}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Subscribe to newsletter"
+                        >
+                            {newsletterState === 'loading' ? (
+                                <Loader2
+                                    size={18}
+                                    className="animate-spin"
+                                    style={{ color: theme.colors.primary }}
+                                />
+                            ) : (
+                                <ArrowRight
+                                    size={18}
+                                    style={{ color: theme.colors.primary }}
+                                />
+                            )}
                         </button>
                     </form>
+
+                    {/* Error message */}
+                    {newsletterState === 'error' && errorMessage && (
+                        <p
+                            id="newsletter-error"
+                            role="alert"
+                            className="mt-3 text-xs leading-relaxed"
+                            style={{ color: '#e07070' }}
+                        >
+                            {errorMessage}
+                        </p>
+                    )}
                 </div>
             </div>
             {/* Contact Info */}
@@ -146,11 +234,26 @@ const Footer = () => {
                         <Link href="/terms" className="hover:underline">Terms of Service</Link>
                     </div>
                 </div>
-
-                <div className="flex space-x-3 opacity-80">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="w-10 h-6 rounded bg-white/10 flex items-center justify-center">
-                            <CreditCard size={14} />
+                <div className="flex flex-wrap items-center gap-3 opacity-90">
+                    {[
+                        "/payments/paypal.png",
+                        "/payments/mastercard.png",
+                        "/payments/gpay.png",
+                        "/payments/discover.png",
+                        "/payments/banccontact.png",
+                        "/payments/apple-pay.png",
+                        "/payments/amex.png",
+                        "/payments/visa.png",
+                    ].map((logo, index) => (
+                        <div
+                            key={index}
+                            className="bg-white rounded-md px-3 py-2 flex items-center justify-center shadow-sm"
+                        >
+                            <img
+                                src={logo}
+                                alt="payment"
+                                className="h-5 object-contain"
+                            />
                         </div>
                     ))}
                 </div>

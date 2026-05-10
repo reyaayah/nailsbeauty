@@ -452,9 +452,11 @@ export default function ProductReviews({ productId }: { productId: string }) {
 
                         {/* ── Review grid ── */}
                         <div className="col-span-1 lg:col-span-2 flex flex-col gap-4">
-                            {reviews.map((review) => (
-                                <ReviewCard key={review.id} review={review} />
-                            ))}
+                            {reviews
+                                .filter((r) => r.rating > 4)
+                                .map((review) => (
+                                    <ReviewCard key={review.id} review={review} />
+                                ))}
                         </div>
                     </div>
                 )}

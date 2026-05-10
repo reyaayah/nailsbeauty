@@ -15,6 +15,7 @@ export interface Product {
     originalPrice?: number;
     discount?: string;
     reviews?: number;
+    reviewCount?: number;
     rating?: number;
     category: string;
     description?: string;

@@ -265,7 +265,7 @@ export default function ProductDetails() {
                         {product.rating != null && product.rating > 0 && (
                             <StarDisplay
                                 value={product.rating}
-                                count={product.reviews ?? undefined}
+                                count={product.reviewCount ?? undefined}
                             />
                         )}
                     </div>

@@ -171,7 +171,7 @@ export default function CheckoutPage() {
                             View Orders
                         </button>
                         <button
-                            onClick={() => router.push("/collections/all")}
+                            onClick={() => router.push("/collections")}
                             className="px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase"
                             style={{ backgroundColor: theme.colors.dark, color: theme.colors.light }}
                         >

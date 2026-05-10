@@ -363,7 +363,7 @@ function DiscountSection({ discount, onApply, onRemove }: DiscountSectionProps) 
                         }}
                         onKeyDown={(e) => e.key === "Enter" && handleApply()}
                         placeholder="Enter code"
-                        className="flex-1 h-9 text-gray-00 px-3 text-xs font-mono rounded-xl border outline-none transition-all focus:ring-2"
+                        className="flex-1 h-9 text-gray-600 px-3 text-xs font-mono rounded-xl border outline-none transition-all focus:ring-2"
                         style={{
                             borderColor: feedback
                                 ? feedback.ok

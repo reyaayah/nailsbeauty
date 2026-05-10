@@ -1,6 +1,12 @@
 "use client";
 import Link from 'next/link';
 import { ArrowRight, CreditCard, Loader2 } from 'lucide-react';
+import {
+    FaInstagram,
+    FaFacebookF,
+    FaXTwitter,
+    FaYoutube,
+} from "react-icons/fa6";
 import theme from '@/theme';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -219,6 +225,66 @@ const Footer = () => {
                     >
                         +44 7787 233999
                     </a>
+                    {/* Social Media */}
+                    <div className="mt-8">
+
+
+                        {/* Social Media */}
+                        <div className="mt-8">
+                            <h4
+                                className="text-sm font-bold tracking-widest mb-4"
+                                style={{ color: theme.colors.subtitle }}
+                            >
+                                FOLLOW US
+                            </h4>
+
+                            <div className="flex items-center gap-4">
+                                <a
+                                    href="https://instagram.com"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full border flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-white hover:text-black"
+                                    style={{ borderColor: "rgba(247, 243, 237, 0.2)" }}
+                                    aria-label="Instagram"
+                                >
+                                    <FaInstagram size={18} />
+                                </a>
+
+                                <a
+                                    href="https://facebook.com"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full border flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-white hover:text-black"
+                                    style={{ borderColor: "rgba(247, 243, 237, 0.2)" }}
+                                    aria-label="Facebook"
+                                >
+                                    <FaFacebookF size={16} />
+                                </a>
+
+                                <a
+                                    href="https://x.com"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full border flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-white hover:text-black"
+                                    style={{ borderColor: "rgba(247, 243, 237, 0.2)" }}
+                                    aria-label="Twitter"
+                                >
+                                    <FaXTwitter size={16} />
+                                </a>
+
+                                <a
+                                    href="https://youtube.com"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 rounded-full border flex items-center justify-center hover:scale-110 transition-all duration-300 hover:bg-white hover:text-black"
+                                    style={{ borderColor: "rgba(247, 243, 237, 0.2)" }}
+                                    aria-label="YouTube"
+                                >
+                                    <FaYoutube size={18} />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

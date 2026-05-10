@@ -26,13 +26,13 @@ export const metadata: Metadata = {
         "glam nails",
     ],
     alternates: {
-        canonical: "https://nailsbeauty.vercel.app",
+        canonical: "www.nailsaltd.co.uk",
     },
     openGraph: {
         title: "Luxury Press-On Nails | Nailsa Beauty",
         description:
             "Discover premium reusable press-on nails designed for effortless beauty.",
-        url: "https://nailsbeauty.vercel.app",
+        url: "https://www.nailsaltd.co.uk",
         siteName: "Nailsa Beauty",
         images: [
             {

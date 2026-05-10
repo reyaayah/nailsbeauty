@@ -447,7 +447,7 @@ export default function CheckoutPage() {
                                 <div className="flex justify-between font-serif italic text-base pt-2 border-t"
                                     style={{ color: theme.colors.dark, borderColor: `${theme.colors.dark}10` }}>
                                     <span>Total</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    <span>£{total.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

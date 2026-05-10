@@ -118,7 +118,7 @@ export default function OrdersPage() {
                                                 {status.label}
                                             </span>
                                             <span className="text-sm font-serif italic" style={{ color: theme.colors.dark }}>
-                                                ${order.total.toFixed(2)}
+                                                £{order.total.toFixed(2)}
                                             </span>
                                             {isOpen
                                                 ? <ChevronUp size={14} style={{ color: theme.colors.muted }} />
@@ -201,7 +201,7 @@ export default function OrdersPage() {
                                                     <div className="flex justify-between text-xs opacity-50"
                                                         style={{ color: theme.colors.dark }}>
                                                         <span>Subtotal</span>
-                                                        <span>${order.subtotal.toFixed(2)}</span>
+                                                        <span>£{order.subtotal.toFixed(2)}</span>
                                                     </div>
                                                     <div className="flex justify-between text-xs opacity-50"
                                                         style={{ color: theme.colors.dark }}>
@@ -213,7 +213,7 @@ export default function OrdersPage() {
                                                     <div className="flex justify-between text-sm font-bold pt-1 border-t"
                                                         style={{ color: theme.colors.dark, borderColor: `${theme.colors.dark}10` }}>
                                                         <span>Total</span>
-                                                        <span>${order.total.toFixed(2)}</span>
+                                                        <span>£{order.total.toFixed(2)}</span>
                                                     </div>
                                                 </div>
                                             </div>

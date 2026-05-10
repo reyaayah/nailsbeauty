@@ -3,7 +3,7 @@ import React from 'react';
 const PrivacyPolicy = () => {
     const brandName = "Nailsa";
     const domain = "Nailsa.com";
-    const contactEmail = "support@Nailsa.com";
+    const contactEmail = "Info@nailsaltd.co.uk";
 
     return (
         <div className="bg-white text-gray-800 min-h-screen pt-20">

@@ -9,6 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SizeShapeSelector from "../modals/SizeShapeSelector";
 import { useWishlist } from "@/context/WIshlistContext";
+import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
@@ -25,20 +26,16 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
                     </span>
                 ))}
             </div>
-            {/* <span
-            className="text-[9px] tracking-[0.1em] font-medium opacity-60"
-            style={{ color: theme.colors.dark }}
-        >
-            {count} REVIEWS
-        </span> */}
         </div>
     );
 }
 
 export default function ProductCard({ product }: { product: Product }) {
     const { addItem, removeItem, isInWishlist } = useWishlist();
+    const { user } = useAuth();
 
-    const wished = isInWishlist(product.id); const [hovered, setHovered] = useState(false);
+    const wished = isInWishlist(product.id);
+    const [hovered, setHovered] = useState(false);
     const [added, setAdded] = useState(false);
     const [selectorOpen, setSelectorOpen] = useState(false);
 
@@ -51,6 +48,30 @@ export default function ProductCard({ product }: { product: Product }) {
     const handleAdded = () => {
         setAdded(true);
         setTimeout(() => setAdded(false), 1200);
+    };
+
+    const handleWishlistToggle = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!user) {
+            toast.error("Please sign in to add products to your wishlist", {
+                icon: "🔒",
+            });
+            return;
+        }
+
+        try {
+            if (wished) {
+                await removeItem(product.id);
+                toast.success("Removed from wishlist 💔");
+            } else {
+                await addItem(product.id);
+                toast.success("Added to wishlist ❤️");
+            }
+        } catch {
+            toast.error("Something went wrong. Please try again.");
+        }
     };
 
     return (
@@ -74,22 +95,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
                     {/* Wishlist Button */}
                     <button
-                        onClick={async (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-
-                            try {
-                                if (wished) {
-                                    await removeItem(product.id);
-                                    toast.success("Removed from wishlist 💔");
-                                } else {
-                                    await addItem(product.id);
-                                    toast.success("Added to wishlist ❤️");
-                                }
-                            } catch (error) {
-                                toast.error("Something went wrong 😢");
-                            }
-                        }}
+                        onClick={handleWishlistToggle}
                         className="absolute top-4 right-4 z-20 transition-all hover:scale-110 active:scale-90 bg-white/50 backdrop-blur-sm p-2 rounded-full"
                         aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
                     >

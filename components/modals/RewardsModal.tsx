@@ -162,7 +162,7 @@ export default function RewardsModal() {
                     <em style={{ color: "#C9956C", fontStyle: "italic" }}>Rewards</em>
                 </h2>
                 <p style={{ fontSize: 12, color: "rgba(232,213,196,0.6)", lineHeight: 1.6, marginBottom: 16 }}>
-                    Getting new nails now comes with rewards! Join G&amp;G inner circle to enjoy VIP access, special discounts, and more. 💓
+                    Getting new nails now comes with rewards! Join Nailsa inner circle to enjoy VIP access, special discounts, and more. 💓
                 </p>
 
                 <a

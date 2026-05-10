@@ -22,7 +22,7 @@ const features = [
     {
         icon: <Truck size={22} strokeWidth={1.2} />,
         title: "Fast Delivery",
-        description: "Complimentary shipping on all orders over $79.",
+        description: "Complimentary shipping on all orders over £70.",
     },
 ];
 

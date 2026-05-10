@@ -1,6 +1,5 @@
 import theme from '@/theme';
 import { Box, GlobeIcon, HeartXIcon, Pin, Rocket, Star, Truck } from 'lucide-react';
-import React from 'react';
 
 
 
@@ -27,7 +26,7 @@ const ShippingPolicy = () => {
                     <p className="leading-relaxed">
                         At Nailsa, we're passionate about delivering our handcrafted masterpieces to nail enthusiasts all around the world.
                         Shipping specifics, including charges and estimated delivery times, will be clearly laid out for you during checkout.
-                        We're thrilled to offer <span className="font-bold" style={{ color: theme.colors.primary }}>complimentary shipping on all orders exceeding $79 USD.</span>
+                        We're thrilled to offer <span className="font-bold" style={{ color: theme.colors.primary }}>complimentary shipping on all orders exceeding £70.</span>
                     </p>
                 </section>
 

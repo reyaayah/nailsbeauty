@@ -96,14 +96,14 @@ export default function OrderDetailPanel({ id }: { id: string }) {
                   <div className="flex flex-col items-center">
                     <div className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all z-10",
-                      done ? "border-[--accent] bg-[--accent]" : "border-slate-200 bg-white"
+                      done ? "border-b-emerald-900 bg-[--accent]" : "border-slate-400 bg-gray-100"
                     )}>
                       {done
-                        ? <CheckCircle2 size={16} className="text-white" />
-                        : <span className="text-xs font-bold text-slate-300">{i + 1}</span>
+                        ? <CheckCircle2 size={16} className="text-green-500" />
+                        : <span className="text-xs font-bold text-slate-600">{i + 1}</span>
                       }
                     </div>
-                    <p className={cn("text-xs mt-1.5 font-medium capitalize", active ? "text-[--accent]" : done ? "text-slate-700" : "text-slate-300")}>
+                    <p className={cn("text-xs mt-1.5 font-medium capitalize", active ? "text-amber-200" : done ? "text-slate-700" : "text-slate-500")}>
                       {step}
                     </p>
                   </div>

@@ -151,7 +151,7 @@ export default function Sidebar({ isOpen, onClose, onFilterSelect }: SidebarProp
                                 BUNDLES
                             </div>
                             <div onClick={() => { router.push("/aboutus") }} className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>About Nailsa</div>
-                            <div className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>Shipping & FAQ</div>
+                            <div onClick={() => { router.push("/shipping-policy") }} className="text-[14px] font-semibold cursor-pointer" style={{ color: theme.colors.dark }}>Shipping & FAQ</div>
                         </div>
                     </div>
                 </div>

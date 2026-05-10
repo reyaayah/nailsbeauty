@@ -268,7 +268,7 @@ export default function Navbar() {
             */}
             <div className="relative flex items-center py-4 md:py-6">
 
-              {/* ── Left: hamburger ─────────────────────────────────────── */}
+              {/* ── Left: hamburger + logo ──────────────────────────────── */}
               <div className="flex items-center gap-3 z-10 shrink-0">
                 <button onClick={() => setIsOpen(true)} className="group flex items-center gap-2" aria-label="Menu">
                   <div className="relative w-6 h-6 flex flex-col justify-center gap-1">
@@ -277,21 +277,21 @@ export default function Navbar() {
                   </div>
                   <span className="hidden md:block text-[10px] tracking-[0.3em] uppercase text-black">Menu</span>
                 </button>
+
+                <div
+                  onClick={() => router.push("/")}
+                  className="flex flex-col leading-none cursor-pointer"
+                >
+                  <h1 className="text-base sm:text-lg md:text-xl text-[#c28c8d] font-black tracking-tighter uppercase whitespace-nowrap">
+                    Nailsa
+                  </h1>
+                  <span className="hidden sm:block text-[7px] tracking-[0.4em] text-gray-400 ml-0.5 uppercase">
+                    Beauty at your fingertips
+                  </span>
+                </div>
               </div>
 
-              {/* ── Center: logo (absolute) + desktop nav / search bar ──── */}
-              {/* Logo — absolutely centered on all screen sizes */}
-              <div
-                onClick={() => router.push("/")}
-                className="absolute left-1/2 -translate-x-1/2 flex flex-col leading-none cursor-pointer z-10"
-              >
-                <h1 className="text-base sm:text-lg md:text-xl text-[#c28c8d] font-black tracking-tighter uppercase whitespace-nowrap">
-                  Nailsa
-                </h1>
-                <span className="hidden sm:block text-[7px] tracking-[0.4em] text-gray-400 ml-0.5 uppercase">
-                  Beauty at your fingertips
-                </span>
-              </div>
+
 
               {/* Desktop nav links — only lg+, centred via own absolute container */}
               <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center z-10 pt-0">
